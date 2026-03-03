@@ -88,3 +88,50 @@ local.properties
 .vscode/
 *.sublime-workspace
 *.sublime-project
+node_modules
+
+# Next.js
+/.next/
+/out/
+/build
+.next
+out
+
+# Production
+/dist
+
+# Environment variables
+.env
+.env*.local
+.env.production
+
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Package manager lock files (keep bun.lockb)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Testing
+/coverage
+*.lcov
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local development
+.DS_Store
+*.pem
