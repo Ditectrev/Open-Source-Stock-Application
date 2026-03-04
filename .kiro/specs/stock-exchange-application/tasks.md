@@ -150,8 +150,8 @@ The implementation follows an incremental approach, building core infrastructure
   - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 5. Market data infrastructure
-  - [ ] 5.1 Implement caching layer
+- [x] 5. Market data infrastructure
+  - [x] 5.1 Implement caching layer
     - Create cache service using Vercel KV or Redis
     - Implement cache key generation (symbol + data type)
     - Implement TTL-based expiration
@@ -162,7 +162,7 @@ The implementation follows an incremental approach, building core infrastructure
     - **Property 3: Market Data Caching**
     - **Validates: Requirements 3.4, 17.2**
 
-  - [ ] 5.3 Implement rate limiting
+  - [x] 5.3 Implement rate limiting
     - Create rate limiter for external API calls
     - Track API usage per endpoint
     - Log warnings when approaching limits
@@ -173,7 +173,7 @@ The implementation follows an incremental approach, building core infrastructure
     - **Property 5: Rate Limit Enforcement**
     - **Validates: Requirements 17.1, 17.4**
 
-  - [ ] 5.5 Implement exponential backoff for retries
+  - [x] 5.5 Implement exponential backoff for retries
     - Create retry utility with exponential backoff (1s, 2s, 4s, 8s)
     - Implement max retry limit (3 attempts)
     - Add jitter to prevent thundering herd
@@ -183,7 +183,7 @@ The implementation follows an incremental approach, building core infrastructure
     - **Property 6: Exponential Backoff**
     - **Validates: Requirements 17.5**
 
-  - [ ] 5.7 Create MarketDataService
+  - [x] 5.7 Create MarketDataService
     - Implement getSymbolData() with caching and rate limiting
     - Implement getHistoricalPrices() with time range support
     - Implement getTechnicalIndicators()
@@ -204,7 +204,7 @@ The implementation follows an incremental approach, building core infrastructure
     - **Property 4: API Error Handling**
     - **Validates: Requirements 3.5, 14.2, 14.5**
 
-  - [ ] 5.10 Implement CNN dataviz API integration
+  - [x] 5.10 Implement CNN dataviz API integration
     - Create CNN API client
     - Implement endpoints for Fear & Greed Index
     - Implement endpoints for world markets
@@ -212,7 +212,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Handle API response parsing and error cases
     - _Requirements: 3.2, 9.1, 10.4, 24.3_
 
-  - [ ] 5.11 Implement Yahoo Finance API integration
+  - [x] 5.11 Implement Yahoo Finance API integration
     - Create Yahoo Finance API client
     - Implement endpoints for symbol quotes
     - Implement endpoints for historical data
@@ -220,7 +220,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Handle API response parsing and error cases
     - _Requirements: 3.3_
 
-  - [ ] 5.12 Create market data API routes
+  - [x] 5.12 Create market data API routes
     - Implement GET /api/market/symbol/[symbol]
     - Implement GET /api/market/historical/[symbol]
     - Implement GET /api/market/indicators/[symbol]

@@ -1,13 +1,14 @@
 {
   "name": "stock-exchange-app",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "bun --bun next dev",
     "build": "bun --bun next build",
     "start": "bun --bun next start",
     "lint": "bun --bun next lint",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test:market-data": "bun run scripts/test-market-data.ts"
   },
   "dependencies": {
     "next": "^15.1.6",
