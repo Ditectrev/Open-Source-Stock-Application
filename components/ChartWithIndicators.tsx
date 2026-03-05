@@ -1,0 +1,69 @@
+"use client";
+
+/**
+ * ChartWithIndicators Component
+ * Combines ChartComponent with TechnicalIndicatorOverlay
+ * Provides a complete charting solution with toggleable indicators
+ * 
+ * Requirements: 4.2, 5.1, 5.2, 11.2, 11.3, 11.4, 11.5
+ */
+
+import { useState, useCallback } from "react";
+import { ChartComponent } from "./ChartComponent";
+import { TechnicalIndicatorOverlay } from "./TechnicalIndicatorOverlay";
+import { PriceData, TimeRange, ChartType, ChartIndicator } from "@/types";
+
+export interface ChartWithIndicatorsProps {
+  data: PriceData[];
+  type?: ChartType;
+  initialTimeRange?: TimeRange;
+  onTimeRangeChange?: (range: TimeRange) => void;
+  responsive?: boolean;
+  height?: number;
+}
+
+/**
+ * Complete chart component with integrated technical indicators
+ */
+export function ChartWithIndicators({
+  data,
+  type = "line",
+  initialTimeRange = "1M",
+  onTimeRangeChange,
+  responsive = true,
+  height = 400,
+}: ChartWithIndicatorsProps) {
+  const [indicators, setIndicators] = useState<ChartIndicator[]>([]);
+  const [hoveredPoint, setHoveredPoint] = useState<PriceData | null>(null);
+
+  // Handle indicator changes from overlay
+  const handleIndicatorsChange = useCallback((newIndicators: ChartIndicator[]) => {
+    setIndicators(newIndicators);
+  }, []);
+
+  // Handle data point hover
+  const handleDataPointHover = useCallback((point: PriceData | null) => {
+    setHoveredPoint(point);
+  }, []);
+
+  return (
+    <div className="chart-with-indicators space-y-4">
+      {/* Technical Indicator Controls */}
+      <TechnicalIndicatorOverlay
+        onIndicatorsChange={handleIndicatorsChange}
+      />
+
+      {/* Chart */}
+      <ChartComponent
+        data={data}
+        type={type}
+        initialTimeRange={initialTimeRange}
+        indicators={indicators}
+        onTimeRangeChange={onTimeRangeChange}
+        onDataPointHover={handleDataPointHover}
+        responsive={responsive}
+        height={height}
+      />
+    </div>
+  );
+}

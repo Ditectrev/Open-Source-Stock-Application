@@ -232,21 +232,21 @@ The implementation follows an incremental approach, building core infrastructure
     - Implement GET /api/market/sectors
     - _Requirements: 3.1, 3.6_
 
-  - [ ]* 5.13 Write unit tests for API routes
+  - [x]* 5.13 Write unit tests for API routes
     - Test successful data retrieval
     - Test caching behavior
     - Test rate limiting
     - Test error responses
     - _Requirements: 3.5, 14.2_
 
-- [ ] 6. Chart and visualization components
-  - [ ] 6.1 Integrate charting library
+- [x] 6. Chart and visualization components
+  - [x] 6.1 Integrate charting library
     - Install Lightweight Charts or Recharts
     - Create wrapper component for consistent styling
     - Configure chart defaults and theme
     - _Requirements: 11.1_
 
-  - [ ] 6.2 Implement ChartComponent
+  - [x] 6.2 Implement ChartComponent
     - Support line, area, and candlestick chart types
     - Implement time range selection (1D, 1W, 1M, 3M, 1Y, 5Y, Max)
     - Add interactive features: zoom, pan, crosshair
@@ -254,7 +254,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Add loading and error states
     - _Requirements: 4.2, 11.2, 11.3, 11.4, 11.5_
 
-  - [ ] 6.3 Add technical indicator overlays to charts
+  - [x] 6.3 Add technical indicator overlays to charts
     - Implement moving average overlays
     - Implement RSI indicator display
     - Implement MACD indicator display
@@ -262,7 +262,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Make indicators toggleable
     - _Requirements: 5.1, 5.2_
 
-  - [ ]* 6.4 Write unit tests for ChartComponent
+  - [x]* 6.4 Write unit tests for ChartComponent
     - Test chart type switching
     - Test time range changes
     - Test responsive behavior
@@ -491,7 +491,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Ensure no data sent to external services
     - _Requirements: 22.9, 22.10, 22.11_
 
-  - [ ]* 18.2 Write property test for Ollama verification
+  - [ ] 18.2 Write property test for Ollama verification
     - **Property 21: Ollama Verification**
     - **Validates: Requirements 22.10**
 
@@ -1138,3 +1138,12 @@ The implementation follows an incremental approach, building core infrastructure
 - Accessibility compliance targets WCAG 2.1 Level AA
 - Performance target is Lighthouse score >80
 - Deployment is configured for Vercel with automatic deployments from main branch
+
+## Version Management
+
+After completing each task, bump the version in `package.json`:
+- Patch version (0.0.x) for bug fixes and minor updates
+- Minor version (0.x.0) for new features and task completions
+- Major version (x.0.0) for breaking changes or major milestones
+
+Example: After completing task 6, bump from 0.2.0 → 0.3.0

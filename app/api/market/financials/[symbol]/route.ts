@@ -9,10 +9,10 @@ import { logger } from "@/lib/logger";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { symbol: string } }
+  { params }: { params: Promise<{ symbol: string }> }
 ) {
   try {
-    const symbol = params.symbol;
+    const { symbol } = await params;
 
     if (!symbol) {
       return NextResponse.json(
@@ -29,8 +29,9 @@ export async function GET(
       timestamp: new Date(),
     });
   } catch (error) {
+    const { symbol } = await params;
     logger.error("Failed to fetch financials", error as Error, {
-      symbol: params.symbol,
+      symbol,
     });
 
     return NextResponse.json(

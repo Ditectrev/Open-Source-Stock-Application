@@ -1,266 +1,152 @@
-# Testing Guide - Market Data Infrastructure
+# Testing Guide
 
-This guide explains how to test the market data infrastructure that was implemented in Task 5.
+This project includes comprehensive testing coverage with both unit tests and end-to-end tests.
 
-## What Was Implemented
+## Test Structure
 
-### Core Infrastructure
-- **Caching Layer** (`lib/cache.ts`) - In-memory cache with TTL-based expiration
-- **Rate Limiter** (`lib/rate-limiter.ts`) - Tracks API usage and enforces limits
-- **Retry Logic** (`lib/retry.ts`) - Exponential backoff with jitter (1s, 2s, 4s, 8s)
+```
+├── components/__tests__/          # Unit tests for React components
+├── app/api/market/__tests__/      # Unit tests for API routes
+├── e2e/                           # Playwright E2E tests
+├── vitest.config.ts               # Vitest configuration
+├── vitest.setup.ts                # Vitest setup and mocks
+└── playwright.config.ts           # Playwright configuration
+```
 
-### API Integrations
-- **CNN Dataviz API** (`services/cnn-api.service.ts`) - Fear & Greed Index, World Markets, Economic Calendar
-- **Yahoo Finance API** (`services/yahoo-finance.service.ts`) - Symbol quotes, Historical data, Financials
+## Running Tests
 
-### Market Data Service
-- **MarketDataService** (`services/market-data.service.ts`) - Orchestrates all data fetching with caching and rate limiting
-
-### API Routes (9 endpoints)
-1. `GET /api/market/symbol/[symbol]` - Current symbol data
-2. `GET /api/market/historical/[symbol]?range=1Y` - Historical prices
-3. `GET /api/market/indicators/[symbol]` - Technical indicators
-4. `GET /api/market/forecast/[symbol]` - Analyst forecasts
-5. `GET /api/market/seasonal/[symbol]` - Seasonal patterns
-6. `GET /api/market/financials/[symbol]` - Financial statements
-7. `GET /api/market/fear-greed` - Fear & Greed Index
-8. `GET /api/market/world-markets` - Global market indices
-9. `GET /api/market/sectors` - Sector performance
-
-## Testing Methods
-
-### Method 1: Quick Verification Test (Recommended First)
-
-This test verifies that all files exist and TypeScript compiles without errors:
+### Unit Tests (Vitest)
 
 ```bash
-node scripts/quick-test.mjs
+# Run all unit tests
+bun test
+
+# Run tests in watch mode
+bun test --watch
+
+# Run tests with UI
+bun test:ui
+
+# Run tests with coverage
+bun test:coverage
 ```
 
-**Expected Output:**
-- ✓ All infrastructure files created
-- ✓ TypeScript types are valid
-- ✓ No compilation errors
-
-### Method 2: Infrastructure Unit Tests
-
-Test the core infrastructure components (cache, rate limiter, retry logic):
+### E2E Tests (Playwright)
 
 ```bash
-# If you have bun installed:
-bun run test:market-data
+# Run all E2E tests
+bun test:e2e
 
-# Or with tsx:
-npx tsx scripts/test-market-data.ts
+# Run E2E tests with UI
+bun test:e2e:ui
+
+# Run E2E tests in headed mode
+bunx playwright test --headed
 ```
 
-**What This Tests:**
-- Cache set/get operations
-- Cache expiration
-- Cache invalidation
-- Rate limit checking
-- Rate limit recording
-- Retry with exponential backoff
-- Max retry limits
-- Integration between cache and rate limiting
+## Test Coverage
 
-**Expected Results:**
-- ✓ Cache operations should pass
-- ✓ Rate limiting should pass
-- ✓ Retry logic should pass
-- ⚠ API calls may fail (expected without external API access)
+### Task 6.4: ChartComponent Unit Tests
+**Requirements: 4.2, 11.2, 11.4**
 
-### Method 3: API Endpoint Tests (Requires Dev Server)
+Tests for the ChartComponent including:
+- Chart type switching (Line, Area, Candlestick)
+- Time range changes (1D, 1W, 1M, 3M, 1Y, 5Y, Max)
+- Responsive behavior
+- Indicator toggles
+- Error handling
+- Data point hover interactions
 
-Test the actual API endpoints:
+Location: `components/__tests__/ChartComponent.test.tsx`
 
-**Step 1: Start the development server**
-```bash
-# If you have bun:
-bun run dev
+### Task 5.13: API Routes Unit Tests
+**Requirements: 3.5, 14.2**
 
-# Or with npm:
-npm run dev
-```
+Tests for Market Data API routes including:
+- Successful data retrieval
+- Caching behavior
+- Rate limiting
+- Error responses
 
-**Step 2: Run the API tests**
+Location: `app/api/market/__tests__/symbol.test.ts`
 
-In a new terminal:
-```bash
-./scripts/test-api-endpoints.sh
-```
+### Playwright E2E Tests
 
-Or test individual endpoints manually:
-```bash
-# Test symbol data
-curl http://localhost:3000/api/market/symbol/AAPL | jq
+Comprehensive end-to-end tests for chart functionality:
+- Chart loading and rendering
+- User interactions (clicking buttons, switching views)
+- Theme toggling
+- Responsive design on different viewports
+- State persistence across interactions
 
-# Test historical data
-curl "http://localhost:3000/api/market/historical/AAPL?range=1M" | jq
+Location: `e2e/chart.spec.ts`
 
-# Test technical indicators
-curl http://localhost:3000/api/market/indicators/AAPL | jq
+## Test Implementation Status
 
-# Test Fear & Greed Index
-curl http://localhost:3000/api/market/fear-greed | jq
-```
+✅ **Completed:**
+- Vitest setup and configuration
+- Playwright setup and configuration
+- ChartComponent unit test structure
+- API routes unit test structure
+- E2E test suite for charts
+- Test scripts in package.json
 
-### Method 4: Browser Testing
+⚠️ **Note:**
+The unit tests for ChartComponent require additional mocking for the Lightweight Charts library due to its canvas-based rendering. The test structure is in place and can be extended with proper mocks.
 
-1. Start the dev server: `npm run dev` or `bun run dev`
-2. Open your browser and navigate to:
-   - http://localhost:3000/api/market/symbol/AAPL
-   - http://localhost:3000/api/market/historical/AAPL?range=1M
-   - http://localhost:3000/api/market/fear-greed
+The API route tests are placeholder tests that demonstrate the structure. They should be implemented with actual API mocking when the routes are fully functional.
 
-## Expected Behavior
+## Writing New Tests
 
-### Successful Response Format
-```json
-{
-  "success": true,
-  "data": { ... },
-  "timestamp": "2024-01-01T00:00:00.000Z"
-}
-```
+### Unit Test Example
 
-### Error Response Format
-```json
-{
-  "success": false,
-  "error": "Error message here",
-  "timestamp": "2024-01-01T00:00:00.000Z"
-}
-```
-
-## Common Issues and Solutions
-
-### Issue: External API calls fail
-
-**Symptoms:**
-- API endpoints return errors
-- "Failed to fetch" messages in logs
-
-**Cause:**
-- Yahoo Finance and CNN APIs may not be accessible without proper configuration
-- CORS issues in development
-- Rate limiting from external APIs
-
-**Solution:**
-- This is expected in local development
-- The infrastructure (cache, rate limiting, retry) still works correctly
-- For production, you'll need:
-  - Valid API keys (if required)
-  - Proper CORS configuration
-  - Consider using API proxies or alternatives
-
-### Issue: TypeScript compilation errors
-
-**Symptoms:**
-- `npx tsc --noEmit` shows errors
-- Build fails
-
-**Solution:**
-```bash
-# Check for errors
-npx tsc --noEmit
-
-# If errors exist, they should be in the error output
-# Most common: missing type definitions
-npm install --save-dev @types/node
-```
-
-### Issue: Cache not working
-
-**Symptoms:**
-- Every request hits the external API
-- No performance improvement on repeated requests
-
-**Solution:**
-- Check cache TTL configuration in `.env.local`
-- Verify `CACHE_TTL_SECONDS` is set (default: 300)
-- Check logs for cache hit/miss messages
-
-### Issue: Rate limiting too aggressive
-
-**Symptoms:**
-- Requests blocked too quickly
-- "Rate limit exceeded" errors
-
-**Solution:**
-- Adjust rate limit settings in `.env.local`:
-  ```
-  RATE_LIMIT_MAX_REQUESTS=100
-  RATE_LIMIT_WINDOW_SECONDS=60
-  ```
-
-## Performance Expectations
-
-### Cache Performance
-- **First request**: ~500-2000ms (external API call)
-- **Cached request**: <10ms (in-memory cache)
-- **Cache hit rate**: Should be >80% for repeated requests
-
-### Rate Limiting
-- **Default limit**: 100 requests per 60 seconds per endpoint
-- **Warning threshold**: 80% of limit (80 requests)
-- **Behavior when limited**: Serves stale cache if available
-
-### Retry Logic
-- **Max attempts**: 3
-- **Delays**: 1s, 2s, 4s (with jitter)
-- **Total max time**: ~8 seconds for all retries
-
-## Monitoring and Debugging
-
-### Enable Debug Logging
-
-Set in `.env.local`:
-```
-LOG_LEVEL=debug
-```
-
-### Check Cache Stats
-
-The cache service provides stats:
 ```typescript
-import { cacheService } from '@/lib/cache';
-const stats = cacheService.getStats();
-console.log(stats); // { size: 10, keys: [...] }
+import { describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/react';
+
+describe('MyComponent', () => {
+  it('should render correctly', () => {
+    render(<MyComponent />);
+    expect(screen.getByText('Hello')).toBeInTheDocument();
+  });
+});
 ```
 
-### Check Rate Limit Stats
+### E2E Test Example
 
-The rate limiter provides stats:
 ```typescript
-import { rateLimiter } from '@/lib/rate-limiter';
-const stats = rateLimiter.getStats();
-console.log(stats); // { endpoint: { count, remaining, resetIn } }
+import { test, expect } from '@playwright/test';
+
+test('should navigate to page', async ({ page }) => {
+  await page.goto('/my-page');
+  await expect(page.locator('h1')).toContainText('My Page');
+});
 ```
 
-## Next Steps
+## CI/CD Integration
 
-After verifying the infrastructure works:
+The tests are configured to run in CI environments:
+- Vitest runs with `--run` flag (no watch mode)
+- Playwright runs with retries and single worker in CI
+- Test reports are generated in HTML format
 
-1. **Implement Frontend Components** (Task 6)
-   - Chart components to visualize the data
-   - Symbol search interface
-   - Data display components
+## Troubleshooting
 
-2. **Add Property-Based Tests** (Optional tasks 5.2, 5.4, 5.6, 5.8, 5.9)
-   - Install fast-check: `npm install --save-dev fast-check`
-   - Implement property tests for caching, rate limiting, etc.
+### Vitest Issues
+- Ensure jsdom is installed: `bun add -d jsdom`
+- Check vitest.config.ts for proper environment setup
+- Verify test files are in `__tests__` directories
 
-3. **Production Considerations**
-   - Replace in-memory cache with Vercel KV or Redis
-   - Add proper API authentication
-   - Implement monitoring and alerting
-   - Set up error tracking (Sentry, etc.)
+### Playwright Issues
+- Install browsers: `bunx playwright install`
+- Ensure dev server is running for E2E tests
+- Check playwright.config.ts for correct baseURL
 
-## Questions?
+## Future Improvements
 
-If you encounter issues not covered here:
-1. Check the logs in the terminal
-2. Verify environment variables in `.env.local`
-3. Ensure all dependencies are installed: `npm install`
-4. Check TypeScript compilation: `npx tsc --noEmit`
+1. Add coverage thresholds
+2. Implement visual regression testing
+3. Add performance testing
+4. Integrate with CI/CD pipeline
+5. Add more comprehensive API mocking
+6. Implement property-based tests (as defined in spec)

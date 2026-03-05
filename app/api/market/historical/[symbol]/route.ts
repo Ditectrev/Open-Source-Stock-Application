@@ -10,10 +10,10 @@ import { TimeRange } from "@/types";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { symbol: string } }
+  { params }: { params: Promise<{ symbol: string }> }
 ) {
   try {
-    const symbol = params.symbol;
+    const { symbol } = await params;
     const searchParams = request.nextUrl.searchParams;
     const range = (searchParams.get("range") || "1Y") as TimeRange;
 
@@ -32,8 +32,9 @@ export async function GET(
       timestamp: new Date(),
     });
   } catch (error) {
+    const { symbol } = await params;
     logger.error("Failed to fetch historical data", error as Error, {
-      symbol: params.symbol,
+      symbol,
     });
 
     return NextResponse.json(
