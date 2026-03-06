@@ -14,3 +14,5 @@ export type { TechnicalIndicatorOverlayProps } from "./TechnicalIndicatorOverlay
 
 export { ChartWithIndicators } from "./ChartWithIndicators";
 export type { ChartWithIndicatorsProps } from "./ChartWithIndicators";
+
+export { SearchBar } from "./SearchBar";

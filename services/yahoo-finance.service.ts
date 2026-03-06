@@ -107,6 +107,53 @@ export class YahooFinanceService {
   }
 
   /**
+   * Search for symbols by query string
+   */
+  async searchSymbols(query: string): Promise<Array<{ symbol: string; name: string; type: string; exchange: string }>> {
+    return retryWithBackoff(
+      async () => {
+        try {
+          const response = await fetch(
+            `${this.baseUrl}/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=10&newsCount=0`,
+            {
+              headers: {
+                "Accept": "application/json",
+                "User-Agent": "Mozilla/5.0",
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(`Yahoo Finance API error: ${response.status} ${response.statusText}`);
+          }
+
+          const data = await response.json();
+          
+          if (!data.quotes) {
+            return [];
+          }
+
+          return data.quotes
+            .filter((quote: any) => quote.symbol && quote.shortname)
+            .map((quote: any) => ({
+              symbol: quote.symbol,
+              name: quote.shortname || quote.longname || quote.symbol,
+              type: quote.quoteType || "EQUITY",
+              exchange: quote.exchange || "",
+            }));
+        } catch (error) {
+          logger.error("Failed to search symbols", error as Error, {
+            query,
+            baseUrl: this.baseUrl,
+          });
+          throw error;
+        }
+      },
+      `YahooFinance:Search:${query}`
+    );
+  }
+
+  /**
    * Fetch financial statements
    */
   async getFinancials(symbol: string): Promise<FinancialData> {

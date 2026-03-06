@@ -30,6 +30,45 @@ export class MarketDataService {
   }
 
   /**
+   * Search for symbols with caching and rate limiting
+   */
+  async searchSymbols(query: string): Promise<Array<{ symbol: string; name: string; type: string; exchange: string }>> {
+    if (!query || query.trim().length === 0) {
+      return [];
+    }
+
+    const normalizedQuery = query.trim().toUpperCase();
+    const cacheKey = `search:${normalizedQuery}`;
+
+    // Check cache first
+    const cached = cacheService.get<Array<{ symbol: string; name: string; type: string; exchange: string }>>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    // Check rate limit
+    const endpoint = `yahoo:search:${normalizedQuery}`;
+    const allowed = await rateLimiter.checkLimit(endpoint);
+    
+    if (!allowed) {
+      logger.warn("Rate limit exceeded for search, serving stale cache if available", { query });
+      const stale = cacheService.get<Array<{ symbol: string; name: string; type: string; exchange: string }>>(cacheKey);
+      if (stale) return stale;
+      
+      throw new Error("Rate limit exceeded and no cached data available");
+    }
+
+    // Fetch from API
+    const data = await yahooFinanceService.searchSymbols(normalizedQuery);
+    rateLimiter.recordCall(endpoint);
+
+    // Cache the result (shorter TTL for search results)
+    cacheService.set(cacheKey, data, 300); // 5 minutes
+
+    return data;
+  }
+
+  /**
    * Get symbol data with caching and rate limiting
    */
   async getSymbolData(symbol: string): Promise<SymbolData> {

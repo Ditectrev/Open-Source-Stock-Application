@@ -269,21 +269,21 @@ The implementation follows an incremental approach, building core infrastructure
     - Test indicator toggles
     - _Requirements: 4.2, 11.2, 11.4_
 
-- [ ] 7. Symbol search and navigation
-  - [ ] 7.1 Implement symbol search functionality
+- [x] 7. Symbol search and navigation
+  - [x] 7.1 Implement symbol search functionality
     - Create search API endpoint with symbol lookup
     - Implement autocomplete suggestions
     - Add debouncing to reduce API calls
     - _Requirements: 2.1, 2.2_
 
-  - [ ] 7.2 Create SearchBar component
+  - [x] 7.2 Create SearchBar component
     - Implement search input with autocomplete dropdown
     - Handle symbol selection and navigation
     - Add keyboard navigation support
     - Style for mobile and desktop
     - _Requirements: 2.1, 2.2, 2.3_
 
-  - [ ]* 7.3 Write unit tests for SearchBar
+  - [x] 7.3 Write unit tests for SearchBar
     - Test autocomplete behavior
     - Test symbol selection
     - Test keyboard navigation
