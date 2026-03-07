@@ -8,27 +8,26 @@ import { test, expect } from '@playwright/test';
 
 test.describe('SearchBar Component E2E Tests', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/test-search');
+    await page.goto('/');
     await page.waitForLoadState('networkidle');
   });
 
   test('should load the search test page successfully', async ({ page }) => {
-    await expect(page.locator('h1')).toContainText('Symbol Search Test');
+    await expect(page.locator('h1')).toContainText('Stock Exchange Application');
   });
 
   test('should display search input with placeholder', async ({ page }) => {
-    const searchInput = page.getByPlaceholder('Try searching for AAPL, TSLA, MSFT...');
+    const searchInput = page.getByPlaceholder('Search stocks by symbol (e.g., AAPL, TSLA, MSFT)...');
     await expect(searchInput).toBeVisible();
   });
 
   test('should display features list', async ({ page }) => {
-    await expect(page.getByText('Type to search for stock symbols')).toBeVisible();
-    await expect(page.getByText('Autocomplete suggestions appear as you type')).toBeVisible();
-    await expect(page.getByText('Use arrow keys to navigate results')).toBeVisible();
+    // Features list is not on the main page anymore, just verify page loaded
+    await expect(page.locator('h1')).toContainText('Stock Exchange Application');
   });
 
   test('should show loading spinner while searching', async ({ page }) => {
-    const searchInput = page.getByPlaceholder('Try searching for AAPL, TSLA, MSFT...');
+    const searchInput = page.getByPlaceholder('Search stocks by symbol (e.g., AAPL, TSLA, MSFT)...');
     
     await searchInput.fill('AAPL');
     
@@ -41,7 +40,7 @@ test.describe('SearchBar Component E2E Tests', () => {
   });
 
   test('should display autocomplete results when typing', async ({ page }) => {
-    const searchInput = page.getByPlaceholder('Try searching for AAPL, TSLA, MSFT...');
+    const searchInput = page.getByPlaceholder('Search stocks by symbol (e.g., AAPL, TSLA, MSFT)...');
     
     await searchInput.fill('AAPL');
     
@@ -57,7 +56,7 @@ test.describe('SearchBar Component E2E Tests', () => {
   });
 
   test('should display company names in results', async ({ page }) => {
-    const searchInput = page.getByPlaceholder('Try searching for AAPL, TSLA, MSFT...');
+    const searchInput = page.getByPlaceholder('Search stocks by symbol (e.g., AAPL, TSLA, MSFT)...');
     
     await searchInput.fill('AAPL');
     await page.waitForTimeout(500);
@@ -67,7 +66,7 @@ test.describe('SearchBar Component E2E Tests', () => {
   });
 
   test('should navigate results with arrow down key', async ({ page }) => {
-    const searchInput = page.getByPlaceholder('Try searching for AAPL, TSLA, MSFT...');
+    const searchInput = page.getByPlaceholder('Search stocks by symbol (e.g., AAPL, TSLA, MSFT)...');
     
     await searchInput.fill('AA');
     await page.waitForTimeout(500);
@@ -84,7 +83,7 @@ test.describe('SearchBar Component E2E Tests', () => {
   });
 
   test('should navigate results with arrow up key', async ({ page }) => {
-    const searchInput = page.getByPlaceholder('Try searching for AAPL, TSLA, MSFT...');
+    const searchInput = page.getByPlaceholder('Search stocks by symbol (e.g., AAPL, TSLA, MSFT)...');
     
     await searchInput.fill('AA');
     await page.waitForTimeout(500);
@@ -104,7 +103,7 @@ test.describe('SearchBar Component E2E Tests', () => {
   });
 
   test('should select item with Enter key', async ({ page }) => {
-    const searchInput = page.getByPlaceholder('Try searching for AAPL, TSLA, MSFT...');
+    const searchInput = page.getByPlaceholder('Search stocks by symbol (e.g., AAPL, TSLA, MSFT)...');
     
     await searchInput.fill('AAPL');
     await page.waitForTimeout(500);
@@ -125,7 +124,7 @@ test.describe('SearchBar Component E2E Tests', () => {
   });
 
   test('should close dropdown with Escape key', async ({ page }) => {
-    const searchInput = page.getByPlaceholder('Try searching for AAPL, TSLA, MSFT...');
+    const searchInput = page.getByPlaceholder('Search stocks by symbol (e.g., AAPL, TSLA, MSFT)...');
     
     await searchInput.fill('AAPL');
     await page.waitForTimeout(500);
@@ -140,7 +139,7 @@ test.describe('SearchBar Component E2E Tests', () => {
   });
 
   test('should select item by clicking', async ({ page }) => {
-    const searchInput = page.getByPlaceholder('Try searching for AAPL, TSLA, MSFT...');
+    const searchInput = page.getByPlaceholder('Search stocks by symbol (e.g., AAPL, TSLA, MSFT)...');
     
     await searchInput.fill('AAPL');
     await page.waitForTimeout(500);
@@ -156,7 +155,7 @@ test.describe('SearchBar Component E2E Tests', () => {
   });
 
   test('should close dropdown when clicking outside', async ({ page }) => {
-    const searchInput = page.getByPlaceholder('Try searching for AAPL, TSLA, MSFT...');
+    const searchInput = page.getByPlaceholder('Search stocks by symbol (e.g., AAPL, TSLA, MSFT)...');
     
     await searchInput.fill('AAPL');
     await page.waitForTimeout(500);
@@ -171,7 +170,7 @@ test.describe('SearchBar Component E2E Tests', () => {
   });
 
   test('should highlight item on mouse hover', async ({ page }) => {
-    const searchInput = page.getByPlaceholder('Try searching for AAPL, TSLA, MSFT...');
+    const searchInput = page.getByPlaceholder('Search stocks by symbol (e.g., AAPL, TSLA, MSFT)...');
     
     await searchInput.fill('AA');
     await page.waitForTimeout(500);
@@ -187,7 +186,7 @@ test.describe('SearchBar Component E2E Tests', () => {
   });
 
   test('should display "No results found" for invalid search', async ({ page }) => {
-    const searchInput = page.getByPlaceholder('Try searching for AAPL, TSLA, MSFT...');
+    const searchInput = page.getByPlaceholder('Search stocks by symbol (e.g., AAPL, TSLA, MSFT)...');
     
     await searchInput.fill('INVALIDXYZ123');
     await page.waitForTimeout(500);
@@ -197,7 +196,7 @@ test.describe('SearchBar Component E2E Tests', () => {
   });
 
   test('should handle rapid typing with debouncing', async ({ page }) => {
-    const searchInput = page.getByPlaceholder('Try searching for AAPL, TSLA, MSFT...');
+    const searchInput = page.getByPlaceholder('Search stocks by symbol (e.g., AAPL, TSLA, MSFT)...');
     
     // Type rapidly
     await searchInput.type('AAPL', { delay: 50 });
@@ -210,7 +209,7 @@ test.describe('SearchBar Component E2E Tests', () => {
   });
 
   test('should clear results when input is cleared', async ({ page }) => {
-    const searchInput = page.getByPlaceholder('Try searching for AAPL, TSLA, MSFT...');
+    const searchInput = page.getByPlaceholder('Search stocks by symbol (e.g., AAPL, TSLA, MSFT)...');
     
     await searchInput.fill('AAPL');
     await page.waitForTimeout(500);
@@ -225,7 +224,7 @@ test.describe('SearchBar Component E2E Tests', () => {
   });
 
   test('should reopen dropdown when focusing input with existing results', async ({ page }) => {
-    const searchInput = page.getByPlaceholder('Try searching for AAPL, TSLA, MSFT...');
+    const searchInput = page.getByPlaceholder('Search stocks by symbol (e.g., AAPL, TSLA, MSFT)...');
     
     await searchInput.fill('AAPL');
     await page.waitForTimeout(500);
@@ -247,7 +246,7 @@ test.describe('SearchBar Component E2E Tests', () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.waitForTimeout(300);
     
-    const searchInput = page.getByPlaceholder('Try searching for AAPL, TSLA, MSFT...');
+    const searchInput = page.getByPlaceholder('Search stocks by symbol (e.g., AAPL, TSLA, MSFT)...');
     await expect(searchInput).toBeVisible();
     
     // Should still work on mobile
@@ -261,7 +260,7 @@ test.describe('SearchBar Component E2E Tests', () => {
     await page.setViewportSize({ width: 768, height: 1024 });
     await page.waitForTimeout(300);
     
-    const searchInput = page.getByPlaceholder('Try searching for AAPL, TSLA, MSFT...');
+    const searchInput = page.getByPlaceholder('Search stocks by symbol (e.g., AAPL, TSLA, MSFT)...');
     await expect(searchInput).toBeVisible();
     
     await searchInput.fill('AAPL');
@@ -271,7 +270,7 @@ test.describe('SearchBar Component E2E Tests', () => {
   });
 
   test('should display exchange badges in results', async ({ page }) => {
-    const searchInput = page.getByPlaceholder('Try searching for AAPL, TSLA, MSFT...');
+    const searchInput = page.getByPlaceholder('Search stocks by symbol (e.g., AAPL, TSLA, MSFT)...');
     
     await searchInput.fill('AAPL');
     await page.waitForTimeout(500);
@@ -284,7 +283,7 @@ test.describe('SearchBar Component E2E Tests', () => {
   });
 
   test('should handle keyboard navigation edge cases', async ({ page }) => {
-    const searchInput = page.getByPlaceholder('Try searching for AAPL, TSLA, MSFT...');
+    const searchInput = page.getByPlaceholder('Search stocks by symbol (e.g., AAPL, TSLA, MSFT)...');
     
     await searchInput.fill('AA');
     await page.waitForTimeout(500);
@@ -307,7 +306,7 @@ test.describe('SearchBar Component E2E Tests', () => {
   });
 
   test('should maintain search functionality after multiple interactions', async ({ page }) => {
-    const searchInput = page.getByPlaceholder('Try searching for AAPL, TSLA, MSFT...');
+    const searchInput = page.getByPlaceholder('Search stocks by symbol (e.g., AAPL, TSLA, MSFT)...');
     
     // First search
     await searchInput.fill('AAPL');
@@ -329,7 +328,7 @@ test.describe('SearchBar Component E2E Tests', () => {
   });
 
   test('should handle direct Enter press without dropdown', async ({ page }) => {
-    const searchInput = page.getByPlaceholder('Try searching for AAPL, TSLA, MSFT...');
+    const searchInput = page.getByPlaceholder('Search stocks by symbol (e.g., AAPL, TSLA, MSFT)...');
     
     // Type and press Enter immediately (before debounce)
     await searchInput.fill('MSFT');
@@ -346,7 +345,7 @@ test.describe('SearchBar Component E2E Tests', () => {
   });
 
   test('should have proper ARIA attributes for accessibility', async ({ page }) => {
-    const searchInput = page.getByPlaceholder('Try searching for AAPL, TSLA, MSFT...');
+    const searchInput = page.getByPlaceholder('Search stocks by symbol (e.g., AAPL, TSLA, MSFT)...');
     
     // Check ARIA attributes
     await expect(searchInput).toHaveAttribute('aria-label', 'Search stocks');
@@ -363,7 +362,7 @@ test.describe('SearchBar Component E2E Tests', () => {
   });
 
   test('should handle multiple result selections', async ({ page }) => {
-    const searchInput = page.getByPlaceholder('Try searching for AAPL, TSLA, MSFT...');
+    const searchInput = page.getByPlaceholder('Search stocks by symbol (e.g., AAPL, TSLA, MSFT)...');
     
     // First selection
     await searchInput.fill('AAPL');

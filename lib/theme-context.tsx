@@ -55,6 +55,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return () => mediaQuery.removeEventListener("change", handler);
   }, [theme]);
 
+  // Apply dark class to HTML element
+  useEffect(() => {
+    const root = document.documentElement;
+    if (resolvedTheme === "dark") {
+      root.classList.add("dark");
+    } else {
+      root.classList.remove("dark");
+    }
+  }, [resolvedTheme]);
+
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
     localStorage.setItem("theme", newTheme);
