@@ -1141,9 +1141,16 @@ The implementation follows an incremental approach, building core infrastructure
 
 ## Version Management
 
-After completing each task, bump the version in `package.json`:
-- Patch version (0.0.x) for bug fixes and minor updates
-- Minor version (0.x.0) for new features and task completions
-- Major version (x.0.0) for breaking changes or major milestones
+⚠️ **CRITICAL - MUST BE DONE AFTER EVERY TASK** ⚠️
+
+After completing each task, you MUST:
+1. **Write unit tests** (Vitest) for all components - REQUIRED, not optional
+2. **Write e2e tests** (Playwright) for all user-facing components - REQUIRED, not optional
+3. **Bump the version** in `package.json`:
+   - Patch version (0.0.x) for bug fixes and minor updates
+   - Minor version (0.x.0) for new features and task completions
+   - Major version (x.0.0) for breaking changes or major milestones
 
 Example: After completing task 6, bump from 0.2.0 → 0.3.0
+
+**Note**: Tasks marked with `*` (e.g., `[ ]*`) are optional property-based tests. All other tests are REQUIRED.
