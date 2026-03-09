@@ -289,14 +289,14 @@ The implementation follows an incremental approach, building core infrastructure
     - Test keyboard navigation
     - _Requirements: 2.2, 2.3_
 
-- [ ] 8. Symbol detail page - Overview tab
-  - [ ] 8.1 Create symbol detail page layout
+- [x] 8. Symbol detail page - Overview tab
+  - [x] 8.1 Create symbol detail page layout
     - Implement /symbol/[symbol] route
     - Create tab navigation: Overview, Financials, Technicals, Forecasts, Seasonals
     - Add symbol header with name and current price
     - _Requirements: 2.4, 4.3_
 
-  - [ ] 8.2 Implement Overview tab content
+  - [x] 8.2 Implement Overview tab content
     - Display price chart with ChartComponent
     - Show current price, change amount, and change percentage
     - Display key metrics: market cap, volume, 52-week range
@@ -304,7 +304,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Color-code positive/negative changes
     - _Requirements: 4.1, 4.3, 4.4, 4.5_
 
-  - [ ]* 8.3 Write unit tests for Overview tab
+  - [x] 8.3 Write unit tests for Overview tab
     - Test metric display
     - Test tooltip functionality
     - Test color coding

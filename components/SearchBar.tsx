@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useRouter } from "next/navigation";
 
 interface SearchResult {
   symbol: string;
@@ -28,7 +27,6 @@ export function SearchBar({
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [error, setError] = useState<string | null>(null);
 
-  const router = useRouter();
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -98,10 +96,8 @@ export function SearchBar({
 
     if (onSelect) {
       onSelect(symbol);
-    } else {
-      // Navigate to symbol detail page
-      router.push(`/symbol/${symbol}`);
     }
+    // Note: Navigation removed - symbol details now shown inline on home page
   };
 
   // Handle keyboard navigation

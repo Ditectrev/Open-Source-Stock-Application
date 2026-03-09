@@ -1,0 +1,70 @@
+/**
+ * Unit tests for TabNavigation component
+ */
+
+import { describe, it, expect, vi } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { TabNavigation } from "../TabNavigation";
+
+// Mock theme context
+vi.mock("@/lib/theme-context", () => ({
+  useTheme: () => ({ resolvedTheme: "light" }),
+}));
+
+describe("TabNavigation", () => {
+  it("should render all tabs", () => {
+    const onTabChange = vi.fn();
+    render(<TabNavigation activeTab="overview" onTabChange={onTabChange} />);
+    
+    expect(screen.getByText("Overview")).toBeInTheDocument();
+    expect(screen.getByText("Financials")).toBeInTheDocument();
+    expect(screen.getByText("Technicals")).toBeInTheDocument();
+    expect(screen.getByText("Forecasts")).toBeInTheDocument();
+    expect(screen.getByText("Seasonals")).toBeInTheDocument();
+  });
+
+  it("should highlight active tab", () => {
+    const onTabChange = vi.fn();
+    render(<TabNavigation activeTab="overview" onTabChange={onTabChange} />);
+    
+    const overviewTab = screen.getByText("Overview");
+    expect(overviewTab).toHaveClass("border-blue-500");
+  });
+
+  it("should call onTabChange when tab is clicked", () => {
+    const onTabChange = vi.fn();
+    render(<TabNavigation activeTab="overview" onTabChange={onTabChange} />);
+    
+    const financialsTab = screen.getByText("Financials");
+    fireEvent.click(financialsTab);
+    
+    expect(onTabChange).toHaveBeenCalledWith("financials");
+  });
+
+  it("should change active tab styling when different tab is active", () => {
+    const onTabChange = vi.fn();
+    render(<TabNavigation activeTab="technicals" onTabChange={onTabChange} />);
+    
+    const technicalsTab = screen.getByText("Technicals");
+    expect(technicalsTab).toHaveClass("border-blue-500");
+    
+    const overviewTab = screen.getByText("Overview");
+    expect(overviewTab).toHaveClass("border-transparent");
+  });
+
+  it("should set aria-current on active tab", () => {
+    const onTabChange = vi.fn();
+    render(<TabNavigation activeTab="forecasts" onTabChange={onTabChange} />);
+    
+    const forecastsTab = screen.getByText("Forecasts");
+    expect(forecastsTab).toHaveAttribute("aria-current", "page");
+  });
+
+  it("should not set aria-current on inactive tabs", () => {
+    const onTabChange = vi.fn();
+    render(<TabNavigation activeTab="overview" onTabChange={onTabChange} />);
+    
+    const financialsTab = screen.getByText("Financials");
+    expect(financialsTab).not.toHaveAttribute("aria-current");
+  });
+});

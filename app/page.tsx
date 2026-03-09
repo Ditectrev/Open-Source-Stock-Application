@@ -1,48 +1,65 @@
 "use client";
 
 import { SearchBar } from "@/components/SearchBar";
-import { ChartWithIndicators } from "@/components/ChartWithIndicators";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { useState, useMemo } from "react";
-import { PriceData } from "@/types";
+import { useState, useEffect } from "react";
+import { SymbolData, PriceData, TimeRange } from "@/types";
+import { SymbolHeader } from "@/components/SymbolHeader";
+import { TabNavigation } from "@/components/TabNavigation";
+import { OverviewTab } from "@/components/OverviewTab";
 
-// Generate sample price data
-function generateSampleData(days: number = 365): PriceData[] {
-  const data: PriceData[] = [];
-  const endDate = new Date();
-  let price = 100;
-  
-  for (let i = days; i >= 0; i--) {
-    const date = new Date(endDate);
-    date.setDate(date.getDate() - i);
-    
-    const change = (Math.random() - 0.5) * 5;
-    const open = price;
-    const close = price + change;
-    const high = Math.max(open, close) + Math.random() * 2;
-    const low = Math.min(open, close) - Math.random() * 2;
-    const volume = Math.floor(Math.random() * 10000000) + 1000000;
-    
-    data.push({
-      timestamp: date,
-      open,
-      high,
-      low,
-      close,
-      volume,
-    });
-    
-    price = close;
-  }
-  
-  return data;
-}
+type TabType = "overview" | "financials" | "technicals" | "forecasts" | "seasonals";
 
 export default function Home() {
-  const [selectedSymbol, setSelectedSymbol] = useState<string>("AAPL");
-  
-  // Generate sample data (in a real app, this would fetch from API based on selectedSymbol)
-  const chartData = useMemo(() => generateSampleData(365), []);
+  const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<TabType>("overview");
+  const [symbolData, setSymbolData] = useState<SymbolData | null>(null);
+  const [historicalData, setHistoricalData] = useState<PriceData[]>([]);
+  const [timeRange, setTimeRange] = useState<TimeRange>("1M");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch symbol data when selected
+  useEffect(() => {
+    const fetchSymbolData = async () => {
+      if (!selectedSymbol) return;
+
+      setLoading(true);
+      setError(null);
+
+      try {
+        // Fetch current symbol data
+        const symbolResponse = await fetch(`/api/market/symbol/${selectedSymbol}`);
+        if (!symbolResponse.ok) {
+          throw new Error("Failed to fetch symbol data");
+        }
+        const symbolResult = await symbolResponse.json();
+        setSymbolData(symbolResult.data);
+
+        // Fetch historical data
+        const historicalResponse = await fetch(
+          `/api/market/historical/${selectedSymbol}?range=${timeRange}`
+        );
+        if (!historicalResponse.ok) {
+          throw new Error("Failed to fetch historical data");
+        }
+        const historicalResult = await historicalResponse.json();
+        setHistoricalData(historicalResult.data);
+      } catch (err) {
+        console.error("Error fetching symbol data:", err);
+        setError(err instanceof Error ? err.message : "Failed to load symbol data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSymbolData();
+  }, [selectedSymbol, timeRange]);
+
+  // Handle time range change
+  const handleTimeRangeChange = (range: TimeRange) => {
+    setTimeRange(range);
+  };
 
   return (
     <div className="min-h-screen p-8 bg-gray-50 dark:bg-gray-900">
@@ -63,21 +80,114 @@ export default function Home() {
         <div className="mt-8">
           <SearchBar 
             placeholder="Search stocks by symbol (e.g., AAPL, TSLA, MSFT)..." 
-            onSelect={(symbol) => setSelectedSymbol(symbol)}
+            onSelect={(symbol) => {
+              setSelectedSymbol(symbol);
+              setActiveTab("overview");
+            }}
           />
         </div>
 
-        <div className="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
-            {selectedSymbol}
-          </h2>
-          <ChartWithIndicators 
-            data={chartData}
-            type="candlestick"
-            initialTimeRange="1M"
-            height={500}
-          />
-        </div>
+        {/* Symbol Detail Section */}
+        {selectedSymbol && (
+          <div className="mt-8">
+            {loading && (
+              <div className="flex items-center justify-center py-12">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    Loading {selectedSymbol}...
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {error && !loading && (
+              <div className="text-center py-12">
+                <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 max-w-md mx-auto">
+                  <h2 className="text-xl font-semibold mb-2">Error Loading Symbol</h2>
+                  <p className="mb-4">{error}</p>
+                  <button
+                    onClick={() => setSelectedSymbol(null)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                  >
+                    Clear Selection
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {symbolData && !loading && !error && (
+              <>
+                {/* Symbol Header */}
+                <SymbolHeader symbolData={symbolData} />
+
+                {/* Tab Navigation */}
+                <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+
+                {/* Tab Content */}
+                <div className="mt-6">
+                  {activeTab === "overview" && (
+                    <OverviewTab
+                      symbolData={symbolData}
+                      historicalData={historicalData}
+                      timeRange={timeRange}
+                      onTimeRangeChange={handleTimeRangeChange}
+                    />
+                  )}
+                  {activeTab === "financials" && (
+                    <div className="p-8 rounded-lg text-center bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300">
+                      <p>Financials tab - Coming soon</p>
+                    </div>
+                  )}
+                  {activeTab === "technicals" && (
+                    <div className="p-8 rounded-lg text-center bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300">
+                      <p>Technicals tab - Coming soon</p>
+                    </div>
+                  )}
+                  {activeTab === "forecasts" && (
+                    <div className="p-8 rounded-lg text-center bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300">
+                      <p>Forecasts tab - Coming soon</p>
+                    </div>
+                  )}
+                  {activeTab === "seasonals" && (
+                    <div className="p-8 rounded-lg text-center bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300">
+                      <p>Seasonals tab - Coming soon</p>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Welcome Message when no symbol selected */}
+        {!selectedSymbol && (
+          <div className="mt-12 text-center">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-12">
+              <svg
+                className="w-24 h-24 mx-auto text-gray-400 dark:text-gray-600 mb-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
+              </svg>
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                Search for a Stock Symbol
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+                Use the search bar above to find and analyze stocks. View detailed
+                information including price charts, technical indicators, forecasts,
+                and more.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

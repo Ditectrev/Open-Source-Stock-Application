@@ -16,3 +16,15 @@ export { ChartWithIndicators } from "./ChartWithIndicators";
 export type { ChartWithIndicatorsProps } from "./ChartWithIndicators";
 
 export { SearchBar } from "./SearchBar";
+
+export { SymbolHeader } from "./SymbolHeader";
+export type { SymbolHeaderProps } from "./SymbolHeader";
+
+export { TabNavigation } from "./TabNavigation";
+export type { TabNavigationProps } from "./TabNavigation";
+
+export { OverviewTab } from "./OverviewTab";
+export type { OverviewTabProps } from "./OverviewTab";
+
+export { KeyMetrics } from "./KeyMetrics";
+export type { KeyMetricsProps } from "./KeyMetrics";

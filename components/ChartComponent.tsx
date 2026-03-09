@@ -71,7 +71,7 @@ export function ChartComponent({
     if (!allData || allData.length === 0) return [];
     
     const now = new Date();
-    let startDate = new Date();
+    const startDate = new Date();
     
     switch (range) {
       case "1D":
