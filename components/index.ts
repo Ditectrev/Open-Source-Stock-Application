@@ -28,3 +28,6 @@ export type { OverviewTabProps } from "./OverviewTab";
 
 export { KeyMetrics } from "./KeyMetrics";
 export type { KeyMetricsProps } from "./KeyMetrics";
+
+export { TechnicalIndicatorsDisplay } from "./TechnicalIndicatorsDisplay";
+export type { TechnicalIndicatorsDisplayProps } from "./TechnicalIndicatorsDisplay";

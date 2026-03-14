@@ -97,7 +97,7 @@ test.describe("Symbol Detail on Home Page", () => {
 
     // Click on Technicals tab
     await page.getByRole("button", { name: "Technicals" }).click();
-    await expect(page.getByText("Technicals tab - Coming soon")).toBeVisible();
+    await expect(page.getByText("Technical Indicators")).toBeVisible();
 
     // Click back to Overview
     await page.getByRole("button", { name: "Overview" }).click();

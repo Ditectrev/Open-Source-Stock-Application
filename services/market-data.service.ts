@@ -21,6 +21,18 @@ import {
   SectorData,
   TimeRange,
 } from "@/types";
+import {
+  calculateRSI as calcRSI,
+  calculateSMA,
+  calculateEMA,
+  calculateMACD as calcMACD,
+  calculateBollingerBands as calcBB,
+  getRSISignal,
+  getMACDSignal,
+  getMASignal,
+  getBollingerSignal,
+  getOverallSentiment,
+} from "@/lib/technical-indicators";
 
 export class MarketDataService {
   private cacheTTL: number;
@@ -365,59 +377,45 @@ export class MarketDataService {
     }
 
     const closes = priceData.map((p) => p.close);
-    
-    // Calculate RSI
-    const rsi = this.calculateRSI(closes);
-    
-    // Calculate Moving Averages
-    const ma50 = this.calculateMA(closes, 50);
-    const ma200 = this.calculateMA(closes, 200);
-    
+    const currentPrice = closes[closes.length - 1];
+
+    // Calculate indicators using dedicated module
+    const rsi = calcRSI(closes);
+    const ma50 = calculateSMA(closes, 50);
+    const ma200 = calculateSMA(closes, 200);
+    const macd = calcMACD(closes);
+    const bb = calcBB(closes);
+
     // Determine signals
-    const rsiSignal = rsi > 70 ? "overpriced" : rsi < 30 ? "underpriced" : "fair";
-    const maSignal = ma50 > ma200 ? "underpriced" : ma50 < ma200 ? "overpriced" : "fair";
+    const rsiSignal = getRSISignal(rsi);
+    const macdSignal = getMACDSignal(macd.histogram);
+    const maSignal = getMASignal(currentPrice, ma50);
+    const bbSignal = getBollingerSignal(currentPrice, bb.upper, bb.lower);
+
+    const overallSentiment = getOverallSentiment([
+      rsiSignal,
+      macdSignal,
+      maSignal,
+      bbSignal,
+    ]);
 
     return {
       rsi: { value: rsi, signal: rsiSignal },
-      macd: { value: 0, signal: 0, histogram: 0, trend: "fair" },
+      macd: {
+        value: macd.value,
+        signal: macd.signal,
+        histogram: macd.histogram,
+        trend: macdSignal,
+      },
       movingAverages: { ma50, ma200, signal: maSignal },
-      bollingerBands: { upper: 0, middle: 0, lower: 0, signal: "fair" },
-      overallSentiment: "fair",
+      bollingerBands: {
+        upper: bb.upper,
+        middle: bb.middle,
+        lower: bb.lower,
+        signal: bbSignal,
+      },
+      overallSentiment,
     };
-  }
-
-  /**
-   * Calculate RSI (Relative Strength Index)
-   */
-  private calculateRSI(closes: number[], period: number = 14): number {
-    if (closes.length < period + 1) return 50;
-
-    let gains = 0;
-    let losses = 0;
-
-    for (let i = closes.length - period; i < closes.length; i++) {
-      const change = closes[i] - closes[i - 1];
-      if (change > 0) gains += change;
-      else losses += Math.abs(change);
-    }
-
-    const avgGain = gains / period;
-    const avgLoss = losses / period;
-
-    if (avgLoss === 0) return 100;
-
-    const rs = avgGain / avgLoss;
-    return 100 - 100 / (1 + rs);
-  }
-
-  /**
-   * Calculate Moving Average
-   */
-  private calculateMA(closes: number[], period: number): number {
-    if (closes.length < period) return closes[closes.length - 1] || 0;
-
-    const slice = closes.slice(-period);
-    return slice.reduce((sum, val) => sum + val, 0) / period;
   }
 
   /**

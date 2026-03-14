@@ -3,10 +3,11 @@
 import { SearchBar } from "@/components/SearchBar";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useState, useEffect } from "react";
-import { SymbolData, PriceData, TimeRange } from "@/types";
+import { SymbolData, PriceData, TechnicalIndicators, TimeRange } from "@/types";
 import { SymbolHeader } from "@/components/SymbolHeader";
 import { TabNavigation } from "@/components/TabNavigation";
 import { OverviewTab } from "@/components/OverviewTab";
+import { TechnicalIndicatorsDisplay } from "@/components/TechnicalIndicatorsDisplay";
 
 type TabType = "overview" | "financials" | "technicals" | "forecasts" | "seasonals";
 
@@ -18,6 +19,7 @@ export default function Home() {
   const [timeRange, setTimeRange] = useState<TimeRange>("1M");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [technicalIndicators, setTechnicalIndicators] = useState<TechnicalIndicators | null>(null);
 
   // Fetch symbol data when selected
   useEffect(() => {
@@ -45,6 +47,13 @@ export default function Home() {
         }
         const historicalResult = await historicalResponse.json();
         setHistoricalData(historicalResult.data);
+
+        // Fetch technical indicators
+        const indicatorsResponse = await fetch(`/api/market/indicators/${selectedSymbol}`);
+        if (indicatorsResponse.ok) {
+          const indicatorsResult = await indicatorsResponse.json();
+          setTechnicalIndicators(indicatorsResult.data);
+        }
       } catch (err) {
         console.error("Error fetching symbol data:", err);
         setError(err instanceof Error ? err.message : "Failed to load symbol data");
@@ -140,9 +149,7 @@ export default function Home() {
                     </div>
                   )}
                   {activeTab === "technicals" && (
-                    <div className="p-8 rounded-lg text-center bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300">
-                      <p>Technicals tab - Coming soon</p>
-                    </div>
+                    <TechnicalIndicatorsDisplay indicators={technicalIndicators} />
                   )}
                   {activeTab === "forecasts" && (
                     <div className="p-8 rounded-lg text-center bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300">
