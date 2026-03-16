@@ -337,7 +337,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Test sentiment gauge
     - _Requirements: 5.1, 5.3, 5.4, 5.5_
 
-- [ ] 10. Checkpoint - Core market data and visualization
+- [x] 10. Checkpoint - Core market data and visualization
   - Ensure all tests pass, ask the user if questions arise.
 
 

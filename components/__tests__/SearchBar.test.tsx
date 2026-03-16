@@ -7,21 +7,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { SearchBar } from "../SearchBar";
 
-// Mock next/navigation
-const mockPush = vi.fn();
-vi.mock("next/navigation", () => ({
-  useRouter: () => ({
-    push: mockPush,
-  }),
-}));
-
 // Mock fetch
 global.fetch = vi.fn();
 
 describe("SearchBar", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockPush.mockClear();
   });
 
   afterEach(() => {
@@ -126,6 +117,7 @@ describe("SearchBar", () => {
   });
 
   it("should navigate to symbol page on selection", async () => {
+    const mockOnSelect = vi.fn();
     const mockResults = [
       {
         symbol: "AAPL",
@@ -140,7 +132,7 @@ describe("SearchBar", () => {
       json: async () => ({ success: true, data: mockResults }),
     });
 
-    render(<SearchBar />);
+    render(<SearchBar onSelect={mockOnSelect} />);
     const input = screen.getByRole("textbox");
 
     fireEvent.change(input, { target: { value: "AAPL" } });
@@ -158,7 +150,7 @@ describe("SearchBar", () => {
     }
 
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith("/symbol/AAPL");
+      expect(mockOnSelect).toHaveBeenCalledWith("AAPL");
     });
   });
 
@@ -259,6 +251,7 @@ describe("SearchBar", () => {
   });
 
   it("should select item on Enter key", async () => {
+    const mockOnSelect = vi.fn();
     const mockResults = [
       {
         symbol: "AAPL",
@@ -273,7 +266,7 @@ describe("SearchBar", () => {
       json: async () => ({ success: true, data: mockResults }),
     });
 
-    render(<SearchBar />);
+    render(<SearchBar onSelect={mockOnSelect} />);
     const input = screen.getByRole("textbox");
 
     fireEvent.change(input, { target: { value: "AAPL" } });
@@ -292,7 +285,7 @@ describe("SearchBar", () => {
     fireEvent.keyDown(input, { key: "Enter" });
 
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith("/symbol/AAPL");
+      expect(mockOnSelect).toHaveBeenCalledWith("AAPL");
     });
   });
 
@@ -507,7 +500,8 @@ describe("SearchBar", () => {
   });
 
   it("should navigate directly when pressing Enter without dropdown", async () => {
-    render(<SearchBar />);
+    const mockOnSelect = vi.fn();
+    render(<SearchBar onSelect={mockOnSelect} />);
     const input = screen.getByRole("textbox");
 
     // Type a symbol without triggering autocomplete
@@ -517,7 +511,7 @@ describe("SearchBar", () => {
     fireEvent.keyDown(input, { key: "Enter" });
 
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith("/symbol/TSLA");
+      expect(mockOnSelect).toHaveBeenCalledWith("TSLA");
     });
   });
 
