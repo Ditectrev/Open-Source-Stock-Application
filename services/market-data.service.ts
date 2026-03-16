@@ -174,7 +174,7 @@ export class MarketDataService {
   }
 
   /**
-   * Get forecast data (placeholder - would integrate with analyst data API)
+   * Get forecast data from Yahoo Finance
    */
   async getForecastData(symbol: string): Promise<ForecastData> {
     const cacheKey = cacheService.generateKey(symbol, "forecast");
@@ -185,28 +185,25 @@ export class MarketDataService {
       return cached;
     }
 
-    // Placeholder implementation - would integrate with real forecast API
-    const forecast: ForecastData = {
-      priceTargets: {
-        low: 0,
-        average: 0,
-        high: 0,
-      },
-      analystRatings: {
-        strongBuy: 0,
-        buy: 0,
-        hold: 0,
-        sell: 0,
-        strongSell: 0,
-      },
-      epsForecasts: [],
-      revenueForecasts: [],
-    };
+    // Check rate limit
+    const endpoint = `yahoo:forecast:${symbol}`;
+    const allowed = await rateLimiter.checkLimit(endpoint);
+
+    if (!allowed) {
+      logger.warn("Rate limit exceeded, serving stale cache if available", { symbol });
+      const stale = cacheService.get<ForecastData>(cacheKey);
+      if (stale) return stale;
+      throw new Error("Rate limit exceeded and no cached data available");
+    }
+
+    // Fetch from API
+    const data = await yahooFinanceService.getForecastData(symbol);
+    rateLimiter.recordCall(endpoint);
 
     // Cache the result
-    cacheService.set(cacheKey, forecast, this.cacheTTL);
+    cacheService.set(cacheKey, data, this.cacheTTL);
 
-    return forecast;
+    return data;
   }
 
   /**

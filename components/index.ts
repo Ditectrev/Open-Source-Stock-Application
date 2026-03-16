@@ -31,3 +31,6 @@ export type { KeyMetricsProps } from "./KeyMetrics";
 
 export { TechnicalIndicatorsDisplay } from "./TechnicalIndicatorsDisplay";
 export type { TechnicalIndicatorsDisplayProps } from "./TechnicalIndicatorsDisplay";
+
+export { ForecastDisplay } from "./ForecastDisplay";
+export type { ForecastDisplayProps } from "./ForecastDisplay";

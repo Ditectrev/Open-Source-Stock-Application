@@ -341,8 +341,8 @@ The implementation follows an incremental approach, building core infrastructure
   - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 11. Forecast data display
-  - [ ] 11.1 Create ForecastDisplay component
+- [x] 11. Forecast data display
+  - [x] 11.1 Create ForecastDisplay component
     - Display analyst price targets (low, average, high)
     - Display analyst rating distribution (Strong Buy, Buy, Hold, Sell, Strong Sell)
     - Display EPS and revenue forecasts
@@ -351,7 +351,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Add tooltips for forecast metrics
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
 
-  - [ ]* 11.2 Write unit tests for ForecastDisplay
+  - [x] 11.2 Write unit tests for ForecastDisplay
     - Test price target display
     - Test rating distribution
     - Test earnings surprise indicators

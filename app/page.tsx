@@ -3,11 +3,12 @@
 import { SearchBar } from "@/components/SearchBar";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useState, useEffect } from "react";
-import { SymbolData, PriceData, TechnicalIndicators, TimeRange } from "@/types";
+import { SymbolData, PriceData, TechnicalIndicators, ForecastData, TimeRange } from "@/types";
 import { SymbolHeader } from "@/components/SymbolHeader";
 import { TabNavigation } from "@/components/TabNavigation";
 import { OverviewTab } from "@/components/OverviewTab";
 import { TechnicalIndicatorsDisplay } from "@/components/TechnicalIndicatorsDisplay";
+import { ForecastDisplay } from "@/components/ForecastDisplay";
 
 type TabType = "overview" | "financials" | "technicals" | "forecasts" | "seasonals";
 
@@ -20,6 +21,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [technicalIndicators, setTechnicalIndicators] = useState<TechnicalIndicators | null>(null);
+  const [forecastData, setForecastData] = useState<ForecastData | null>(null);
 
   // Fetch symbol data when selected
   useEffect(() => {
@@ -53,6 +55,13 @@ export default function Home() {
         if (indicatorsResponse.ok) {
           const indicatorsResult = await indicatorsResponse.json();
           setTechnicalIndicators(indicatorsResult.data);
+        }
+
+        // Fetch forecast data
+        const forecastResponse = await fetch(`/api/market/forecast/${selectedSymbol}`);
+        if (forecastResponse.ok) {
+          const forecastResult = await forecastResponse.json();
+          setForecastData(forecastResult.data);
         }
       } catch (err) {
         console.error("Error fetching symbol data:", err);
@@ -152,9 +161,7 @@ export default function Home() {
                     <TechnicalIndicatorsDisplay indicators={technicalIndicators} />
                   )}
                   {activeTab === "forecasts" && (
-                    <div className="p-8 rounded-lg text-center bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300">
-                      <p>Forecasts tab - Coming soon</p>
-                    </div>
+                    <ForecastDisplay forecast={forecastData} />
                   )}
                   {activeTab === "seasonals" && (
                     <div className="p-8 rounded-lg text-center bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300">

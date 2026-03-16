@@ -18,9 +18,91 @@ import {
 
 export class YahooFinanceService {
   private baseUrl: string;
+  private crumb: string | null = null;
+  private cookie: string | null = null;
+  private crumbExpiry: number = 0;
 
   constructor() {
     this.baseUrl = env.apis.yahooFinanceUrl;
+  }
+
+  /**
+   * Get a valid crumb + cookie pair for authenticated Yahoo Finance endpoints.
+   * Crumbs are cached for 30 minutes.
+   */
+  private async getCrumb(): Promise<{ crumb: string; cookie: string }> {
+    if (this.crumb && this.cookie && Date.now() < this.crumbExpiry) {
+      return { crumb: this.crumb, cookie: this.cookie };
+    }
+
+    try {
+      // Step 1: hit the consent/finance page to get a session cookie
+      const pageRes = await fetch("https://fc.yahoo.com", {
+        redirect: "manual",
+        headers: { "User-Agent": "Mozilla/5.0" },
+      });
+      const setCookie = pageRes.headers.get("set-cookie") || "";
+      const cookie = setCookie.split(";")[0]; // e.g. "A3=d=AQ..."
+
+      // Step 2: use the cookie to fetch a crumb
+      const crumbRes = await fetch(
+        "https://query2.finance.yahoo.com/v1/test/getcrumb",
+        {
+          headers: {
+            "User-Agent": "Mozilla/5.0",
+            Cookie: cookie,
+          },
+        }
+      );
+
+      if (!crumbRes.ok) {
+        throw new Error(`Failed to fetch crumb: ${crumbRes.status}`);
+      }
+
+      const crumb = await crumbRes.text();
+
+      this.crumb = crumb;
+      this.cookie = cookie;
+      this.crumbExpiry = Date.now() + 30 * 60 * 1000; // 30 min
+
+      return { crumb, cookie };
+    } catch (error) {
+      logger.warn("Failed to obtain Yahoo Finance crumb, will try without auth", { error });
+      return { crumb: "", cookie: "" };
+    }
+  }
+
+  /**
+   * Fetch from quoteSummary with crumb authentication
+   */
+  private async fetchQuoteSummary(symbol: string, modules: string): Promise<any> {
+    const { crumb, cookie } = await getCrumbSafe(this);
+
+    const url = crumb
+      ? `${this.baseUrl}/v10/finance/quoteSummary/${symbol}?modules=${modules}&crumb=${encodeURIComponent(crumb)}`
+      : `${this.baseUrl}/v10/finance/quoteSummary/${symbol}?modules=${modules}`;
+
+    const headers: Record<string, string> = {
+      "Accept": "application/json",
+      "User-Agent": "Mozilla/5.0",
+    };
+    if (cookie) {
+      headers["Cookie"] = cookie;
+    }
+
+    const response = await fetch(url, { headers });
+
+    if (!response.ok) {
+      throw new Error(`Yahoo Finance API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    if (!data.quoteSummary?.result?.[0]) {
+      throw new Error(`No data found for symbol: ${symbol}`);
+    }
+
+    return data.quoteSummary.result[0];
   }
 
   /**
@@ -154,33 +236,41 @@ export class YahooFinanceService {
   }
 
   /**
+   * Fetch forecast/analyst data
+   */
+  async getForecastData(symbol: string): Promise<ForecastData> {
+    return retryWithBackoff(
+      async () => {
+        try {
+          const summary = await this.fetchQuoteSummary(
+            symbol,
+            "financialData,earningsTrend,recommendationTrend,earningsHistory"
+          );
+          return this.parseForecastResponse(summary);
+        } catch (error) {
+          logger.error("Failed to fetch forecast data", error as Error, {
+            symbol,
+            baseUrl: this.baseUrl,
+          });
+          throw error;
+        }
+      },
+      `YahooFinance:Forecast:${symbol}`
+    );
+  }
+
+  /**
    * Fetch financial statements
    */
   async getFinancials(symbol: string): Promise<FinancialData> {
     return retryWithBackoff(
       async () => {
         try {
-          const response = await fetch(
-            `${this.baseUrl}/v10/finance/quoteSummary/${symbol}?modules=financialData,defaultKeyStatistics,summaryDetail`,
-            {
-              headers: {
-                "Accept": "application/json",
-                "User-Agent": "Mozilla/5.0",
-              },
-            }
+          const summary = await this.fetchQuoteSummary(
+            symbol,
+            "financialData,defaultKeyStatistics,summaryDetail"
           );
-
-          if (!response.ok) {
-            throw new Error(`Yahoo Finance API error: ${response.status} ${response.statusText}`);
-          }
-
-          const data = await response.json();
-          
-          if (!data.quoteSummary?.result?.[0]) {
-            throw new Error(`No financial data found for symbol: ${symbol}`);
-          }
-
-          return this.parseFinancialsResponse(data.quoteSummary.result[0]);
+          return this.parseFinancialsResponse(summary);
         } catch (error) {
           logger.error("Failed to fetch financials", error as Error, {
             symbol,
@@ -232,6 +322,80 @@ export class YahooFinanceService {
       close: close[index] || 0,
       volume: volume[index] || 0,
     }));
+  }
+
+  /**
+   * Parse forecast response from Yahoo Finance quoteSummary
+   */
+  private parseForecastResponse(summary: any): ForecastData {
+    const financialData = summary.financialData || {};
+    const recommendationTrend = summary.recommendationTrend?.trend?.[0] || {};
+    const earningsTrend = summary.earningsTrend?.trend || [];
+    const earningsHistory = summary.earningsHistory?.history || [];
+
+    // Price targets from financialData
+    const priceTargets = {
+      low: financialData.targetLowPrice?.raw || 0,
+      average: financialData.targetMeanPrice?.raw || 0,
+      high: financialData.targetHighPrice?.raw || 0,
+    };
+
+    // Analyst ratings from recommendationTrend
+    const analystRatings = {
+      strongBuy: recommendationTrend.strongBuy || 0,
+      buy: recommendationTrend.buy || 0,
+      hold: recommendationTrend.hold || 0,
+      sell: recommendationTrend.sell || 0,
+      strongSell: recommendationTrend.strongSell || 0,
+    };
+
+    // EPS forecasts from earningsTrend (future) + earningsHistory (past)
+    const epsForecasts: ForecastData["epsForecasts"] = [];
+
+    // Add historical earnings with actuals
+    for (const entry of earningsHistory) {
+      const quarter = entry.quarter?.fmt || entry.period || "";
+      if (!quarter) continue;
+      const estimate = entry.epsEstimate?.raw;
+      const actual = entry.epsActual?.raw;
+      const surprise = entry.epsDifference?.raw;
+      const surprisePercent = entry.surprisePercent?.raw != null
+        ? entry.surprisePercent.raw * 100
+        : undefined;
+
+      epsForecasts.push({
+        quarter,
+        estimate: estimate ?? 0,
+        ...(actual != null && { actual }),
+        ...(surprise != null && { surprise }),
+        ...(surprisePercent != null && { surprisePercent }),
+      });
+    }
+
+    // Add future EPS estimates from earningsTrend
+    for (const trend of earningsTrend) {
+      const period = trend.period || "";
+      if (!period) continue;
+      // Skip if we already have this quarter from history
+      if (epsForecasts.some((e) => e.quarter === period)) continue;
+      const estimate = trend.earningsEstimate?.avg?.raw;
+      if (estimate != null) {
+        epsForecasts.push({ quarter: period, estimate });
+      }
+    }
+
+    // Revenue forecasts from earningsTrend
+    const revenueForecasts: ForecastData["revenueForecasts"] = [];
+    for (const trend of earningsTrend) {
+      const period = trend.period || "";
+      if (!period) continue;
+      const estimate = trend.revenueEstimate?.avg?.raw;
+      if (estimate != null) {
+        revenueForecasts.push({ quarter: period, estimate });
+      }
+    }
+
+    return { priceTargets, analystRatings, epsForecasts, revenueForecasts };
   }
 
   /**
@@ -288,6 +452,11 @@ export class YahooFinanceService {
         return { interval: "1d", period: "1y" };
     }
   }
+}
+
+// Helper to access private getCrumb from fetchQuoteSummary
+async function getCrumbSafe(service: YahooFinanceService): Promise<{ crumb: string; cookie: string }> {
+  return (service as any).getCrumb();
 }
 
 // Export singleton instance
