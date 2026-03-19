@@ -17,14 +17,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
+      - uses: oven-sh/setup-bun@v2
 
-      - run: npm ci
+      - run: bun install
 
-      - run: npx vitest run
+      - run: bun run vitest run
 
   deploy-preview:
     name: Deploy Preview
@@ -34,12 +31,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
+      - uses: oven-sh/setup-bun@v2
 
-      - run: npm i -g vercel
+      - run: bun install
+
+      - run: bun install -g vercel
 
       - run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
 
@@ -55,12 +51,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
+      - uses: oven-sh/setup-bun@v2
 
-      - run: npm i -g vercel
+      - run: bun install
+
+      - run: bun install -g vercel
 
       - run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
 
