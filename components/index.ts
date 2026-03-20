@@ -34,3 +34,6 @@ export type { TechnicalIndicatorsDisplayProps } from "./TechnicalIndicatorsDispl
 
 export { ForecastDisplay } from "./ForecastDisplay";
 export type { ForecastDisplayProps } from "./ForecastDisplay";
+
+export { SeasonalHeatmap } from "./SeasonalHeatmap";
+export type { SeasonalHeatmapProps } from "./SeasonalHeatmap";

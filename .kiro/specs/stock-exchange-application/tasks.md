@@ -358,21 +358,21 @@ The implementation follows an incremental approach, building core infrastructure
     - Test tooltip functionality
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
 
-- [ ] 12. Seasonal patterns display
-  - [ ] 12.1 Calculate seasonal patterns from historical data
+- [x] 12. Seasonal patterns display
+  - [x] 12.1 Calculate seasonal patterns from historical data
     - Aggregate returns by month across multiple years
     - Calculate cumulative returns for each month
     - Handle missing data gracefully
     - _Requirements: 7.2_
 
-  - [ ] 12.2 Create SeasonalHeatmap component
+  - [x] 12.2 Create SeasonalHeatmap component
     - Render heatmap with months as columns and years as rows
     - Color-code cells based on return percentage
     - Display return percentage on hover
     - Add disclaimer about past performance
     - _Requirements: 7.1, 7.3, 7.4_
 
-  - [ ]* 12.3 Write unit tests for SeasonalHeatmap
+  - [x] 12.3 Write unit tests for SeasonalHeatmap
     - Test heatmap rendering
     - Test color coding
     - Test hover tooltips
