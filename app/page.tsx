@@ -3,13 +3,14 @@
 import { SearchBar } from "@/components/SearchBar";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useState, useEffect } from "react";
-import { SymbolData, PriceData, TechnicalIndicators, ForecastData, SeasonalData, TimeRange } from "@/types";
+import { SymbolData, PriceData, TechnicalIndicators, ForecastData, SeasonalData, FinancialData, TimeRange } from "@/types";
 import { SymbolHeader } from "@/components/SymbolHeader";
 import { TabNavigation } from "@/components/TabNavigation";
 import { OverviewTab } from "@/components/OverviewTab";
 import { TechnicalIndicatorsDisplay } from "@/components/TechnicalIndicatorsDisplay";
 import { ForecastDisplay } from "@/components/ForecastDisplay";
 import { SeasonalHeatmap } from "@/components/SeasonalHeatmap";
+import { FinancialsTable } from "@/components/FinancialsTable";
 
 type TabType = "overview" | "financials" | "technicals" | "forecasts" | "seasonals";
 
@@ -24,6 +25,7 @@ export default function Home() {
   const [technicalIndicators, setTechnicalIndicators] = useState<TechnicalIndicators | null>(null);
   const [forecastData, setForecastData] = useState<ForecastData | null>(null);
   const [seasonalData, setSeasonalData] = useState<SeasonalData | null>(null);
+  const [financialData, setFinancialData] = useState<FinancialData | null>(null);
 
   // Fetch symbol data when selected
   useEffect(() => {
@@ -71,6 +73,13 @@ export default function Home() {
         if (seasonalResponse.ok) {
           const seasonalResult = await seasonalResponse.json();
           setSeasonalData(seasonalResult.data);
+        }
+
+        // Fetch financials data
+        const financialsResponse = await fetch(`/api/market/financials/${selectedSymbol}`);
+        if (financialsResponse.ok) {
+          const financialsResult = await financialsResponse.json();
+          setFinancialData(financialsResult.data);
         }
       } catch (err) {
         console.error("Error fetching symbol data:", err);
@@ -162,9 +171,7 @@ export default function Home() {
                     />
                   )}
                   {activeTab === "financials" && (
-                    <div className="p-8 rounded-lg text-center bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300">
-                      <p>Financials tab - Coming soon</p>
-                    </div>
+                    <FinancialsTable financials={financialData} />
                   )}
                   {activeTab === "technicals" && (
                     <TechnicalIndicatorsDisplay indicators={technicalIndicators} />

@@ -379,8 +379,8 @@ The implementation follows an incremental approach, building core infrastructure
     - Test disclaimer display
     - _Requirements: 7.1, 7.3, 7.4_
 
-- [ ] 13. Financials tab display
-  - [ ] 13.1 Create FinancialsTable component
+- [x] 13. Financials tab display
+  - [x] 13.1 Create FinancialsTable component
     - Display key financial facts: revenue, net income, profit margins
     - Display valuation metrics: P/E, P/B, PEG ratios
     - Display growth metrics: revenue growth, earnings growth
@@ -389,7 +389,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Color-code favorable vs unfavorable values
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6_
 
-  - [ ]* 13.2 Write unit tests for FinancialsTable
+  - [x] 13.2 Write unit tests for FinancialsTable
     - Test metric display
     - Test tooltip functionality
     - Test color coding

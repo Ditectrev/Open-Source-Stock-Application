@@ -37,3 +37,6 @@ export type { ForecastDisplayProps } from "./ForecastDisplay";
 
 export { SeasonalHeatmap } from "./SeasonalHeatmap";
 export type { SeasonalHeatmapProps } from "./SeasonalHeatmap";
+
+export { FinancialsTable } from "./FinancialsTable";
+export type { FinancialsTableProps } from "./FinancialsTable";
