@@ -10,6 +10,7 @@ import {
   SymbolData,
   PriceData,
   FinancialData,
+  MarketIndex,
   TimeRange,
   TechnicalIndicators,
   ForecastData,
@@ -282,6 +283,64 @@ export class YahooFinanceService {
       `YahooFinance:Financials:${symbol}`
     );
   }
+
+  /**
+   * Fetch world market indices via Yahoo Finance quote endpoint.
+   * Used as a fallback when CNN dataviz is unavailable.
+   */
+  /**
+     * Fetch world market indices via Yahoo Finance quoteSummary endpoint.
+     * Used as a fallback when CNN dataviz is unavailable.
+     */
+    async getWorldMarkets(): Promise<MarketIndex[]> {
+      const indices: { symbol: string; name: string; region: MarketIndex["region"] }[] = [
+        { symbol: "^GSPC", name: "S&P 500", region: "Americas" },
+        { symbol: "^DJI", name: "Dow Jones", region: "Americas" },
+        { symbol: "^IXIC", name: "NASDAQ", region: "Americas" },
+        { symbol: "^N225", name: "Nikkei 225", region: "Asia-Pacific" },
+        { symbol: "^HSI", name: "Hang Seng", region: "Asia-Pacific" },
+        { symbol: "000001.SS", name: "Shanghai Composite", region: "Asia-Pacific" },
+        { symbol: "^FTSE", name: "FTSE 100", region: "Europe" },
+        { symbol: "^GDAXI", name: "DAX", region: "Europe" },
+        { symbol: "^FCHI", name: "CAC 40", region: "Europe" },
+      ];
+
+      const results: MarketIndex[] = [];
+
+      // Fetch each index using the authenticated quoteSummary endpoint
+      const fetches = indices.map(async (idx) => {
+        try {
+          const summary = await this.fetchQuoteSummary(idx.symbol, "price");
+          const price = summary.price || {};
+          return {
+            name: idx.name,
+            symbol: idx.symbol,
+            value: price.regularMarketPrice?.raw || 0,
+            change: price.regularMarketChange?.raw || 0,
+            changePercent: price.regularMarketChangePercent?.raw || 0,
+            region: idx.region,
+          };
+        } catch (error) {
+          logger.warn(`Failed to fetch index ${idx.symbol}, skipping`, {
+            error: (error as Error).message,
+          });
+          return null;
+        }
+      });
+
+      const settled = await Promise.all(fetches);
+      for (const item of settled) {
+        if (item) results.push(item);
+      }
+
+      if (results.length === 0) {
+        throw new Error("Failed to fetch any world market indices from Yahoo Finance");
+      }
+
+      return results;
+    }
+
+
 
   /**
    * Parse quote response

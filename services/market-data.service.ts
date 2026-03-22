@@ -322,8 +322,16 @@ export class MarketDataService {
       throw new Error("Rate limit exceeded and no cached data available");
     }
 
-    // Fetch from API
-    const data = await cnnApiService.getWorldMarkets();
+    // Fetch from API (CNN primary, Yahoo Finance fallback)
+    let data: MarketIndex[];
+    try {
+      data = await cnnApiService.getWorldMarkets();
+    } catch (cnnError) {
+      logger.warn("CNN world markets unavailable, falling back to Yahoo Finance", {
+        error: (cnnError as Error).message,
+      });
+      data = await yahooFinanceService.getWorldMarkets();
+    }
     rateLimiter.recordCall(endpoint);
 
     // Cache the result

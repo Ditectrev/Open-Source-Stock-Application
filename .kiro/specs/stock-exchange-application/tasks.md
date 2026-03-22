@@ -411,15 +411,15 @@ The implementation follows an incremental approach, building core infrastructure
     - Test tooltip
     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5_
 
-- [ ] 15. World markets overview
-  - [ ] 15.1 Create WorldMarkets component
+- [x] 15. World markets overview
+  - [x] 15.1 Create WorldMarkets component
     - Display major indices by region (Americas, Asia-Pacific, Europe)
     - Show current values and percentage changes
     - Color-code based on positive/negative performance
     - Implement auto-refresh at configurable intervals
     - _Requirements: 10.1, 10.2, 10.3, 10.5_
 
-  - [ ]* 15.2 Write unit tests for WorldMarkets
+  - [x] 15.2 Write unit tests for WorldMarkets
     - Test index display
     - Test color coding
     - Test regional grouping

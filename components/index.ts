@@ -43,3 +43,6 @@ export type { FinancialsTableProps } from "./FinancialsTable";
 
 export { FearGreedGauge } from "./FearGreedGauge";
 export type { FearGreedGaugeProps } from "./FearGreedGauge";
+
+export { WorldMarkets } from "./WorldMarkets";
+export type { WorldMarketsProps } from "./WorldMarkets";

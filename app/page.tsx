@@ -12,6 +12,7 @@ import { ForecastDisplay } from "@/components/ForecastDisplay";
 import { SeasonalHeatmap } from "@/components/SeasonalHeatmap";
 import { FinancialsTable } from "@/components/FinancialsTable";
 import { FearGreedGauge } from "@/components/FearGreedGauge";
+import { WorldMarkets } from "@/components/WorldMarkets";
 import { Footer } from "@/components/Footer";
 
 type TabType = "overview" | "financials" | "technicals" | "forecasts" | "seasonals";
@@ -194,6 +195,9 @@ export default function Home() {
         {!selectedSymbol && (
           <div className="mt-12">
             <FearGreedGauge />
+            <div className="mt-8">
+              <WorldMarkets />
+            </div>
           </div>
         )}
       </div>
