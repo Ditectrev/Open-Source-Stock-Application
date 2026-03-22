@@ -12,6 +12,7 @@ import { ForecastDisplay } from "@/components/ForecastDisplay";
 import { SeasonalHeatmap } from "@/components/SeasonalHeatmap";
 import { FinancialsTable } from "@/components/FinancialsTable";
 import { FearGreedGauge } from "@/components/FearGreedGauge";
+import { Footer } from "@/components/Footer";
 
 type TabType = "overview" | "financials" | "technicals" | "forecasts" | "seasonals";
 
@@ -192,38 +193,11 @@ export default function Home() {
         {/* Welcome Message when no symbol selected */}
         {!selectedSymbol && (
           <div className="mt-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Search prompt */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-12 text-center flex flex-col justify-center">
-                <svg
-                  className="w-24 h-24 mx-auto text-gray-400 dark:text-gray-600 mb-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                  />
-                </svg>
-                <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                  Search for a Stock Symbol
-                </h2>
-                <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
-                  Use the search bar above to find and analyze stocks. View detailed
-                  information including price charts, technical indicators, forecasts,
-                  and more.
-                </p>
-              </div>
-
-              {/* Market Sentiment */}
-              <FearGreedGauge />
-            </div>
+            <FearGreedGauge />
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }

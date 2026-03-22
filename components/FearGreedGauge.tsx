@@ -339,7 +339,7 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
               </div>
             )}
           </div>
-          <div className="relative h-24">
+          <div className="relative h-64">
             <svg
               viewBox={`0 0 ${Math.max(data.history.length * 4, 100)} 100`}
               className="w-full h-full"
@@ -355,9 +355,13 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
                 const clamped = Math.max(0, Math.min(data.history.length - 1, idx));
                 const point = data.history[clamped];
                 if (point) {
+                  // Snap X to the data point's position
+                  const snapX = (clamped / Math.max(data.history.length - 1, 1)) * rect.width;
+                  // Snap Y to the data value (0 at bottom, 100 at top)
+                  const snapY = ((100 - point.value) / 100) * rect.height;
                   setHoveredPoint({
-                    x: e.clientX - rect.left,
-                    y: e.clientY - rect.top,
+                    x: snapX,
+                    y: snapY,
                     value: point.value,
                     date: new Date(point.date),
                   });
@@ -388,6 +392,24 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
                   .join(" ")}
               />
             </svg>
+
+            {/* Hover crosshair lines */}
+            {hoveredPoint && (
+              <>
+                <div
+                  className={`absolute top-0 h-full w-px pointer-events-none ${
+                    isDark ? "bg-gray-400" : "bg-gray-600"
+                  }`}
+                  style={{ left: hoveredPoint.x }}
+                />
+                <div
+                  className={`absolute left-0 w-full h-px pointer-events-none ${
+                    isDark ? "bg-gray-400" : "bg-gray-600"
+                  }`}
+                  style={{ top: hoveredPoint.y }}
+                />
+              </>
+            )}
 
             {/* Hover tooltip */}
             {hoveredPoint && (
