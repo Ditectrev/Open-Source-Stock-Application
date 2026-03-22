@@ -9,8 +9,9 @@ import { logger } from "@/lib/logger";
 
 export async function GET(request: NextRequest) {
   try {
-    const limit = parseInt(request.nextUrl.searchParams.get("limit") || "30", 10);
-    const clampedLimit = Math.max(1, Math.min(365, limit));
+    const limitParam = parseInt(request.nextUrl.searchParams.get("limit") || "30", 10);
+    // 0 means "all data" for the Alternative.me API
+    const clampedLimit = limitParam === 0 ? 0 : Math.max(1, limitParam);
     const data = await marketDataService.getFearGreedIndex(clampedLimit);
 
     return NextResponse.json({
