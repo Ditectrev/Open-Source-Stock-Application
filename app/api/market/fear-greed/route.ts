@@ -9,7 +9,9 @@ import { logger } from "@/lib/logger";
 
 export async function GET(request: NextRequest) {
   try {
-    const data = await marketDataService.getFearGreedIndex();
+    const limit = parseInt(request.nextUrl.searchParams.get("limit") || "30", 10);
+    const clampedLimit = Math.max(1, Math.min(365, limit));
+    const data = await marketDataService.getFearGreedIndex(clampedLimit);
 
     return NextResponse.json({
       success: true,

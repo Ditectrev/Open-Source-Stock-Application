@@ -17,32 +17,30 @@ export class CNNApiService {
 
   /**
    * Fetch Fear & Greed Index
+   * Uses Alternative.me API as primary source (CNN blocks automated requests).
+   * @param limit Number of historical data points to fetch (default 30)
    */
-  async getFearGreedIndex(): Promise<FearGreedData> {
+  async getFearGreedIndex(limit: number = 30): Promise<FearGreedData> {
     return retryWithBackoff(
       async () => {
         try {
-          const response = await fetch(`${this.baseUrl}/fear-and-greed`, {
-            headers: {
-              "Accept": "application/json",
-            },
-          });
+          const response = await fetch(
+            `https://api.alternative.me/fng/?limit=${limit}`,
+            { headers: { "Accept": "application/json" } }
+          );
 
           if (!response.ok) {
-            throw new Error(`CNN API error: ${response.status} ${response.statusText}`);
+            throw new Error(`Alternative.me API error: ${response.status} ${response.statusText}`);
           }
 
-          const data = await response.json();
-          
-          return this.parseFearGreedResponse(data);
+          const json = await response.json();
+          return this.parseAlternativeFngResponse(json);
         } catch (error) {
-          logger.error("Failed to fetch Fear & Greed Index", error as Error, {
-            baseUrl: this.baseUrl,
-          });
+          logger.error("Failed to fetch Fear & Greed Index", error as Error);
           throw error;
         }
       },
-      "CNN:FearGreedIndex"
+      "AlternativeMe:FearGreedIndex"
     );
   }
 
@@ -120,7 +118,35 @@ export class CNNApiService {
   }
 
   /**
-   * Parse Fear & Greed Index response
+   * Parse Alternative.me Fear & Greed response
+   */
+  private parseAlternativeFngResponse(json: any): FearGreedData {
+    const entries = json.data || [];
+    const latest = entries[0];
+    const value = parseInt(latest?.value || "50", 10);
+
+    let label: FearGreedData["label"];
+    if (value <= 25) label = "Extreme Fear";
+    else if (value <= 45) label = "Fear";
+    else if (value <= 55) label = "Neutral";
+    else if (value <= 75) label = "Greed";
+    else label = "Extreme Greed";
+
+    const history = entries.map((item: any) => ({
+      date: new Date(parseInt(item.timestamp, 10) * 1000),
+      value: parseInt(item.value, 10),
+    })).reverse();
+
+    return {
+      value,
+      label,
+      timestamp: new Date(parseInt(latest?.timestamp || "0", 10) * 1000),
+      history,
+    };
+  }
+
+  /**
+   * Parse Fear & Greed Index response (CNN format, kept for reference)
    */
   private parseFearGreedResponse(data: any): FearGreedData {
     const value = data.fear_and_greed?.score || data.score || 50;

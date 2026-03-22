@@ -40,3 +40,6 @@ export type { SeasonalHeatmapProps } from "./SeasonalHeatmap";
 
 export { FinancialsTable } from "./FinancialsTable";
 export type { FinancialsTableProps } from "./FinancialsTable";
+
+export { FearGreedGauge } from "./FearGreedGauge";
+export type { FearGreedGaugeProps } from "./FearGreedGauge";

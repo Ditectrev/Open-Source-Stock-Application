@@ -395,8 +395,8 @@ The implementation follows an incremental approach, building core infrastructure
     - Test color coding
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6_
 
-- [ ] 14. Fear and Greed Index
-  - [ ] 14.1 Create FearGreedGauge component
+- [x] 14. Fear and Greed Index
+  - [x] 14.1 Create FearGreedGauge component
     - Display current index value from CNN
     - Render gauge visualization (0-100 scale)
     - Display historical timeline
@@ -404,7 +404,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Add tooltip explaining the index
     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5_
 
-  - [ ]* 14.2 Write unit tests for FearGreedGauge
+  - [x] 14.2 Write unit tests for FearGreedGauge
     - Test gauge rendering
     - Test range labels
     - Test timeline display

@@ -267,8 +267,8 @@ export class MarketDataService {
   /**
    * Get Fear & Greed Index with caching and rate limiting
    */
-  async getFearGreedIndex(): Promise<FearGreedData> {
-    const cacheKey = "market:fear-greed";
+  async getFearGreedIndex(limit: number = 30): Promise<FearGreedData> {
+    const cacheKey = `market:fear-greed:${limit}`;
 
     // Check cache first
     const cached = cacheService.get<FearGreedData>(cacheKey);
@@ -289,7 +289,7 @@ export class MarketDataService {
     }
 
     // Fetch from API
-    const data = await cnnApiService.getFearGreedIndex();
+    const data = await cnnApiService.getFearGreedIndex(limit);
     rateLimiter.recordCall(endpoint);
 
     // Cache the result
