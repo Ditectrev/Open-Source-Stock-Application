@@ -92,17 +92,20 @@ export async function retryWithBackoff<T>(
 /**
  * Check if error is retryable
  */
-export function isRetryableError(error: any): boolean {
+export function isRetryableError(error: unknown): boolean {
+  const err = error as Record<string, unknown>;
   // Network errors
-  if (error.code === "ECONNREFUSED" || error.code === "ETIMEDOUT") {
+  if (err.code === "ECONNREFUSED" || err.code === "ETIMEDOUT") {
     return true;
   }
 
   // HTTP status codes that should be retried
-  if (error.response?.status) {
-    const status = error.response.status;
-    // Retry on 5xx server errors and 429 rate limit
-    return status >= 500 || status === 429;
+  if (err.response && typeof err.response === "object") {
+    const resp = err.response as Record<string, unknown>;
+    if (typeof resp.status === "number") {
+      // Retry on 5xx server errors and 429 rate limit
+      return resp.status >= 500 || resp.status === 429;
+    }
   }
 
   return false;

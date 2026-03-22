@@ -99,7 +99,7 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
       >
         <p className="text-red-500 text-center">{error}</p>
         <button
-          onClick={fetchData}
+          onClick={() => fetchData()}
           className="mt-2 mx-auto block text-sm text-blue-500 hover:underline"
         >
           Retry
