@@ -45,11 +45,11 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
   const [loading, setLoading] = useState(!externalData);
   const [error, setError] = useState<string | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
-  const [historyRange, setHistoryRange] = useState<"1W" | "1M" | "3M" | "1Y" | "5Y" | "Max">("1M");
+  const [historyRange, setHistoryRange] = useState<"1W" | "1M" | "3M" | "1Y" | "5Y" | "YTD" | "Max">("1M");
 
   const [hoveredPoint, setHoveredPoint] = useState<{ x: number; y: number; value: number; date: Date } | null>(null);
 
-  const rangeLimits: Record<string, number> = { "1W": 7, "1M": 30, "3M": 90, "1Y": 365, "5Y": 1825, "Max": 0 };
+  const rangeLimits: Record<string, number> = { "1W": 7, "1M": 30, "3M": 90, "1Y": 365, "5Y": 1825, "YTD": -1, "Max": 0 };
 
   const fetchData = useCallback(async (limit: number = 30) => {
     setLoading(true);
@@ -73,7 +73,9 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
       setLoading(false);
       return;
     }
-    fetchData(rangeLimits[historyRange]);
+    fetchData(historyRange === "YTD"
+      ? Math.ceil((Date.now() - new Date(new Date().getFullYear(), 0, 1).getTime()) / 86400000)
+      : rangeLimits[historyRange]);
   }, [externalData, fetchData, historyRange]);
 
   // --- Loading state ---
@@ -321,7 +323,7 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
             </h4>
             {!externalData && (
               <div className="flex gap-1" data-testid="fear-greed-range-selector">
-                {(["1W", "1M", "3M", "1Y", "5Y", "Max"] as const).map((range) => (
+                {(["1W", "1M", "3M", "1Y", "5Y", "YTD", "Max"] as const).map((range) => (
                   <button
                     key={range}
                     onClick={() => setHistoryRange(range)}

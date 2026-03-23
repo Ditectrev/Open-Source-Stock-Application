@@ -41,7 +41,7 @@ export interface ChartComponentProps {
   height?: number;
 }
 
-const TIME_RANGES: TimeRange[] = ["1D", "1W", "1M", "3M", "1Y", "5Y", "Max"];
+const TIME_RANGES: TimeRange[] = ["1D", "1W", "1M", "3M", "1Y", "5Y", "YTD", "Max"];
 
 /**
  * ChartComponent with time range selection, multiple chart types,

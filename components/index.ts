@@ -46,3 +46,6 @@ export type { FearGreedGaugeProps } from "./FearGreedGauge";
 
 export { WorldMarkets } from "./WorldMarkets";
 export type { WorldMarketsProps } from "./WorldMarkets";
+
+export { SectorHub } from "./SectorHub";
+export type { SectorHubProps } from "./SectorHub";

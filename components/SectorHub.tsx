@@ -1,0 +1,308 @@
+"use client";
+
+/**
+ * SectorHub Component
+ * Displays all 11 market sectors with performance metrics, color coding,
+ * comparison view, time period selection, sorting, tooltips, and auto-refresh.
+ *
+ * Requirements: 23.1, 23.2, 23.3, 23.4, 23.5, 23.6, 23.7, 23.8, 23.9, 23.10, 23.11, 23.12
+ */
+
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useTheme } from "@/lib/theme-context";
+import { SectorData } from "@/types";
+
+type TimePeriod = "1D" | "1W" | "1M" | "3M" | "1Y" | "5Y" | "YTD" | "Max";
+type SortField = "sector" | "changePercent";
+type SortDirection = "asc" | "desc";
+
+const SECTOR_DESCRIPTIONS: Record<string, string> = {
+  Technology: "Companies in software, hardware, semiconductors, and IT services.",
+  Financial: "Banks, insurance companies, asset managers, and financial exchanges.",
+  "Consumer Discretionary": "Non-essential goods and services: retail, automotive, apparel, and entertainment.",
+  Communication: "Telecom providers, media companies, and interactive entertainment.",
+  Healthcare: "Pharmaceuticals, biotech, medical devices, and healthcare providers.",
+  Industrials: "Aerospace, defense, construction, machinery, and transportation.",
+  "Consumer Staples": "Essential products: food, beverages, household goods, and personal care.",
+  Energy: "Oil, gas, coal, and renewable energy companies.",
+  Materials: "Chemicals, metals, mining, paper, and construction materials.",
+  "Real Estate": "REITs, property developers, and real estate services.",
+  Utilities: "Electric, gas, water utilities, and independent power producers.",
+};
+
+const DEFAULT_REFRESH_INTERVAL = 60_000;
+
+export interface SectorHubProps {
+  data?: SectorData[];
+  refreshInterval?: number;
+}
+
+function formatPercent(pct: number): string {
+  const sign = pct >= 0 ? "+" : "";
+  return `${sign}${pct.toFixed(2)}%`;
+}
+
+export function SectorHub({
+  data: externalData,
+  refreshInterval = DEFAULT_REFRESH_INTERVAL,
+}: SectorHubProps) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+
+  const [data, setData] = useState<SectorData[] | null>(externalData ?? null);
+  const [loading, setLoading] = useState(!externalData);
+  const [error, setError] = useState<string | null>(null);
+  const [timePeriod, setTimePeriod] = useState<TimePeriod>("1D");
+  const [sortField, setSortField] = useState<SortField>("changePercent");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [selectedSectors, setSelectedSectors] = useState<string[]>([]);
+  const [hoveredSector, setHoveredSector] = useState<string | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const fetchData = useCallback(async () => {
+    setError(null);
+    try {
+      const res = await fetch(`/api/market/sectors?period=${timePeriod}`);
+      if (!res.ok) throw new Error("Failed to fetch sector data");
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error ?? "Unknown error");
+      setData(json.data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load data");
+    } finally {
+      setLoading(false);
+    }
+  }, [timePeriod]);
+
+  useEffect(() => {
+    if (externalData) {
+      setData(externalData);
+      setLoading(false);
+      return;
+    }
+
+    fetchData();
+
+    if (refreshInterval > 0) {
+      intervalRef.current = setInterval(fetchData, refreshInterval);
+    }
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [externalData, fetchData, refreshInterval]);
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortField(field);
+      setSortDirection(field === "changePercent" ? "desc" : "asc");
+    }
+  };
+
+  const toggleSectorComparison = (sector: string) => {
+    setSelectedSectors((prev) =>
+      prev.includes(sector)
+        ? prev.filter((s) => s !== sector)
+        : [...prev, sector]
+    );
+  };
+
+  const sortedData = data
+    ? [...data].sort((a, b) => {
+        const mul = sortDirection === "asc" ? 1 : -1;
+        if (sortField === "sector") return mul * a.sector.localeCompare(b.sector);
+        return mul * (a.changePercent - b.changePercent);
+      })
+    : [];
+
+  const comparisonData = selectedSectors.length > 0
+    ? sortedData.filter((s) => selectedSectors.includes(s.sector))
+    : null;
+
+  // --- Loading ---
+  if (loading) {
+    return (
+      <div className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`} data-testid="sector-hub-loading">
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+        </div>
+      </div>
+    );
+  }
+
+  // --- Error ---
+  if (error) {
+    return (
+      <div className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`} data-testid="sector-hub-error">
+        <p className="text-red-500 text-center">{error}</p>
+        <button
+          onClick={() => { setLoading(true); fetchData(); }}
+          className="mt-2 mx-auto block text-sm text-blue-500 hover:underline"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  if (!data || data.length === 0) return null;
+
+  const maxAbsChange = Math.max(...data.map((s) => Math.abs(s.changePercent)), 0.01);
+
+  return (
+    <div className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`} data-testid="sector-hub">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
+        <h3 className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
+          Sectors Hub
+        </h3>
+        <div className="flex items-center gap-2">
+          {/* Sort toggle */}
+          <button
+            onClick={() => handleSort("changePercent")}
+            className={`text-xs px-2 py-1 rounded ${
+              sortField === "changePercent"
+                ? "bg-blue-600 text-white"
+                : isDark ? "bg-gray-700 text-gray-300" : "bg-gray-100 text-gray-600"
+            }`}
+            data-testid="sort-performance"
+            aria-label={`Sort by performance ${sortDirection === "asc" ? "ascending" : "descending"}`}
+          >
+            Performance {sortField === "changePercent" ? (sortDirection === "asc" ? "↑" : "↓") : ""}
+          </button>
+          <button
+            onClick={() => handleSort("sector")}
+            className={`text-xs px-2 py-1 rounded ${
+              sortField === "sector"
+                ? "bg-blue-600 text-white"
+                : isDark ? "bg-gray-700 text-gray-300" : "bg-gray-100 text-gray-600"
+            }`}
+            data-testid="sort-name"
+            aria-label={`Sort by name ${sortDirection === "asc" ? "ascending" : "descending"}`}
+          >
+            Name {sortField === "sector" ? (sortDirection === "asc" ? "↑" : "↓") : ""}
+          </button>
+        </div>
+      </div>
+
+      {/* Time period selector */}
+      <div className="flex gap-1 mb-4" data-testid="time-period-selector">
+        {(["1D", "1W", "1M", "3M", "1Y", "5Y", "YTD", "Max"] as TimePeriod[]).map((period) => (
+          <button
+            key={period}
+            onClick={() => setTimePeriod(period)}
+            className={`text-xs px-2.5 py-1 rounded ${
+              timePeriod === period
+                ? "bg-blue-600 text-white"
+                : isDark ? "bg-gray-700 text-gray-300 hover:bg-gray-600" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+            }`}
+            data-testid={`period-${period}`}
+          >
+            {period}
+          </button>
+        ))}
+      </div>
+
+      {/* Sector grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" data-testid="sector-grid">
+        {sortedData.map((sector) => {
+          const isPositive = sector.changePercent >= 0;
+          const colorClass = isPositive ? "text-green-500" : "text-red-500";
+          const barWidth = Math.min(Math.abs(sector.changePercent) / maxAbsChange * 100, 100);
+          const barColor = isPositive ? "bg-green-500/20" : "bg-red-500/20";
+          const isSelected = selectedSectors.includes(sector.sector);
+          const isHovered = hoveredSector === sector.sector;
+
+          return (
+            <div
+              key={sector.sector}
+              className={`relative p-3 rounded-lg cursor-pointer transition-all ${
+                isSelected
+                  ? isDark ? "ring-2 ring-blue-500 bg-gray-700" : "ring-2 ring-blue-500 bg-blue-50"
+                  : isDark ? "bg-gray-700/50 hover:bg-gray-700" : "bg-gray-50 hover:bg-gray-100"
+              }`}
+              data-testid={`sector-${sector.sector.replace(/\s+/g, "-")}`}
+              onClick={() => toggleSectorComparison(sector.sector)}
+              onMouseEnter={() => setHoveredSector(sector.sector)}
+              onMouseLeave={() => setHoveredSector(null)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") toggleSectorComparison(sector.sector); }}
+              aria-pressed={isSelected}
+              aria-label={`${sector.sector}: ${formatPercent(sector.changePercent)}`}
+            >
+              {/* Strength bar */}
+              <div
+                className={`absolute bottom-0 left-0 h-1 rounded-b-lg ${barColor}`}
+                style={{ width: `${barWidth}%` }}
+                data-testid={`strength-bar-${sector.sector.replace(/\s+/g, "-")}`}
+              />
+
+              <div className="flex items-center justify-between">
+                <p className={`text-sm font-medium ${isDark ? "text-gray-200" : "text-gray-900"}`}>
+                  {sector.sector}
+                </p>
+                <p className={`text-sm font-semibold ${colorClass}`} data-testid={`change-${sector.sector.replace(/\s+/g, "-")}`}>
+                  {formatPercent(sector.changePercent)}
+                </p>
+              </div>
+
+              {/* Tooltip on hover */}
+              {isHovered && SECTOR_DESCRIPTIONS[sector.sector] && (
+                <div
+                  className={`mt-2 text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}
+                  role="tooltip"
+                  data-testid={`tooltip-${sector.sector.replace(/\s+/g, "-")}`}
+                >
+                  {SECTOR_DESCRIPTIONS[sector.sector]}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Comparison view */}
+      {comparisonData && comparisonData.length > 0 && (
+        <div className="mt-6" data-testid="comparison-view">
+          <div className="flex items-center justify-between mb-3">
+            <h4 className={`text-sm font-semibold ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+              Sector Comparison
+            </h4>
+            <button
+              onClick={() => setSelectedSectors([])}
+              className="text-xs text-blue-500 hover:underline"
+              data-testid="clear-comparison"
+            >
+              Clear
+            </button>
+          </div>
+          <div className="space-y-2">
+            {comparisonData.map((sector) => {
+              const isPositive = sector.changePercent >= 0;
+              const barWidth = Math.min(Math.abs(sector.changePercent) / maxAbsChange * 100, 100);
+              return (
+                <div key={sector.sector} className="flex items-center gap-3">
+                  <span className={`text-xs w-40 truncate ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+                    {sector.sector}
+                  </span>
+                  <div className={`flex-1 h-4 rounded ${isDark ? "bg-gray-700" : "bg-gray-100"}`}>
+                    <div
+                      className={`h-full rounded ${isPositive ? "bg-green-500" : "bg-red-500"}`}
+                      style={{ width: `${barWidth}%` }}
+                    />
+                  </div>
+                  <span className={`text-xs font-medium w-16 text-right ${isPositive ? "text-green-500" : "text-red-500"}`}>
+                    {formatPercent(sector.changePercent)}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

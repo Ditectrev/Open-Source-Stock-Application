@@ -11,6 +11,7 @@ import {
   PriceData,
   FinancialData,
   MarketIndex,
+  SectorData,
   TimeRange,
   TechnicalIndicators,
   ForecastData,
@@ -340,6 +341,102 @@ export class YahooFinanceService {
       return results;
     }
 
+    /**
+     * Fetch sector performance data via SPDR sector ETFs.
+     */
+    /**
+       * Fetch sector performance data via SPDR sector ETFs.
+       * @param period Yahoo Finance range string (1d, 5d, 1mo, 3mo, 1y, ytd). Defaults to 1d.
+       */
+      async getSectorPerformance(period: string = "1d"): Promise<SectorData[]> {
+        const sectorETFs: { symbol: string; sector: string }[] = [
+          { symbol: "XLK", sector: "Technology" },
+          { symbol: "XLF", sector: "Financial" },
+          { symbol: "XLY", sector: "Consumer Discretionary" },
+          { symbol: "XLC", sector: "Communication" },
+          { symbol: "XLV", sector: "Healthcare" },
+          { symbol: "XLI", sector: "Industrials" },
+          { symbol: "XLP", sector: "Consumer Staples" },
+          { symbol: "XLE", sector: "Energy" },
+          { symbol: "XLB", sector: "Materials" },
+          { symbol: "XLRE", sector: "Real Estate" },
+          { symbol: "XLU", sector: "Utilities" },
+        ];
+
+        const results: SectorData[] = [];
+
+        const fetches = sectorETFs.map(async (etf) => {
+          try {
+            // For 1d, use the live quote change
+            if (period === "1d") {
+              const summary = await this.fetchQuoteSummary(etf.symbol, "price");
+              const price = summary.price || {};
+              return {
+                sector: etf.sector,
+                performance: price.regularMarketPrice?.raw || 0,
+                changePercent: (price.regularMarketChangePercent?.raw || 0) * 100,
+                constituents: 0,
+              };
+            }
+
+            // For other periods, compute change from historical data
+            const interval = period === "5d" ? "1d" : "1d";
+            const url = `${this.baseUrl}/v8/finance/chart/${etf.symbol}?range=${period}&interval=${interval}`;
+            const { crumb, cookie } = await getCrumbSafe(this);
+
+            const headers: Record<string, string> = {
+              Accept: "application/json",
+              "User-Agent": "Mozilla/5.0",
+            };
+            if (cookie) headers["Cookie"] = cookie;
+
+            const finalUrl = crumb ? `${url}&crumb=${encodeURIComponent(crumb)}` : url;
+            const response = await fetch(finalUrl, { headers });
+
+            if (!response.ok) {
+              throw new Error(`Yahoo Finance API error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            const closes: number[] = data.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
+            const validCloses = closes.filter((c: number | null) => c != null);
+
+            if (validCloses.length < 2) {
+              throw new Error("Not enough data points");
+            }
+
+            const startPrice = validCloses[0];
+            const endPrice = validCloses[validCloses.length - 1];
+            const changePct = ((endPrice - startPrice) / startPrice) * 100;
+
+            return {
+              sector: etf.sector,
+              performance: endPrice,
+              changePercent: changePct,
+              constituents: 0,
+            };
+          } catch (error) {
+            logger.warn(`Failed to fetch sector ETF ${etf.symbol} for period ${period}, skipping`, {
+              error: (error as Error).message,
+            });
+            return null;
+          }
+        });
+
+        const settled = await Promise.all(fetches);
+        for (const item of settled) {
+          if (item) results.push(item);
+        }
+
+        if (results.length === 0) {
+          throw new Error("Failed to fetch any sector performance data");
+        }
+
+        return results;
+      }
+
+
+
 
 
   /**
@@ -505,6 +602,8 @@ export class YahooFinanceService {
         return { interval: "1d", period: "1y" };
       case "5Y":
         return { interval: "1wk", period: "5y" };
+      case "YTD":
+        return { interval: "1d", period: "ytd" };
       case "Max":
         return { interval: "1mo", period: "max" };
       default:

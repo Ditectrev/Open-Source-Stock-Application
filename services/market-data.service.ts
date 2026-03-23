@@ -343,27 +343,20 @@ export class MarketDataService {
   /**
    * Get sector performance (placeholder - would integrate with sector data API)
    */
-  async getSectorPerformance(): Promise<SectorData[]> {
-    const cacheKey = "market:sectors";
+  async getSectorPerformance(period: string = "1d"): Promise<SectorData[]> {
+      const cacheKey = `market:sectors:${period}`;
 
-    // Check cache first
-    const cached = cacheService.get<SectorData[]>(cacheKey);
-    if (cached) {
-      return cached;
+      const cached = cacheService.get<SectorData[]>(cacheKey);
+      if (cached) {
+        return cached;
+      }
+
+      const data = await yahooFinanceService.getSectorPerformance(period);
+
+      cacheService.set(cacheKey, data, this.cacheTTL);
+
+      return data;
     }
-
-    // Placeholder implementation
-    const sectors: SectorData[] = [
-      { sector: "Technology", performance: 0, changePercent: 0, constituents: 0 },
-      { sector: "Financial", performance: 0, changePercent: 0, constituents: 0 },
-      { sector: "Healthcare", performance: 0, changePercent: 0, constituents: 0 },
-    ];
-
-    // Cache the result
-    cacheService.set(cacheKey, sectors, this.cacheTTL);
-
-    return sectors;
-  }
 
   /**
    * Invalidate cache for a symbol

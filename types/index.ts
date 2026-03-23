@@ -51,7 +51,7 @@ export interface AuthResult {
 // Market Data Types
 // ============================================================================
 
-export type TimeRange = "1D" | "1W" | "1M" | "3M" | "1Y" | "5Y" | "Max";
+export type TimeRange = "1D" | "1W" | "1M" | "3M" | "1Y" | "5Y" | "YTD" | "Max";
 export type ChartType = "line" | "area" | "candlestick";
 
 export interface SymbolData {
@@ -183,6 +183,7 @@ export interface SectorData {
   performance: number;
   changePercent: number;
   constituents: number;
+  topHoldings?: string[];
 }
 
 // ============================================================================

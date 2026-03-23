@@ -13,6 +13,7 @@ import { SeasonalHeatmap } from "@/components/SeasonalHeatmap";
 import { FinancialsTable } from "@/components/FinancialsTable";
 import { FearGreedGauge } from "@/components/FearGreedGauge";
 import { WorldMarkets } from "@/components/WorldMarkets";
+import { SectorHub } from "@/components/SectorHub";
 import { Footer } from "@/components/Footer";
 
 type TabType = "overview" | "financials" | "technicals" | "forecasts" | "seasonals";
@@ -197,6 +198,9 @@ export default function Home() {
             <FearGreedGauge />
             <div className="mt-8">
               <WorldMarkets />
+            </div>
+            <div className="mt-8">
+              <SectorHub />
             </div>
           </div>
         )}
