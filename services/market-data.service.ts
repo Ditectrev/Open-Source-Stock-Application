@@ -21,6 +21,7 @@ import {
   MarketIndex,
   SectorData,
   EconomicEvent,
+  EarningsEvent,
   TimeRange,
 } from "@/types";
 import {
@@ -389,6 +390,46 @@ export class MarketDataService {
         data = [];
       }
     }
+    rateLimiter.recordCall(endpoint);
+
+    // Cache the result
+    cacheService.set(cacheKey, data, this.cacheTTL);
+
+    return data;
+  }
+
+  /**
+   * Get earnings calendar events with caching and rate limiting
+   */
+  async getEarningsEvents(
+    startDate?: string,
+    endDate?: string
+  ): Promise<EarningsEvent[]> {
+    const cacheKey = `market:earnings-events:${startDate || "default"}:${endDate || "default"}`;
+
+    // Check cache first
+    const cached = cacheService.get<EarningsEvent[]>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    // Check rate limit
+    const endpoint = "yahoo:earnings-events";
+    const allowed = await rateLimiter.checkLimit(endpoint);
+
+    if (!allowed) {
+      logger.warn("Rate limit exceeded, serving stale cache if available", {
+        startDate,
+        endDate,
+      });
+      const stale = cacheService.get<EarningsEvent[]>(cacheKey);
+      if (stale) return stale;
+
+      throw new Error("Rate limit exceeded and no cached data available");
+    }
+
+    // Fetch from API
+    const data = await yahooFinanceService.getEarningsCalendar(startDate, endDate);
     rateLimiter.recordCall(endpoint);
 
     // Cache the result

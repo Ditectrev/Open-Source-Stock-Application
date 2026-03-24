@@ -52,3 +52,6 @@ export type { SectorHubProps } from "./SectorHub";
 
 export { EconomicCalendar } from "./EconomicCalendar";
 export type { EconomicCalendarProps } from "./EconomicCalendar";
+
+export { EarningsCalendar } from "./EarningsCalendar";
+export type { EarningsCalendarProps } from "./EarningsCalendar";

@@ -16,6 +16,7 @@ import {
   TechnicalIndicators,
   ForecastData,
   SeasonalData,
+  EarningsEvent,
 } from "@/types";
 
 export class YahooFinanceService {
@@ -434,6 +435,103 @@ export class YahooFinanceService {
 
         return results;
       }
+
+
+  /**
+   * Fetch earnings calendar data for a date range.
+   * Uses Yahoo Finance trending tickers + calendarEvents module to build an earnings calendar.
+   */
+  async getEarningsCalendar(startDate?: string, endDate?: string): Promise<EarningsEvent[]> {
+      return retryWithBackoff(
+        async () => {
+          try {
+            const rangeStart = startDate ? new Date(startDate) : new Date();
+            const rangeEnd = endDate
+              ? new Date(endDate)
+              : new Date(rangeStart.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+            // Scan a broad set of well-known symbols for upcoming earnings
+            const symbols = [
+              // Mega-cap tech
+              "AAPL","MSFT","GOOGL","AMZN","META","NVDA","TSLA","AVGO","ORCL","CRM",
+              "ADBE","AMD","INTC","CSCO","QCOM","TXN","IBM","NOW","UBER","SHOP",
+              // Finance
+              "JPM","BAC","WFC","GS","MS","C","BLK","SCHW","AXP","USB",
+              "PNC","TFC","COF","BK","CME","ICE","MCO","SPGI","MMC","AON",
+              // Healthcare
+              "UNH","JNJ","LLY","PFE","ABBV","MRK","TMO","ABT","DHR","BMY",
+              "AMGN","GILD","ISRG","MDT","SYK","REGN","VRTX","ZTS","BDX","EW",
+              // Consumer
+              "WMT","PG","KO","PEP","COST","MCD","NKE","SBUX","TGT","LOW",
+              "HD","TJX","BKNG","MAR","HLT","CMG","YUM","DG","DLTR","ROST",
+              // Industrial / Energy / Materials
+              "CAT","DE","HON","UNP","RTX","BA","LMT","GE","MMM","EMR",
+              "XOM","CVX","COP","SLB","EOG","PSX","VLO","MPC","OXY","HAL",
+              // Comm / Media / Other
+              "DIS","NFLX","CMCSA","T","VZ","TMUS","CHTR","EA","TTWO","WBD",
+              "V","MA","PYPL","SQ","FIS","FISV","GPN","INTU","ADP","PAYX",
+              // Additional coverage
+              "LIN","APD","ECL","DD","NEM","FCX","ASML","JEF","QS","PLTR",
+              "SNOW","CRWD","DDOG","ZS","NET","MDB","PANW","FTNT","OKTA","BILL",
+            ];
+
+            // Batch fetch using quote endpoint for speed (up to 100 symbols per call)
+            const earningsEvents: EarningsEvent[] = [];
+            const batchSize = 15;
+
+            for (let i = 0; i < symbols.length; i += batchSize) {
+              const batch = symbols.slice(i, i + batchSize);
+
+              const fetches = batch.map(async (symbol) => {
+                try {
+                  const summary = await this.fetchQuoteSummary(symbol, "calendarEvents,price");
+                  const calendarEvents = summary.calendarEvents || {};
+                  const earnings = calendarEvents.earnings || {};
+                  const price = summary.price || {};
+
+                  const earningsDate = earnings.earningsDate?.[0]?.raw
+                    ? new Date(earnings.earningsDate[0].raw * 1000)
+                    : null;
+
+                  if (!earningsDate) return null;
+                  if (earningsDate < rangeStart || earningsDate > rangeEnd) return null;
+
+                  return {
+                    id: `earnings-${symbol}-${earningsDate.toISOString().split("T")[0]}`,
+                    symbol,
+                    companyName: price.longName || price.shortName || symbol,
+                    date: earningsDate,
+                    time: earnings.earningsDate?.length > 1 ? "BMO" : undefined,
+                    epsEstimate: earnings.earningsAverage?.raw ?? undefined,
+                    revenueEstimate: earnings.revenueAverage?.raw ?? undefined,
+                  } as EarningsEvent;
+                } catch {
+                  return null;
+                }
+              });
+
+              const results = await Promise.all(fetches);
+              for (const item of results) {
+                if (item) earningsEvents.push(item);
+              }
+            }
+
+            earningsEvents.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+            return earningsEvents;
+          } catch (error) {
+            logger.error("Failed to fetch earnings calendar", error as Error, {
+              startDate,
+              endDate,
+              baseUrl: this.baseUrl,
+            });
+            throw error;
+          }
+        },
+        `YahooFinance:EarningsCalendar`
+      );
+    }
+
 
 
 

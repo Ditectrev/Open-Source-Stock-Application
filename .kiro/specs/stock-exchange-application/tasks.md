@@ -588,19 +588,19 @@ The implementation follows an incremental approach, building core infrastructure
     - Support country and importance filters
     - _Requirements: 24.3, 24.5, 24.6_
 
-  - [~] 21.4 Write unit tests for EconomicCalendar
+  - [x] 21.4 Write unit tests for EconomicCalendar
     - Test event display
     - Test country filter
     - Test importance filter
     - _Requirements: 24.4, 24.5, 24.6, 24.7_
 
-- [ ] 22. Earnings Calendar
-  - [ ] 22.1 Implement earnings calendar data fetching
+- [x] 22. Earnings Calendar
+  - [x] 22.1 Implement earnings calendar data fetching
     - Fetch earnings announcements
     - Parse company name, symbol, date, EPS estimates
     - _Requirements: 24.8_
 
-  - [ ] 22.2 Create EarningsCalendar component
+  - [x] 22.2 Create EarningsCalendar component
     - Display upcoming earnings announcements
     - Show company name, symbol, announcement date
     - Display EPS estimates
@@ -610,11 +610,11 @@ The implementation follows an incremental approach, building core infrastructure
     - Color-code surprises: green for beats, red for misses
     - _Requirements: 24.8, 24.9, 24.10, 24.11, 24.12, 24.13_
 
-  - [ ] 22.3 Create earnings calendar API route
+  - [x] 22.3 Create earnings calendar API route
     - Implement GET /api/calendar/earnings with date range
     - _Requirements: 24.8_
 
-  - [ ]* 22.4 Write unit tests for EarningsCalendar
+  - [x] 22.4 Write unit tests for EarningsCalendar
     - Test earnings display
     - Test EPS comparison
     - Test surprise color coding
