@@ -1,0 +1,15 @@
+{
+  "enabled": true,
+  "name": "Release & Push",
+  "description": "Bumps the patch version in package.json, runs tests (vitest --run) and linting (next lint), then stages all files, commits with the new version number, creates a git tag, and pushes to the remote repository.",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Perform the following release steps in order. Stop immediately if any step fails and report the error:\n\n1. Read the current version from package.json\n2. Bump the patch version (e.g., 0.13.0 → 0.13.1) by editing package.json\n3. Run tests: vitest --run\n4. Run linting: bun --bun next lint\n5. Stage all changes: git add -A\n6. Commit with message: \"release: v{new_version}\"\n7. Create a git tag: git tag v{new_version}\n8. Push to remote with tags: git push && git push --tags\n\nReport the result of each step as you go."
+  },
+  "workspaceFolderName": "stock-app",
+  "shortName": "release-and-push"
+}

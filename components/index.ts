@@ -55,3 +55,6 @@ export type { EconomicCalendarProps } from "./EconomicCalendar";
 
 export { EarningsCalendar } from "./EarningsCalendar";
 export type { EarningsCalendarProps } from "./EarningsCalendar";
+
+export { DividendCalendar } from "./DividendCalendar";
+export type { DividendCalendarProps } from "./DividendCalendar";

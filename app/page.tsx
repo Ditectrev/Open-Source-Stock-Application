@@ -16,6 +16,7 @@ import { WorldMarkets } from "@/components/WorldMarkets";
 import { SectorHub } from "@/components/SectorHub";
 import { EconomicCalendar } from "@/components/EconomicCalendar";
 import { EarningsCalendar } from "@/components/EarningsCalendar";
+import { DividendCalendar } from "@/components/DividendCalendar";
 import { Footer } from "@/components/Footer";
 
 type TabType = "overview" | "financials" | "technicals" | "forecasts" | "seasonals";
@@ -209,6 +210,9 @@ export default function Home() {
             </div>
             <div className="mt-8">
               <EarningsCalendar />
+            </div>
+            <div className="mt-8">
+              <DividendCalendar />
             </div>
           </div>
         )}

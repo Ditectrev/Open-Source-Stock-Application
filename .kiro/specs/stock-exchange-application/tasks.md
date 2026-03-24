@@ -620,13 +620,13 @@ The implementation follows an incremental approach, building core infrastructure
     - Test surprise color coding
     - _Requirements: 24.8, 24.10, 24.13_
 
-- [ ] 23. Dividend Calendar
-  - [ ] 23.1 Implement dividend calendar data fetching
+- [x] 23. Dividend Calendar
+  - [x] 23.1 Implement dividend calendar data fetching
     - Fetch dividend payment information
     - Parse company name, symbol, amount, dates, yield
     - _Requirements: 24.14, 24.15_
 
-  - [ ] 23.2 Create DividendCalendar component
+  - [x] 23.2 Create DividendCalendar component
     - Display upcoming dividend payments
     - Show company name, symbol, dividend amount
     - Display ex-dividend date, payment date, yield
@@ -635,11 +635,11 @@ The implementation follows an incremental approach, building core infrastructure
     - Implement timezone filter
     - _Requirements: 24.14, 24.15, 24.16, 24.17, 24.18_
 
-  - [ ] 23.3 Create dividend calendar API route
+  - [x] 23.3 Create dividend calendar API route
     - Implement GET /api/calendar/dividends with filters
     - _Requirements: 24.14_
 
-  - [ ]* 23.4 Write unit tests for DividendCalendar
+  - [x] 23.4 Write unit tests for DividendCalendar
     - Test dividend display
     - Test time period sorting
     - Test country filter

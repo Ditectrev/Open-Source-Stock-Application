@@ -17,6 +17,7 @@ import {
   ForecastData,
   SeasonalData,
   EarningsEvent,
+  DividendEvent,
 } from "@/types";
 
 export class YahooFinanceService {
@@ -532,9 +533,125 @@ export class YahooFinanceService {
       );
     }
 
+  /**
+   * Fetch dividend calendar data.
+   * Scans well-known dividend-paying symbols via quoteSummary to build a dividend calendar.
+   */
+  async getDividendCalendar(): Promise<DividendEvent[]> {
+    return retryWithBackoff(
+      async () => {
+        try {
+          // Dividend-heavy symbols across sectors
+          const symbols = [
+            // Dividend aristocrats / kings
+            "JNJ", "PG", "KO", "PEP", "MCD", "MMM", "ABT", "ABBV",
+            "T", "VZ", "XOM", "CVX", "CL", "GPC", "SWK", "EMR",
+            "ITW", "ADP", "BDX", "SHW", "CTAS", "AFL", "CB", "ED",
+            // High-yield / popular dividend stocks
+            "O", "MAIN", "STAG", "AGNC", "NLY", "EPD", "MO", "PM",
+            "IBM", "INTC", "CSCO", "TXN", "AVGO", "QCOM", "HD", "LOW",
+            // Financials
+            "JPM", "BAC", "WFC", "GS", "MS", "USB", "PNC", "BLK",
+            // Utilities / REITs
+            "DUK", "SO", "NEE", "D", "AEP", "WEC", "ES", "SPG",
+            "AMT", "PLD", "CCI", "WELL", "DLR", "PSA", "EQR", "AVB",
+          ];
 
+          const dividendEvents: DividendEvent[] = [];
+          const batchSize = 15;
 
+          for (let i = 0; i < symbols.length; i += batchSize) {
+            const batch = symbols.slice(i, i + batchSize);
 
+            const fetches = batch.map(async (symbol) => {
+              try {
+                const summary = await this.fetchQuoteSummary(
+                  symbol,
+                  "calendarEvents,summaryDetail,price"
+                );
+                const calendar = summary.calendarEvents || {};
+                const summaryDetail = summary.summaryDetail || {};
+                const price = summary.price || {};
+
+                const exDivRaw = calendar.exDividendDate?.raw;
+                const divDateRaw = calendar.dividendDate?.raw;
+
+                if (!exDivRaw) return null;
+
+                const exDividendDate = new Date(exDivRaw * 1000);
+                const paymentDate = divDateRaw
+                  ? new Date(divDateRaw * 1000)
+                  : exDividendDate;
+
+                const amount =
+                  summaryDetail.dividendRate?.raw ?? 0;
+                const yieldVal =
+                  summaryDetail.dividendYield?.raw ?? 0;
+
+                // Infer frequency from ex-dividend date patterns
+                const frequency = this.inferDividendFrequency(
+                  summaryDetail.trailingAnnualDividendRate?.raw,
+                  amount
+                );
+
+                return {
+                  id: `div-${symbol}-${exDividendDate.toISOString().split("T")[0]}`,
+                  symbol,
+                  companyName:
+                    price.longName || price.shortName || symbol,
+                  amount,
+                  exDividendDate,
+                  paymentDate,
+                  yield: yieldVal * 100,
+                  frequency,
+                } as DividendEvent;
+              } catch {
+                return null;
+              }
+            });
+
+            const results = await Promise.all(fetches);
+            for (const item of results) {
+              if (item && item.amount > 0) dividendEvents.push(item);
+            }
+          }
+
+          dividendEvents.sort(
+            (a, b) =>
+              new Date(a.exDividendDate).getTime() -
+              new Date(b.exDividendDate).getTime()
+          );
+
+          return dividendEvents;
+        } catch (error) {
+          logger.error(
+            "Failed to fetch dividend calendar",
+            error as Error,
+            { baseUrl: this.baseUrl }
+          );
+          throw error;
+        }
+      },
+      `YahooFinance:DividendCalendar`
+    );
+  }
+
+  /**
+   * Infer dividend payment frequency from annual vs per-payment rate.
+   */
+  private inferDividendFrequency(
+    annualRate: number | undefined,
+    perPaymentRate: number | undefined
+  ): DividendEvent["frequency"] {
+    if (!annualRate || !perPaymentRate || perPaymentRate === 0) {
+      return "quarterly";
+    }
+    const ratio = Math.round(annualRate / perPaymentRate);
+    if (ratio >= 11) return "monthly";
+    if (ratio >= 3) return "quarterly";
+    if (ratio >= 2) return "semi-annual";
+    return "annual";
+  }
 
 
   /**

@@ -294,6 +294,8 @@ export interface DividendEvent {
   recordDate?: Date;
   yield: number;
   frequency: "monthly" | "quarterly" | "semi-annual" | "annual";
+  country?: string;
+  timezone?: string;
 }
 
 export interface IPOEvent {

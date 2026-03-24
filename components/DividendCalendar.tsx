@@ -1,0 +1,459 @@
+"use client";
+
+/**
+ * DividendCalendar Component
+ * Displays upcoming dividend payments grouped by day with filtering and sorting.
+ *
+ * Requirements: 24.14, 24.15, 24.16, 24.17, 24.18
+ */
+
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { useTheme } from "@/lib/theme-context";
+import { DividendEvent } from "@/types";
+
+export interface DividendCalendarProps {
+  data?: DividendEvent[];
+}
+
+function toDateString(d: Date): string {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function formatDayHeader(dateStr: string): string {
+  const d = new Date(dateStr + "T12:00:00");
+  return d.toLocaleDateString(undefined, {
+    weekday: "long",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function formatCurrency(value: number): string {
+  return `$${value.toFixed(2)}`;
+}
+
+function formatYield(value: number): string {
+  return `${value.toFixed(2)}%`;
+}
+
+const todayStr = toDateString(new Date());
+const defaultStart = todayStr;
+
+export function DividendCalendar({
+  data: externalData,
+}: DividendCalendarProps) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+
+  const [data, setData] = useState<DividendEvent[] | null>(
+    externalData ?? null
+  );
+  const [loading, setLoading] = useState(!externalData);
+  const [error, setError] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState<string>(defaultStart);
+  const [endDate, setEndDate] = useState<string>("");
+  const [timePeriod, setTimePeriod] = useState<string>("all");
+  const [countryFilter, setCountryFilter] = useState<string>("all");
+  const [timezoneFilter, setTimezoneFilter] = useState<string>("all");
+
+  const fetchData = useCallback(async () => {
+    setError(null);
+    try {
+      const res = await fetch("/api/calendar/dividends");
+      if (!res.ok) throw new Error("Failed to fetch dividend events");
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error ?? "Unknown error");
+      setData(json.data);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to load data"
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (externalData) {
+      setData(externalData);
+      setLoading(false);
+      return;
+    }
+    fetchData();
+  }, [externalData, fetchData]);
+
+  const filteredEvents = useMemo(() => {
+    if (!data) return [];
+
+    let effectiveStart = startDate;
+    let effectiveEnd = endDate;
+
+    if (timePeriod !== "all") {
+      const now = new Date();
+      effectiveStart = toDateString(now);
+      const end = new Date(now);
+      if (timePeriod === "week") end.setDate(end.getDate() + 7);
+      else if (timePeriod === "month") end.setMonth(end.getMonth() + 1);
+      else if (timePeriod === "quarter") end.setMonth(end.getMonth() + 3);
+      effectiveEnd = toDateString(end);
+    }
+
+    return data.filter((event) => {
+      const exDate =
+        typeof event.exDividendDate === "string"
+          ? new Date(event.exDividendDate)
+          : event.exDividendDate;
+      const exDateStr = toDateString(exDate);
+
+      if (effectiveStart && exDateStr < effectiveStart) return false;
+      if (effectiveEnd && exDateStr > effectiveEnd) return false;
+
+      if (countryFilter !== "all" && event.country !== countryFilter)
+        return false;
+      if (timezoneFilter !== "all" && event.timezone !== timezoneFilter)
+        return false;
+
+      return true;
+    });
+  }, [data, startDate, endDate, timePeriod, countryFilter, timezoneFilter]);
+
+  const availableCountries = useMemo(() => {
+    if (!data) return [];
+    const set = new Set(data.map((e) => e.country).filter(Boolean));
+    return Array.from(set).sort();
+  }, [data]);
+
+  const availableTimezones = useMemo(() => {
+    if (!data) return [];
+    const set = new Set(data.map((e) => e.timezone).filter(Boolean));
+    return Array.from(set).sort();
+  }, [data]);
+
+  const groupedEvents = useMemo(() => {
+    const groups: Record<string, DividendEvent[]> = {};
+    for (const event of filteredEvents) {
+      const exDate =
+        typeof event.exDividendDate === "string"
+          ? new Date(event.exDividendDate)
+          : event.exDividendDate;
+      const key = toDateString(exDate);
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(event);
+    }
+    return Object.entries(groups).sort(([a], [b]) =>
+      a.localeCompare(b)
+    );
+  }, [filteredEvents]);
+
+  if (loading) {
+    return (
+      <div
+        className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
+        data-testid="dividend-calendar-loading"
+      >
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div
+        className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
+        data-testid="dividend-calendar-error"
+      >
+        <p className="text-red-500 text-center">{error}</p>
+        <button
+          onClick={() => {
+            setLoading(true);
+            fetchData();
+          }}
+          className="mt-2 mx-auto block text-sm text-blue-500 hover:underline"
+          data-testid="retry-button"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
+      data-testid="dividend-calendar"
+    >
+      <h3
+        className={`text-lg font-semibold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}
+      >
+        Dividend Calendar
+      </h3>
+
+      {/* Filters */}
+      <div
+        className="flex flex-col sm:flex-row gap-3 mb-4"
+        data-testid="filters"
+      >
+        <div className="flex items-center gap-2">
+          <label
+            htmlFor="dividend-start-date"
+            className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}
+          >
+            From:
+          </label>
+          <input
+            id="dividend-start-date"
+            type="date"
+            value={startDate}
+            onChange={(e) => {
+              setStartDate(e.target.value);
+              setTimePeriod("all");
+            }}
+            className={`text-sm rounded px-2 py-1 border ${
+              isDark
+                ? "bg-gray-700 border-gray-600 text-gray-200"
+                : "bg-white border-gray-300 text-gray-700"
+            }`}
+            data-testid="start-date"
+          />
+          <label
+            htmlFor="dividend-end-date"
+            className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}
+          >
+            To:
+          </label>
+          <input
+            id="dividend-end-date"
+            type="date"
+            value={endDate}
+            onChange={(e) => {
+              setEndDate(e.target.value);
+              setTimePeriod("all");
+            }}
+            className={`text-sm rounded px-2 py-1 border ${
+              isDark
+                ? "bg-gray-700 border-gray-600 text-gray-200"
+                : "bg-white border-gray-300 text-gray-700"
+            }`}
+            data-testid="end-date"
+          />
+        </div>
+
+        {/* Time period sorting (Req 24.16) */}
+        <div className="flex items-center gap-2">
+          <label
+            htmlFor="dividend-time-period"
+            className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}
+          >
+            Period:
+          </label>
+          <select
+            id="dividend-time-period"
+            value={timePeriod}
+            onChange={(e) => setTimePeriod(e.target.value)}
+            className={`text-sm rounded px-2 py-1 border ${
+              isDark
+                ? "bg-gray-700 border-gray-600 text-gray-200"
+                : "bg-white border-gray-300 text-gray-700"
+            }`}
+            data-testid="time-period-select"
+          >
+            <option value="all">All</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+            <option value="quarter">This Quarter</option>
+          </select>
+        </div>
+
+        {/* Country filter (Req 24.17) */}
+        {availableCountries.length > 0 && (
+          <div className="flex items-center gap-2">
+            <label
+              htmlFor="dividend-country"
+              className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}
+            >
+              Country:
+            </label>
+            <select
+              id="dividend-country"
+              value={countryFilter}
+              onChange={(e) => setCountryFilter(e.target.value)}
+              className={`text-sm rounded px-2 py-1 border ${
+                isDark
+                  ? "bg-gray-700 border-gray-600 text-gray-200"
+                  : "bg-white border-gray-300 text-gray-700"
+              }`}
+              data-testid="country-filter"
+            >
+              <option value="all">All Countries</option>
+              {availableCountries.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {/* Timezone filter (Req 24.18) */}
+        {availableTimezones.length > 0 && (
+          <div className="flex items-center gap-2">
+            <label
+              htmlFor="dividend-timezone"
+              className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}
+            >
+              Timezone:
+            </label>
+            <select
+              id="dividend-timezone"
+              value={timezoneFilter}
+              onChange={(e) => setTimezoneFilter(e.target.value)}
+              className={`text-sm rounded px-2 py-1 border ${
+                isDark
+                  ? "bg-gray-700 border-gray-600 text-gray-200"
+                  : "bg-white border-gray-300 text-gray-700"
+              }`}
+              data-testid="timezone-filter"
+            >
+              <option value="all">All Timezones</option>
+              {availableTimezones.map((tz) => (
+                <option key={tz} value={tz}>
+                  {tz}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+      </div>
+
+      {/* Events grouped by day */}
+      {filteredEvents.length === 0 ? (
+        <p
+          className={`text-center py-4 text-sm ${isDark ? "text-gray-400" : "text-gray-500"}`}
+          data-testid="no-events"
+        >
+          No dividend events match the selected filters.
+          {!externalData && (
+            <span className="block mt-1 text-xs">
+              The data source may be temporarily unavailable. Try again
+              in a few minutes.
+            </span>
+          )}
+        </p>
+      ) : (
+        <div className="space-y-4" data-testid="events-list">
+          {groupedEvents.map(([dateKey, events]) => {
+            const isToday = dateKey === todayStr;
+            return (
+              <div key={dateKey} data-testid={`day-group-${dateKey}`}>
+                <div
+                  className={`sticky top-0 z-10 px-3 py-2 rounded-t-lg text-sm font-semibold ${
+                    isToday
+                      ? isDark
+                        ? "bg-blue-900/40 text-blue-300 border-b border-blue-500/30"
+                        : "bg-blue-50 text-blue-800 border-b border-blue-200"
+                      : isDark
+                        ? "bg-gray-700 text-gray-200 border-b border-gray-600"
+                        : "bg-gray-100 text-gray-800 border-b border-gray-200"
+                  }`}
+                  data-testid={`day-header-${dateKey}`}
+                >
+                  {formatDayHeader(dateKey)}
+                  {isToday && (
+                    <span
+                      className={`ml-2 text-xs font-normal px-1.5 py-0.5 rounded ${
+                        isDark
+                          ? "bg-blue-800 text-blue-200"
+                          : "bg-blue-200 text-blue-700"
+                      }`}
+                    >
+                      Today
+                    </span>
+                  )}
+                  <span
+                    className={`ml-2 text-xs font-normal ${isDark ? "text-gray-400" : "text-gray-500"}`}
+                  >
+                    ({events.length} event
+                    {events.length !== 1 ? "s" : ""})
+                  </span>
+                </div>
+
+                <div
+                  className={`divide-y ${isDark ? "divide-gray-700" : "divide-gray-100"}`}
+                >
+                  {events.map((event) => {
+                    const payDate =
+                      typeof event.paymentDate === "string"
+                        ? new Date(event.paymentDate)
+                        : event.paymentDate;
+
+                    return (
+                      <div
+                        key={event.id}
+                        className={`flex items-start gap-3 px-3 py-2 ${
+                          isDark
+                            ? "hover:bg-gray-700/50"
+                            : "hover:bg-gray-50"
+                        }`}
+                        data-testid={`event-${event.id}`}
+                      >
+                        {/* Symbol badge */}
+                        <span
+                          className={`text-xs font-semibold px-2 py-0.5 rounded shrink-0 w-16 text-center inline-block ${
+                            isDark
+                              ? "bg-green-900/40 text-green-300"
+                              : "bg-green-100 text-green-700"
+                          }`}
+                          data-testid={`symbol-${event.id}`}
+                        >
+                          {event.symbol}
+                        </span>
+
+                        {/* Details */}
+                        <div className="flex-1 min-w-0">
+                          <span
+                            className={`text-sm font-medium truncate block ${isDark ? "text-gray-200" : "text-gray-900"}`}
+                          >
+                            {event.companyName}
+                          </span>
+                          <div
+                            className={`flex flex-wrap gap-3 mt-1 text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}
+                          >
+                            <span data-testid={`amount-${event.id}`}>
+                              Div: {formatCurrency(event.amount)}
+                            </span>
+                            <span data-testid={`yield-${event.id}`}>
+                              Yield: {formatYield(event.yield)}
+                            </span>
+                            <span data-testid={`payment-date-${event.id}`}>
+                              Pay: {toDateString(payDate)}
+                            </span>
+                            <span
+                              className={`capitalize ${
+                                isDark
+                                  ? "text-gray-500"
+                                  : "text-gray-400"
+                              }`}
+                              data-testid={`frequency-${event.id}`}
+                            >
+                              {event.frequency}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}

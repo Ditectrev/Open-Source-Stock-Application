@@ -22,6 +22,7 @@ import {
   SectorData,
   EconomicEvent,
   EarningsEvent,
+  DividendEvent,
   TimeRange,
 } from "@/types";
 import {
@@ -433,6 +434,38 @@ export class MarketDataService {
     rateLimiter.recordCall(endpoint);
 
     // Cache the result
+    cacheService.set(cacheKey, data, this.cacheTTL);
+
+    return data;
+  }
+
+  /**
+   * Get dividend calendar events with caching and rate limiting
+   */
+  async getDividendEvents(): Promise<DividendEvent[]> {
+    const cacheKey = "market:dividend-events";
+
+    const cached = cacheService.get<DividendEvent[]>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const endpoint = "yahoo:dividend-events";
+    const allowed = await rateLimiter.checkLimit(endpoint);
+
+    if (!allowed) {
+      logger.warn(
+        "Rate limit exceeded for dividend events, serving stale cache if available"
+      );
+      const stale = cacheService.get<DividendEvent[]>(cacheKey);
+      if (stale) return stale;
+
+      throw new Error("Rate limit exceeded and no cached data available");
+    }
+
+    const data = await yahooFinanceService.getDividendCalendar();
+    rateLimiter.recordCall(endpoint);
+
     cacheService.set(cacheKey, data, this.cacheTTL);
 
     return data;
