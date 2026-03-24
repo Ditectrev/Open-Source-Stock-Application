@@ -9,6 +9,7 @@ import { cacheService } from "@/lib/cache";
 import { rateLimiter } from "@/lib/rate-limiter";
 import { yahooFinanceService } from "./yahoo-finance.service";
 import { cnnApiService } from "./cnn-api.service";
+import { tradingEconomicsService } from "./trading-economics.service";
 import {
   SymbolData,
   PriceData,
@@ -19,6 +20,7 @@ import {
   FearGreedData,
   MarketIndex,
   SectorData,
+  EconomicEvent,
   TimeRange,
 } from "@/types";
 import {
@@ -331,6 +333,61 @@ export class MarketDataService {
         error: (cnnError as Error).message,
       });
       data = await yahooFinanceService.getWorldMarkets();
+    }
+    rateLimiter.recordCall(endpoint);
+
+    // Cache the result
+    cacheService.set(cacheKey, data, this.cacheTTL);
+
+    return data;
+  }
+
+  /**
+   * Get economic calendar events with caching and rate limiting
+   */
+  async getEconomicEvents(
+    country?: string,
+    importance?: "high" | "medium" | "low"
+  ): Promise<EconomicEvent[]> {
+    const cacheKey = `market:economic-events:${country || "all"}:${importance || "all"}`;
+
+    // Check cache first
+    const cached = cacheService.get<EconomicEvent[]>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    // Check rate limit
+    const endpoint = "cnn:economic-events";
+    const allowed = await rateLimiter.checkLimit(endpoint);
+
+    if (!allowed) {
+      logger.warn("Rate limit exceeded, serving stale cache if available", {
+        country,
+        importance,
+      });
+      const stale = cacheService.get<EconomicEvent[]>(cacheKey);
+      if (stale) return stale;
+
+      throw new Error("Rate limit exceeded and no cached data available");
+    }
+
+    // Fetch from API (CNN primary, Trading Economics fallback)
+    let data: EconomicEvent[];
+    try {
+      data = await cnnApiService.getEconomicEvents(country, importance);
+    } catch (cnnError) {
+      logger.warn("CNN economic events unavailable, falling back to Trading Economics", {
+        error: (cnnError as Error).message,
+      });
+      try {
+        data = await tradingEconomicsService.getEconomicEvents(country, importance);
+      } catch (teError) {
+        logger.warn("Trading Economics also unavailable, returning empty list", {
+          error: (teError as Error).message,
+        });
+        data = [];
+      }
     }
     rateLimiter.recordCall(endpoint);
 

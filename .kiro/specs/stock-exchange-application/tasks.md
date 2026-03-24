@@ -536,7 +536,7 @@ The implementation follows an incremental approach, building core infrastructure
   - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 20. Sectors Hub
+- [x] 20. Sectors Hub
   - [x] 20.1 Create SectorHub component
     - Display all 11 sectors: Technology, Financial, Consumer Discretionary, Communication, Healthcare, Industrials, Consumer Staples, Energy, Materials, Real Estate, Utilities
     - Fetch sector performance data
@@ -569,13 +569,13 @@ The implementation follows an incremental approach, building core infrastructure
     - Test sorting
     - _Requirements: 23.1, 23.5, 23.7, 23.12_
 
-- [ ] 21. Economic Calendar
-  - [ ] 21.1 Implement economic calendar API integration
+- [x] 21. Economic Calendar
+  - [x] 21.1 Implement economic calendar API integration
     - Fetch economic events from CNN's economic-events endpoint
     - Parse event data: name, date, time, country, importance, description
     - _Requirements: 24.3, 24.4_
 
-  - [ ] 21.2 Create EconomicCalendar component
+  - [x] 21.2 Create EconomicCalendar component
     - Display upcoming economic events
     - Show event name, date, time, and description
     - Implement country filter
@@ -583,12 +583,12 @@ The implementation follows an incremental approach, building core infrastructure
     - Apply filters to display matching events only
     - _Requirements: 24.4, 24.5, 24.6, 24.7_
 
-  - [ ] 21.3 Create calendar API route
+  - [x] 21.3 Create calendar API route
     - Implement GET /api/calendar/economic with query params
     - Support country and importance filters
     - _Requirements: 24.3, 24.5, 24.6_
 
-  - [ ]* 21.4 Write unit tests for EconomicCalendar
+  - [~] 21.4 Write unit tests for EconomicCalendar
     - Test event display
     - Test country filter
     - Test importance filter

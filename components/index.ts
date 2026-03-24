@@ -49,3 +49,6 @@ export type { WorldMarketsProps } from "./WorldMarkets";
 
 export { SectorHub } from "./SectorHub";
 export type { SectorHubProps } from "./SectorHub";
+
+export { EconomicCalendar } from "./EconomicCalendar";
+export type { EconomicCalendarProps } from "./EconomicCalendar";

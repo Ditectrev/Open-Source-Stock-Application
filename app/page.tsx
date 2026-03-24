@@ -14,6 +14,7 @@ import { FinancialsTable } from "@/components/FinancialsTable";
 import { FearGreedGauge } from "@/components/FearGreedGauge";
 import { WorldMarkets } from "@/components/WorldMarkets";
 import { SectorHub } from "@/components/SectorHub";
+import { EconomicCalendar } from "@/components/EconomicCalendar";
 import { Footer } from "@/components/Footer";
 
 type TabType = "overview" | "financials" | "technicals" | "forecasts" | "seasonals";
@@ -201,6 +202,9 @@ export default function Home() {
             </div>
             <div className="mt-8">
               <SectorHub />
+            </div>
+            <div className="mt-8">
+              <EconomicCalendar />
             </div>
           </div>
         )}
