@@ -58,3 +58,6 @@ export type { EarningsCalendarProps } from "./EarningsCalendar";
 
 export { DividendCalendar } from "./DividendCalendar";
 export type { DividendCalendarProps } from "./DividendCalendar";
+
+export { IPOCalendar } from "./IPOCalendar";
+export type { IPOCalendarProps } from "./IPOCalendar";

@@ -23,6 +23,7 @@ import {
   EconomicEvent,
   EarningsEvent,
   DividendEvent,
+  IPOEvent,
   TimeRange,
 } from "@/types";
 import {
@@ -464,6 +465,41 @@ export class MarketDataService {
     }
 
     const data = await yahooFinanceService.getDividendCalendar();
+    rateLimiter.recordCall(endpoint);
+
+    cacheService.set(cacheKey, data, this.cacheTTL);
+
+    return data;
+  }
+
+  /**
+   * Get IPO calendar events with caching and rate limiting
+   */
+  async getIPOEvents(
+    startDate?: string,
+    endDate?: string
+  ): Promise<IPOEvent[]> {
+    const cacheKey = `market:ipo-events:${startDate || "default"}:${endDate || "default"}`;
+
+    const cached = cacheService.get<IPOEvent[]>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const endpoint = "yahoo:ipo-events";
+    const allowed = await rateLimiter.checkLimit(endpoint);
+
+    if (!allowed) {
+      logger.warn(
+        "Rate limit exceeded for IPO events, serving stale cache if available"
+      );
+      const stale = cacheService.get<IPOEvent[]>(cacheKey);
+      if (stale) return stale;
+
+      throw new Error("Rate limit exceeded and no cached data available");
+    }
+
+    const data = await yahooFinanceService.getIPOCalendar(startDate, endDate);
     rateLimiter.recordCall(endpoint);
 
     cacheService.set(cacheKey, data, this.cacheTTL);

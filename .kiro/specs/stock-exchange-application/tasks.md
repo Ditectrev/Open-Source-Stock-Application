@@ -646,24 +646,24 @@ The implementation follows an incremental approach, building core infrastructure
     - Test timezone filter
     - _Requirements: 24.14, 24.15, 24.16, 24.17, 24.18_
 
-- [ ] 24. IPO Calendar
-  - [ ] 24.1 Implement IPO calendar data fetching
+- [x] 24. IPO Calendar
+  - [x] 24.1 Implement IPO calendar data fetching
     - Fetch upcoming IPO information
     - Parse company name, expected date, price range, shares, exchange
     - _Requirements: 24.19, 24.20, 24.21_
 
-  - [ ] 24.2 Create IPOCalendar component
+  - [x] 24.2 Create IPOCalendar component
     - Display upcoming IPOs
     - Show company name, expected listing date
     - Display price range and number of shares when available
     - Display exchange information
     - _Requirements: 24.19, 24.20, 24.21_
 
-  - [ ] 24.3 Create IPO calendar API route
+  - [x] 24.3 Create IPO calendar API route
     - Implement GET /api/calendar/ipos with date range
     - _Requirements: 24.19_
 
-  - [ ]* 24.4 Write unit tests for IPOCalendar
+  - [x] 24.4 Write unit tests for IPOCalendar
     - Test IPO display
     - Test price range display
     - Test exchange display

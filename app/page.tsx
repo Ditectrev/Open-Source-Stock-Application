@@ -17,6 +17,7 @@ import { SectorHub } from "@/components/SectorHub";
 import { EconomicCalendar } from "@/components/EconomicCalendar";
 import { EarningsCalendar } from "@/components/EarningsCalendar";
 import { DividendCalendar } from "@/components/DividendCalendar";
+import { IPOCalendar } from "@/components/IPOCalendar";
 import { Footer } from "@/components/Footer";
 
 type TabType = "overview" | "financials" | "technicals" | "forecasts" | "seasonals";
@@ -213,6 +214,9 @@ export default function Home() {
             </div>
             <div className="mt-8">
               <DividendCalendar />
+            </div>
+            <div className="mt-8">
+              <IPOCalendar />
             </div>
           </div>
         )}
