@@ -21,6 +21,7 @@ import { IPOCalendar } from "@/components/IPOCalendar";
 import { CalendarHub } from "@/components/CalendarHub";
 import { HeatmapComponent } from "@/components/HeatmapComponent";
 import type { HeatmapTimePeriod, HeatmapSortField, HeatmapSortDirection } from "@/components/HeatmapComponent";
+import { ETFHeatmap } from "@/components/ETFHeatmap";
 import { Footer } from "@/components/Footer";
 import { HeatmapData } from "@/types";
 
@@ -273,6 +274,18 @@ export default function Home() {
                 }}
                 refreshInterval={60000}
                 onRefresh={fetchHeatmapData}
+              />
+            </div>
+            <div className="mt-8">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+                ETF Heatmap
+              </h2>
+              <ETFHeatmap
+                refreshInterval={60000}
+                onETFClick={(symbol) => {
+                  setSelectedSymbol(symbol);
+                  setActiveTab("overview");
+                }}
               />
             </div>
             <div className="mt-8">

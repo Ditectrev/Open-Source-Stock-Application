@@ -320,6 +320,16 @@ export interface HeatmapData {
   value: number;
   changePercent: number;
   sector?: string;
+  category?: string;
+  marketCap?: number;
+}
+
+export interface ETFData {
+  symbol: string;
+  name: string;
+  price: number;
+  changePercent: number;
+  category: string;
   marketCap?: number;
 }
 

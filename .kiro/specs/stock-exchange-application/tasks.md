@@ -729,18 +729,18 @@ The implementation follows an incremental approach, building core infrastructure
     - Test filtering and sorting
     - _Requirements: 25.3, 25.4, 25.5, 25.12, 25.17, 25.18_
 
-- [ ] 28. ETF Heatmap
-  - [ ] 28.1 Implement ETF data fetching
+- [x] 28. ETF Heatmap
+  - [x] 28.1 Implement ETF data fetching
     - Fetch ETF performance data
     - Group by category or sector
     - _Requirements: 25.7_
 
-  - [ ] 28.2 Create ETFHeatmap component
+  - [x] 28.2 Create ETFHeatmap component
     - Extend HeatmapComponent for ETFs
     - Display ETFs grouped by category/sector
     - _Requirements: 25.1, 25.7_
 
-  - [ ]* 28.3 Write unit tests for ETFHeatmap
+  - [x] 28.3 Write unit tests for ETFHeatmap
     - Test ETF display
     - Test category grouping
     - _Requirements: 25.7_

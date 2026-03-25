@@ -134,6 +134,9 @@ describe("HeatmapComponent", () => {
     expect(screen.getByTestId("heatmap-period-1M")).toBeDefined();
     expect(screen.getByTestId("heatmap-period-3M")).toBeDefined();
     expect(screen.getByTestId("heatmap-period-1Y")).toBeDefined();
+    expect(screen.getByTestId("heatmap-period-5Y")).toBeDefined();
+    expect(screen.getByTestId("heatmap-period-YTD")).toBeDefined();
+    expect(screen.getByTestId("heatmap-period-MAX")).toBeDefined();
   });
 
   it("should highlight the active time period", () => {

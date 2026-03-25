@@ -78,3 +78,6 @@ export type {
   HeatmapSortField,
   HeatmapSortDirection,
 } from "./HeatmapComponent";
+
+export { ETFHeatmap } from "./ETFHeatmap";
+export type { ETFHeatmapProps } from "./ETFHeatmap";

@@ -20,6 +20,7 @@ import {
   FearGreedData,
   MarketIndex,
   SectorData,
+  ETFData,
   EconomicEvent,
   EarningsEvent,
   DividendEvent,
@@ -524,6 +525,24 @@ export class MarketDataService {
 
       return data;
     }
+
+  /**
+   * Get ETF performance data grouped by category
+   */
+  async getETFPerformance(period: string = "1d"): Promise<ETFData[]> {
+    const cacheKey = `market:etfs:${period}`;
+
+    const cached = cacheService.get<ETFData[]>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const data = await yahooFinanceService.getETFPerformance(period);
+
+    cacheService.set(cacheKey, data, this.cacheTTL);
+
+    return data;
+  }
 
   /**
    * Invalidate cache for a symbol

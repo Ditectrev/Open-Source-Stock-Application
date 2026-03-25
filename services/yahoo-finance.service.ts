@@ -12,6 +12,7 @@ import {
   FinancialData,
   MarketIndex,
   SectorData,
+  ETFData,
   TimeRange,
   TechnicalIndicators,
   ForecastData,
@@ -812,6 +813,114 @@ export class YahooFinanceService {
         return d >= rangeStart && d <= rangeEnd;
       });
     }
+
+  /**
+   * Fetch ETF performance data grouped by category.
+   * Uses a curated list of popular ETFs across categories.
+   */
+  async getETFPerformance(period: string = "1d"): Promise<ETFData[]> {
+    const etfList: { symbol: string; name: string; category: string }[] = [
+      // Broad Market
+      { symbol: "SPY", name: "SPDR S&P 500", category: "Broad Market" },
+      { symbol: "QQQ", name: "Invesco QQQ Trust", category: "Broad Market" },
+      { symbol: "IWM", name: "iShares Russell 2000", category: "Broad Market" },
+      { symbol: "DIA", name: "SPDR Dow Jones", category: "Broad Market" },
+      { symbol: "VTI", name: "Vanguard Total Stock", category: "Broad Market" },
+      // Sector
+      { symbol: "XLK", name: "Technology Select", category: "Sector" },
+      { symbol: "XLF", name: "Financial Select", category: "Sector" },
+      { symbol: "XLV", name: "Health Care Select", category: "Sector" },
+      { symbol: "XLE", name: "Energy Select", category: "Sector" },
+      { symbol: "XLI", name: "Industrial Select", category: "Sector" },
+      // Fixed Income
+      { symbol: "TLT", name: "iShares 20+ Year Treasury", category: "Fixed Income" },
+      { symbol: "BND", name: "Vanguard Total Bond", category: "Fixed Income" },
+      { symbol: "HYG", name: "iShares High Yield Corp", category: "Fixed Income" },
+      // Commodity
+      { symbol: "GLD", name: "SPDR Gold Shares", category: "Commodity" },
+      { symbol: "SLV", name: "iShares Silver Trust", category: "Commodity" },
+      { symbol: "USO", name: "United States Oil Fund", category: "Commodity" },
+      // International
+      { symbol: "EFA", name: "iShares MSCI EAFE", category: "International" },
+      { symbol: "EEM", name: "iShares MSCI Emerging", category: "International" },
+      { symbol: "VEA", name: "Vanguard FTSE Developed", category: "International" },
+    ];
+
+    const fetches = etfList.map(async (etf) => {
+      try {
+        if (period === "1d") {
+          const summary = await this.fetchQuoteSummary(etf.symbol, "price");
+          const price = summary.price || {};
+          return {
+            symbol: etf.symbol,
+            name: etf.name,
+            price: price.regularMarketPrice?.raw || 0,
+            changePercent:
+              (price.regularMarketChangePercent?.raw || 0) * 100,
+            category: etf.category,
+            marketCap: price.marketCap?.raw,
+          };
+        }
+
+        const url = `${this.baseUrl}/v8/finance/chart/${etf.symbol}?range=${period}&interval=1d`;
+        const { crumb, cookie } = await getCrumbSafe(this);
+
+        const headers: Record<string, string> = {
+          Accept: "application/json",
+          "User-Agent": "Mozilla/5.0",
+        };
+        if (cookie) headers["Cookie"] = cookie;
+
+        const finalUrl = crumb
+          ? `${url}&crumb=${encodeURIComponent(crumb)}`
+          : url;
+        const response = await fetch(finalUrl, { headers });
+
+        if (!response.ok) {
+          throw new Error(`Yahoo Finance API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const closes: number[] =
+          data.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
+        const validCloses = closes.filter(
+          (c: number | null) => c != null
+        );
+
+        if (validCloses.length < 2) {
+          throw new Error("Not enough data points");
+        }
+
+        const startPrice = validCloses[0];
+        const endPrice = validCloses[validCloses.length - 1];
+        const changePct =
+          ((endPrice - startPrice) / startPrice) * 100;
+
+        return {
+          symbol: etf.symbol,
+          name: etf.name,
+          price: endPrice,
+          changePercent: changePct,
+          category: etf.category,
+        } as ETFData;
+      } catch (error) {
+        logger.warn(
+          `Failed to fetch ETF ${etf.symbol} for period ${period}, skipping`,
+          { error: (error as Error).message }
+        );
+        return null;
+      }
+    });
+
+    const settled = await Promise.all(fetches);
+    const results = settled.filter((item): item is ETFData => item !== null);
+
+    if (results.length === 0) {
+      throw new Error("Failed to fetch any ETF performance data");
+    }
+
+    return results;
+  }
 
   /**
    * Infer dividend payment frequency from annual vs per-payment rate.

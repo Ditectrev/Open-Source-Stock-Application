@@ -13,7 +13,15 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "@/lib/theme-context";
 import { HeatmapData } from "@/types";
 
-export type HeatmapTimePeriod = "1D" | "1W" | "1M" | "3M" | "1Y";
+export type HeatmapTimePeriod =
+  | "1D"
+  | "1W"
+  | "1M"
+  | "3M"
+  | "1Y"
+  | "5Y"
+  | "YTD"
+  | "MAX";
 export type HeatmapSortField = "changePercent" | "marketCap" | "name";
 export type HeatmapSortDirection = "asc" | "desc";
 
@@ -23,6 +31,9 @@ const HEATMAP_TIME_PERIODS: HeatmapTimePeriod[] = [
   "1M",
   "3M",
   "1Y",
+  "5Y",
+  "YTD",
+  "MAX",
 ];
 
 export interface HeatmapComponentProps {
