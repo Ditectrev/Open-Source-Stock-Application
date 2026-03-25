@@ -81,3 +81,6 @@ export type {
 
 export { ETFHeatmap } from "./ETFHeatmap";
 export type { ETFHeatmapProps } from "./ETFHeatmap";
+
+export { CryptoHeatmap } from "./CryptoHeatmap";
+export type { CryptoHeatmapProps } from "./CryptoHeatmap";

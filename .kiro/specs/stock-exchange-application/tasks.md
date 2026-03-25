@@ -745,17 +745,17 @@ The implementation follows an incremental approach, building core infrastructure
     - Test category grouping
     - _Requirements: 25.7_
 
-- [ ] 29. Crypto Heatmap
-  - [ ] 29.1 Implement crypto data fetching
+- [x] 29. Crypto Heatmap
+  - [x] 29.1 Implement crypto data fetching
     - Fetch cryptocurrency performance data
     - _Requirements: 25.8_
 
-  - [ ] 29.2 Create CryptoHeatmap component
+  - [x] 29.2 Create CryptoHeatmap component
     - Extend HeatmapComponent for crypto
     - Display cryptocurrency assets with current performance
     - _Requirements: 25.1, 25.8_
 
-  - [ ]* 29.3 Write unit tests for CryptoHeatmap
+  - [x] 29.3 Write unit tests for CryptoHeatmap
     - Test crypto display
     - Test performance display
     - _Requirements: 25.8_

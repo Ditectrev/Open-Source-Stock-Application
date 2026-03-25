@@ -21,6 +21,7 @@ import {
   MarketIndex,
   SectorData,
   ETFData,
+  CryptoData,
   EconomicEvent,
   EarningsEvent,
   DividendEvent,
@@ -538,6 +539,24 @@ export class MarketDataService {
     }
 
     const data = await yahooFinanceService.getETFPerformance(period);
+
+    cacheService.set(cacheKey, data, this.cacheTTL);
+
+    return data;
+  }
+
+  /**
+   * Get cryptocurrency performance data
+   */
+  async getCryptoPerformance(period: string = "1d"): Promise<CryptoData[]> {
+    const cacheKey = `market:crypto:${period}`;
+
+    const cached = cacheService.get<CryptoData[]>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const data = await yahooFinanceService.getCryptoPerformance(period);
 
     cacheService.set(cacheKey, data, this.cacheTTL);
 

@@ -85,11 +85,13 @@ function getTileColor(changePercent: number, isDark: boolean): string {
 }
 
 function formatPercent(pct: number): string {
+  if (pct == null || isNaN(pct)) return "N/A";
   const sign = pct >= 0 ? "+" : "";
   return `${sign}${pct.toFixed(2)}%`;
 }
 
 function formatMarketCap(cap: number): string {
+  if (cap == null || isNaN(cap)) return "N/A";
   if (cap >= 1e12) return `$${(cap / 1e12).toFixed(2)}T`;
   if (cap >= 1e9) return `$${(cap / 1e9).toFixed(2)}B`;
   if (cap >= 1e6) return `$${(cap / 1e6).toFixed(2)}M`;

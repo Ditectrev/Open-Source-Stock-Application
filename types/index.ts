@@ -333,6 +333,15 @@ export interface ETFData {
   marketCap?: number;
 }
 
+export interface CryptoData {
+  symbol: string;
+  name: string;
+  price: number;
+  changePercent: number;
+  category: string;
+  marketCap?: number;
+}
+
 export type ValuationContext = "overpriced" | "underpriced" | "fair";
 
 export interface ScreenerFilter {

@@ -22,6 +22,7 @@ import { CalendarHub } from "@/components/CalendarHub";
 import { HeatmapComponent } from "@/components/HeatmapComponent";
 import type { HeatmapTimePeriod, HeatmapSortField, HeatmapSortDirection } from "@/components/HeatmapComponent";
 import { ETFHeatmap } from "@/components/ETFHeatmap";
+import { CryptoHeatmap } from "@/components/CryptoHeatmap";
 import { Footer } from "@/components/Footer";
 import { HeatmapData } from "@/types";
 
@@ -125,14 +126,26 @@ export default function Home() {
       const res = await fetch(`/api/market/sectors?period=${heatmapPeriod}`);
       if (res.ok) {
         const result = await res.json();
-        const items: HeatmapData[] = (result.data ?? []).map(
-          (s: { sector: string; performance: number; changePercent: number }) => ({
-            symbol: s.sector.replace(/\s+/g, "").substring(0, 5).toUpperCase(),
-            name: s.sector,
-            value: s.performance,
-            changePercent: s.changePercent,
-            sector: s.sector,
-          })
+        const seen = new Set<string>();
+        const items: HeatmapData[] = (result.data ?? []).reduce(
+          (
+            acc: HeatmapData[],
+            s: { sector: string; performance: number; changePercent: number }
+          ) => {
+            const key = s.sector.replace(/\s+/g, "-").toUpperCase();
+            if (!seen.has(key)) {
+              seen.add(key);
+              acc.push({
+                symbol: key,
+                name: s.sector,
+                value: s.performance,
+                changePercent: s.changePercent,
+                sector: s.sector,
+              });
+            }
+            return acc;
+          },
+          []
         );
         setHeatmapData(items);
       }
@@ -283,6 +296,18 @@ export default function Home() {
               <ETFHeatmap
                 refreshInterval={60000}
                 onETFClick={(symbol) => {
+                  setSelectedSymbol(symbol);
+                  setActiveTab("overview");
+                }}
+              />
+            </div>
+            <div className="mt-8">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+                Crypto Heatmap
+              </h2>
+              <CryptoHeatmap
+                refreshInterval={60000}
+                onCryptoClick={(symbol) => {
                   setSelectedSymbol(symbol);
                   setActiveTab("overview");
                 }}

@@ -13,6 +13,7 @@ import {
   MarketIndex,
   SectorData,
   ETFData,
+  CryptoData,
   TimeRange,
   TechnicalIndicators,
   ForecastData,
@@ -917,6 +918,115 @@ export class YahooFinanceService {
 
     if (results.length === 0) {
       throw new Error("Failed to fetch any ETF performance data");
+    }
+
+    return results;
+  }
+
+  /**
+   * Fetch cryptocurrency performance data.
+   * Uses Yahoo Finance quote endpoint for major crypto assets.
+   * Requirements: 25.8
+   */
+  async getCryptoPerformance(period: string = "1d"): Promise<CryptoData[]> {
+    const cryptoList: { symbol: string; name: string; category: string }[] = [
+      // Large Cap
+      { symbol: "BTC-USD", name: "Bitcoin", category: "Large Cap" },
+      { symbol: "ETH-USD", name: "Ethereum", category: "Large Cap" },
+      { symbol: "BNB-USD", name: "BNB", category: "Large Cap" },
+      { symbol: "SOL-USD", name: "Solana", category: "Large Cap" },
+      { symbol: "XRP-USD", name: "XRP", category: "Large Cap" },
+      // DeFi
+      { symbol: "AVAX-USD", name: "Avalanche", category: "DeFi" },
+      { symbol: "LINK-USD", name: "Chainlink", category: "DeFi" },
+      { symbol: "UNI7083-USD", name: "Uniswap", category: "DeFi" },
+      { symbol: "AAVE-USD", name: "Aave", category: "DeFi" },
+      { symbol: "MKR-USD", name: "Maker", category: "DeFi" },
+      // Layer 2
+      { symbol: "MATIC-USD", name: "Polygon", category: "Layer 2" },
+      { symbol: "ARB11841-USD", name: "Arbitrum", category: "Layer 2" },
+      { symbol: "OP-USD", name: "Optimism", category: "Layer 2" },
+      // Stablecoins / Other
+      { symbol: "ADA-USD", name: "Cardano", category: "Other" },
+      { symbol: "DOT-USD", name: "Polkadot", category: "Other" },
+      { symbol: "DOGE-USD", name: "Dogecoin", category: "Other" },
+      { symbol: "SHIB-USD", name: "Shiba Inu", category: "Other" },
+      { symbol: "LTC-USD", name: "Litecoin", category: "Other" },
+      { symbol: "TRX-USD", name: "TRON", category: "Other" },
+      { symbol: "ATOM-USD", name: "Cosmos", category: "Other" },
+    ];
+
+    const fetches = cryptoList.map(async (crypto) => {
+      try {
+        if (period === "1d") {
+          const summary = await this.fetchQuoteSummary(crypto.symbol, "price");
+          const price = summary.price || {};
+          return {
+            symbol: crypto.symbol,
+            name: crypto.name,
+            price: price.regularMarketPrice?.raw || 0,
+            changePercent:
+              (price.regularMarketChangePercent?.raw || 0) * 100,
+            category: crypto.category,
+            marketCap: price.marketCap?.raw,
+          } as CryptoData;
+        }
+
+        // For other periods, compute change from historical data
+        const url = `${this.baseUrl}/v8/finance/chart/${crypto.symbol}?range=${period}&interval=1d`;
+        const { crumb, cookie } = await getCrumbSafe(this);
+
+        const headers: Record<string, string> = {
+          Accept: "application/json",
+          "User-Agent": "Mozilla/5.0",
+        };
+        if (cookie) headers["Cookie"] = cookie;
+
+        const finalUrl = crumb
+          ? `${url}&crumb=${encodeURIComponent(crumb)}`
+          : url;
+        const response = await fetch(finalUrl, { headers });
+
+        if (!response.ok) {
+          throw new Error(`Yahoo Finance API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const closes: number[] =
+          data.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
+        const validCloses = closes.filter((c: number | null) => c != null);
+
+        if (validCloses.length < 2) {
+          throw new Error("Not enough data points");
+        }
+
+        const startPrice = validCloses[0];
+        const endPrice = validCloses[validCloses.length - 1];
+        const changePct = ((endPrice - startPrice) / startPrice) * 100;
+
+        return {
+          symbol: crypto.symbol,
+          name: crypto.name,
+          price: endPrice,
+          changePercent: changePct,
+          category: crypto.category,
+        } as CryptoData;
+      } catch (error) {
+        logger.warn(
+          `Failed to fetch crypto ${crypto.symbol} for period ${period}, skipping`,
+          { error: (error as Error).message }
+        );
+        return null;
+      }
+    });
+
+    const settled = await Promise.all(fetches);
+    const results = settled.filter(
+      (item): item is CryptoData => item !== null
+    );
+
+    if (results.length === 0) {
+      throw new Error("Failed to fetch any crypto performance data");
     }
 
     return results;
