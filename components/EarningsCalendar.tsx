@@ -10,9 +10,11 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTheme } from "@/lib/theme-context";
 import { EarningsEvent } from "@/types";
+import { CalendarDateRangePicker } from "@/components/CalendarDateRangePicker";
 
 export interface EarningsCalendarProps {
   data?: EarningsEvent[];
+  onSymbolClick?: (symbol: string) => void;
 }
 
 function toDateString(d: Date): string {
@@ -48,7 +50,7 @@ const todayStr = toDateString(today);
 const defaultStart = todayStr;
 const defaultEnd = "";
 
-export function EarningsCalendar({ data: externalData }: EarningsCalendarProps) {
+export function EarningsCalendar({ data: externalData, onSymbolClick }: EarningsCalendarProps) {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
@@ -150,44 +152,13 @@ export function EarningsCalendar({ data: externalData }: EarningsCalendarProps) 
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 mb-4" data-testid="filters">
-        <div className="flex items-center gap-2">
-          <label
-            htmlFor="earnings-start-date"
-            className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}
-          >
-            From:
-          </label>
-          <input
-            id="earnings-start-date"
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className={`text-sm rounded px-2 py-1 border ${
-              isDark
-                ? "bg-gray-700 border-gray-600 text-gray-200"
-                : "bg-white border-gray-300 text-gray-700"
-            }`}
-            data-testid="start-date"
-          />
-          <label
-            htmlFor="earnings-end-date"
-            className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}
-          >
-            To:
-          </label>
-          <input
-            id="earnings-end-date"
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className={`text-sm rounded px-2 py-1 border ${
-              isDark
-                ? "bg-gray-700 border-gray-600 text-gray-200"
-                : "bg-white border-gray-300 text-gray-700"
-            }`}
-            data-testid="end-date"
-          />
-        </div>
+        <CalendarDateRangePicker
+          startDate={startDate}
+          endDate={endDate}
+          onStartDateChange={setStartDate}
+          onEndDateChange={setEndDate}
+          idPrefix="earnings"
+        />
       </div>
 
       {/* Events grouped by day */}
@@ -257,16 +228,18 @@ export function EarningsCalendar({ data: externalData }: EarningsCalendarProps) 
                         data-testid={`event-${event.id}`}
                       >
                         {/* Symbol badge */}
-                        <span
-                          className={`text-xs font-semibold px-2 py-0.5 rounded shrink-0 w-16 text-center inline-block ${
+                        <button
+                          onClick={() => onSymbolClick?.(event.symbol)}
+                          className={`text-xs font-semibold px-2 py-0.5 rounded shrink-0 w-16 text-center inline-block cursor-pointer transition-colors ${
                             isDark
-                              ? "bg-blue-900/40 text-blue-300"
-                              : "bg-blue-100 text-blue-700"
+                              ? "bg-blue-900/40 text-blue-300 hover:bg-blue-800/60"
+                              : "bg-blue-100 text-blue-700 hover:bg-blue-200"
                           }`}
                           data-testid={`symbol-${event.id}`}
+                          aria-label={`View details for ${event.symbol}`}
                         >
                           {event.symbol}
-                        </span>
+                        </button>
 
                         {/* Company details */}
                         <div className="flex-1 min-w-0">

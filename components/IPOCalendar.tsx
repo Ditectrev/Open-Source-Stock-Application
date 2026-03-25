@@ -10,9 +10,11 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTheme } from "@/lib/theme-context";
 import { IPOEvent } from "@/types";
+import { CalendarDateRangePicker } from "@/components/CalendarDateRangePicker";
 
 export interface IPOCalendarProps {
   data?: IPOEvent[];
+  onSymbolClick?: (symbol: string) => void;
 }
 
 function toDateString(d: Date): string {
@@ -47,7 +49,7 @@ function formatShares(value: number | undefined): string {
 const todayStr = toDateString(new Date());
 const defaultStart = todayStr;
 
-export function IPOCalendar({ data: externalData }: IPOCalendarProps) {
+export function IPOCalendar({ data: externalData, onSymbolClick }: IPOCalendarProps) {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
@@ -162,44 +164,13 @@ export function IPOCalendar({ data: externalData }: IPOCalendarProps) {
         className="flex flex-col sm:flex-row gap-3 mb-4"
         data-testid="filters"
       >
-        <div className="flex items-center gap-2">
-          <label
-            htmlFor="ipo-start-date"
-            className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}
-          >
-            From:
-          </label>
-          <input
-            id="ipo-start-date"
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className={`text-sm rounded px-2 py-1 border ${
-              isDark
-                ? "bg-gray-700 border-gray-600 text-gray-200"
-                : "bg-white border-gray-300 text-gray-700"
-            }`}
-            data-testid="start-date"
-          />
-          <label
-            htmlFor="ipo-end-date"
-            className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}
-          >
-            To:
-          </label>
-          <input
-            id="ipo-end-date"
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className={`text-sm rounded px-2 py-1 border ${
-              isDark
-                ? "bg-gray-700 border-gray-600 text-gray-200"
-                : "bg-white border-gray-300 text-gray-700"
-            }`}
-            data-testid="end-date"
-          />
-        </div>
+        <CalendarDateRangePicker
+          startDate={startDate}
+          endDate={endDate}
+          onStartDateChange={setStartDate}
+          onEndDateChange={setEndDate}
+          idPrefix="ipo"
+        />
       </div>
 
       {/* Events grouped by day */}
@@ -294,16 +265,18 @@ export function IPOCalendar({ data: externalData }: IPOCalendarProps) {
                               {event.companyName}
                             </span>
                             {event.symbol && (
-                              <span
-                                className={`text-xs px-1.5 py-0.5 rounded ${
+                              <button
+                                onClick={() => onSymbolClick?.(event.symbol!)}
+                                className={`text-xs px-1.5 py-0.5 rounded cursor-pointer transition-colors ${
                                   isDark
-                                    ? "bg-gray-700 text-gray-400"
-                                    : "bg-gray-100 text-gray-500"
+                                    ? "bg-gray-700 text-gray-400 hover:bg-gray-600"
+                                    : "bg-gray-100 text-gray-500 hover:bg-gray-200"
                                 }`}
                                 data-testid={`symbol-${event.id}`}
+                                aria-label={`View details for ${event.symbol}`}
                               >
                                 {event.symbol}
-                              </span>
+                              </button>
                             )}
                           </div>
 

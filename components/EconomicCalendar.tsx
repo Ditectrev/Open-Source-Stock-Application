@@ -10,6 +10,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTheme } from "@/lib/theme-context";
 import { EconomicEvent } from "@/types";
+import { CalendarDateRangePicker } from "@/components/CalendarDateRangePicker";
 
 const COUNTRIES = [
   "All",
@@ -259,44 +260,13 @@ export function EconomicCalendar({ data: externalData }: EconomicCalendarProps) 
           ))}
         </div>
 
-        <div className="flex items-center gap-2">
-          <label
-            htmlFor="start-date"
-            className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}
-          >
-            From:
-          </label>
-          <input
-            id="start-date"
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className={`text-sm rounded px-2 py-1 border ${
-              isDark
-                ? "bg-gray-700 border-gray-600 text-gray-200"
-                : "bg-white border-gray-300 text-gray-700"
-            }`}
-            data-testid="start-date"
-          />
-          <label
-            htmlFor="end-date"
-            className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}
-          >
-            To:
-          </label>
-          <input
-            id="end-date"
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className={`text-sm rounded px-2 py-1 border ${
-              isDark
-                ? "bg-gray-700 border-gray-600 text-gray-200"
-                : "bg-white border-gray-300 text-gray-700"
-            }`}
-            data-testid="end-date"
-          />
-        </div>
+        <CalendarDateRangePicker
+          startDate={startDate}
+          endDate={endDate}
+          onStartDateChange={setStartDate}
+          onEndDateChange={setEndDate}
+          idPrefix="economic"
+        />
       </div>
 
       {/* Events grouped by day */}

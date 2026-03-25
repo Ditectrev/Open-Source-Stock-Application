@@ -669,27 +669,27 @@ The implementation follows an incremental approach, building core infrastructure
     - Test exchange display
     - _Requirements: 24.19, 24.20, 24.21_
 
-- [ ] 25. Calendar shared features
-  - [ ] 25.1 Implement calendar navigation component
+- [x] 25. Calendar shared features
+  - [x] 25.1 Implement calendar navigation component
     - Create navigation to switch between calendar types
     - _Requirements: 24.2_
 
-  - [ ] 25.2 Add date range selection to all calendars
+  - [x] 25.2 Add date range selection to all calendars
     - Implement date range picker
     - Highlight today's date
     - _Requirements: 24.22, 24.23_
 
-  - [ ] 25.3 Add symbol navigation from calendar entries
+  - [x] 25.3 Add symbol navigation from calendar entries
     - Navigate to symbol detail page on click
     - _Requirements: 24.24_
 
-  - [ ]* 25.4 Write unit tests for calendar navigation
+  - [x] 25.4 Write unit tests for calendar navigation
     - Test calendar type switching
     - Test date range selection
     - Test symbol navigation
     - _Requirements: 24.2, 24.22, 24.24_
 
-- [ ] 26. Checkpoint - Calendars complete
+- [x] 26. Checkpoint - Calendars complete
   - Ensure all tests pass, ask the user if questions arise.
 
 

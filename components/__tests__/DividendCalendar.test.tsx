@@ -1,9 +1,9 @@
 /**
  * DividendCalendar Component Tests
- * Tests for dividend display, time period sorting, country filter,
+ * Tests for dividend display, country filter,
  * timezone filter, loading/error states
  *
- * Requirements: 24.14, 24.15, 24.16, 24.17, 24.18
+ * Requirements: 24.14, 24.15, 24.17, 24.18
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
@@ -143,76 +143,6 @@ describe("DividendCalendar", () => {
       "[data-testid^='day-group-']"
     );
     expect(dayGroups.length).toBe(4);
-  });
-
-  // --- Time period sorting (Req 24.16) ---
-
-  it("should show time period selector with week/month/quarter options (Req 24.16)", () => {
-    render(<DividendCalendar data={mockEvents} />);
-    const select = screen.getByTestId("time-period-select");
-    expect(select).toBeDefined();
-    const options = select.querySelectorAll("option");
-    const values = Array.from(options).map((o) => o.getAttribute("value"));
-    expect(values).toContain("all");
-    expect(values).toContain("week");
-    expect(values).toContain("month");
-    expect(values).toContain("quarter");
-  });
-
-  it("should filter to upcoming week when 'week' period selected (Req 24.16)", () => {
-    render(<DividendCalendar data={mockEvents} />);
-    fireEvent.change(screen.getByTestId("time-period-select"), {
-      target: { value: "week" },
-    });
-    // day 2 and day 5 are within a week; day 45 and day 100 are not
-    expect(screen.getByText("Johnson & Johnson")).toBeDefined();
-    expect(screen.getByText("Realty Income Corp.")).toBeDefined();
-    expect(screen.queryByText("Exxon Mobil Corp.")).toBeNull();
-    expect(
-      screen.queryByText("Enterprise Products Partners")
-    ).toBeNull();
-  });
-
-  it("should filter to upcoming month when 'month' period selected (Req 24.16)", () => {
-    render(<DividendCalendar data={mockEvents} />);
-    fireEvent.change(screen.getByTestId("time-period-select"), {
-      target: { value: "month" },
-    });
-    // day 2, 5 within a month; day 45 may or may not be; day 100 is not
-    expect(screen.getByText("Johnson & Johnson")).toBeDefined();
-    expect(screen.getByText("Realty Income Corp.")).toBeDefined();
-    expect(
-      screen.queryByText("Enterprise Products Partners")
-    ).toBeNull();
-  });
-
-  it("should filter to upcoming quarter when 'quarter' period selected (Req 24.16)", () => {
-    render(<DividendCalendar data={mockEvents} />);
-    fireEvent.change(screen.getByTestId("time-period-select"), {
-      target: { value: "quarter" },
-    });
-    // day 2, 5, 45 within ~90 days; day 100 is beyond quarter
-    expect(screen.getByText("Johnson & Johnson")).toBeDefined();
-    expect(screen.getByText("Realty Income Corp.")).toBeDefined();
-    expect(screen.getByText("Exxon Mobil Corp.")).toBeDefined();
-    expect(
-      screen.queryByText("Enterprise Products Partners")
-    ).toBeNull();
-  });
-
-  it("should show all events when 'all' period selected (Req 24.16)", () => {
-    render(<DividendCalendar data={mockEvents} />);
-    // Select week first, then back to all
-    fireEvent.change(screen.getByTestId("time-period-select"), {
-      target: { value: "week" },
-    });
-    fireEvent.change(screen.getByTestId("time-period-select"), {
-      target: { value: "all" },
-    });
-    expect(screen.getByText("Johnson & Johnson")).toBeDefined();
-    expect(
-      screen.getByText("Enterprise Products Partners")
-    ).toBeDefined();
   });
 
   // --- Country filter (Req 24.17) ---

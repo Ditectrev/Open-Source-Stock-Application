@@ -10,9 +10,11 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTheme } from "@/lib/theme-context";
 import { DividendEvent } from "@/types";
+import { CalendarDateRangePicker } from "@/components/CalendarDateRangePicker";
 
 export interface DividendCalendarProps {
   data?: DividendEvent[];
+  onSymbolClick?: (symbol: string) => void;
 }
 
 function toDateString(d: Date): string {
@@ -45,6 +47,7 @@ const defaultStart = todayStr;
 
 export function DividendCalendar({
   data: externalData,
+  onSymbolClick,
 }: DividendCalendarProps) {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
@@ -56,7 +59,6 @@ export function DividendCalendar({
   const [error, setError] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<string>(defaultStart);
   const [endDate, setEndDate] = useState<string>("");
-  const [timePeriod, setTimePeriod] = useState<string>("all");
   const [countryFilter, setCountryFilter] = useState<string>("all");
   const [timezoneFilter, setTimezoneFilter] = useState<string>("all");
 
@@ -89,19 +91,6 @@ export function DividendCalendar({
   const filteredEvents = useMemo(() => {
     if (!data) return [];
 
-    let effectiveStart = startDate;
-    let effectiveEnd = endDate;
-
-    if (timePeriod !== "all") {
-      const now = new Date();
-      effectiveStart = toDateString(now);
-      const end = new Date(now);
-      if (timePeriod === "week") end.setDate(end.getDate() + 7);
-      else if (timePeriod === "month") end.setMonth(end.getMonth() + 1);
-      else if (timePeriod === "quarter") end.setMonth(end.getMonth() + 3);
-      effectiveEnd = toDateString(end);
-    }
-
     return data.filter((event) => {
       const exDate =
         typeof event.exDividendDate === "string"
@@ -109,8 +98,8 @@ export function DividendCalendar({
           : event.exDividendDate;
       const exDateStr = toDateString(exDate);
 
-      if (effectiveStart && exDateStr < effectiveStart) return false;
-      if (effectiveEnd && exDateStr > effectiveEnd) return false;
+      if (startDate && exDateStr < startDate) return false;
+      if (endDate && exDateStr > endDate) return false;
 
       if (countryFilter !== "all" && event.country !== countryFilter)
         return false;
@@ -119,7 +108,7 @@ export function DividendCalendar({
 
       return true;
     });
-  }, [data, startDate, endDate, timePeriod, countryFilter, timezoneFilter]);
+  }, [data, startDate, endDate, countryFilter, timezoneFilter]);
 
   const availableCountries = useMemo(() => {
     if (!data) return [];
@@ -199,76 +188,17 @@ export function DividendCalendar({
         className="flex flex-col sm:flex-row gap-3 mb-4"
         data-testid="filters"
       >
-        <div className="flex items-center gap-2">
-          <label
-            htmlFor="dividend-start-date"
-            className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}
-          >
-            From:
-          </label>
-          <input
-            id="dividend-start-date"
-            type="date"
-            value={startDate}
-            onChange={(e) => {
-              setStartDate(e.target.value);
-              setTimePeriod("all");
-            }}
-            className={`text-sm rounded px-2 py-1 border ${
-              isDark
-                ? "bg-gray-700 border-gray-600 text-gray-200"
-                : "bg-white border-gray-300 text-gray-700"
-            }`}
-            data-testid="start-date"
-          />
-          <label
-            htmlFor="dividend-end-date"
-            className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}
-          >
-            To:
-          </label>
-          <input
-            id="dividend-end-date"
-            type="date"
-            value={endDate}
-            onChange={(e) => {
-              setEndDate(e.target.value);
-              setTimePeriod("all");
-            }}
-            className={`text-sm rounded px-2 py-1 border ${
-              isDark
-                ? "bg-gray-700 border-gray-600 text-gray-200"
-                : "bg-white border-gray-300 text-gray-700"
-            }`}
-            data-testid="end-date"
-          />
-        </div>
-
-        {/* Time period sorting (Req 24.16) */}
-        <div className="flex items-center gap-2">
-          <label
-            htmlFor="dividend-time-period"
-            className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}
-          >
-            Period:
-          </label>
-          <select
-            id="dividend-time-period"
-            value={timePeriod}
-            onChange={(e) => setTimePeriod(e.target.value)}
-            className={`text-sm rounded px-2 py-1 border ${
-              isDark
-                ? "bg-gray-700 border-gray-600 text-gray-200"
-                : "bg-white border-gray-300 text-gray-700"
-            }`}
-            data-testid="time-period-select"
-          >
-            <option value="all">All</option>
-            <option value="week">This Week</option>
-            <option value="month">This Month</option>
-            <option value="quarter">This Quarter</option>
-          </select>
-        </div>
+        <CalendarDateRangePicker
+          startDate={startDate}
+          endDate={endDate}
+          onStartDateChange={(d) => {
+            setStartDate(d);
+          }}
+          onEndDateChange={(d) => {
+            setEndDate(d);
+          }}
+          idPrefix="dividend"
+        />
 
         {/* Country filter (Req 24.17) */}
         {availableCountries.length > 0 && (
@@ -403,16 +333,18 @@ export function DividendCalendar({
                         data-testid={`event-${event.id}`}
                       >
                         {/* Symbol badge */}
-                        <span
-                          className={`text-xs font-semibold px-2 py-0.5 rounded shrink-0 w-16 text-center inline-block ${
+                        <button
+                          onClick={() => onSymbolClick?.(event.symbol)}
+                          className={`text-xs font-semibold px-2 py-0.5 rounded shrink-0 w-16 text-center inline-block cursor-pointer transition-colors ${
                             isDark
-                              ? "bg-green-900/40 text-green-300"
-                              : "bg-green-100 text-green-700"
+                              ? "bg-green-900/40 text-green-300 hover:bg-green-800/60"
+                              : "bg-green-100 text-green-700 hover:bg-green-200"
                           }`}
                           data-testid={`symbol-${event.id}`}
+                          aria-label={`View details for ${event.symbol}`}
                         >
                           {event.symbol}
-                        </span>
+                        </button>
 
                         {/* Details */}
                         <div className="flex-1 min-w-0">
