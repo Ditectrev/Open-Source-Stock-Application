@@ -693,8 +693,8 @@ The implementation follows an incremental approach, building core infrastructure
   - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 27. Heatmap infrastructure
-  - [ ] 27.1 Create base HeatmapComponent
+- [x] 27. Heatmap infrastructure
+  - [x] 27.1 Create base HeatmapComponent
     - Render data in grid of tiles
     - Color-code tiles based on performance (green positive, red negative)
     - Vary color intensity based on magnitude
@@ -703,26 +703,26 @@ The implementation follows an incremental approach, building core infrastructure
     - Display legend explaining color coding
     - _Requirements: 25.3, 25.4, 25.5, 25.6, 25.16, 25.19_
 
-  - [ ] 27.2 Add heatmap interactivity
+  - [x] 27.2 Add heatmap interactivity
     - Display tooltip with detailed info on hover
     - Navigate to asset detail page on click
     - _Requirements: 25.14, 25.15_
 
-  - [ ] 27.3 Add heatmap time period selection
+  - [x] 27.3 Add heatmap time period selection
     - Support time periods: 1D, 1W, 1M, 3M, 1Y
     - Update colors and values when period changes
     - _Requirements: 25.12, 25.13_
 
-  - [ ] 27.4 Add heatmap filtering and sorting
+  - [x] 27.4 Add heatmap filtering and sorting
     - Implement filtering options
     - Implement sorting: by performance, market cap, volume
     - _Requirements: 25.17, 25.18_
 
-  - [ ] 27.5 Implement heatmap auto-refresh
+  - [x] 27.5 Implement heatmap auto-refresh
     - Update data at configurable intervals
     - _Requirements: 25.20_
 
-  - [ ]* 27.6 Write unit tests for HeatmapComponent
+  - [x] 27.6 Write unit tests for HeatmapComponent
     - Test tile rendering
     - Test color coding
     - Test time period changes

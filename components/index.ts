@@ -70,3 +70,11 @@ export type { CalendarDateRangePickerProps } from "./CalendarDateRangePicker";
 
 export { CalendarHub } from "./CalendarHub";
 export type { CalendarHubProps } from "./CalendarHub";
+
+export { HeatmapComponent } from "./HeatmapComponent";
+export type {
+  HeatmapComponentProps,
+  HeatmapTimePeriod,
+  HeatmapSortField,
+  HeatmapSortDirection,
+} from "./HeatmapComponent";

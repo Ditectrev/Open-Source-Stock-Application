@@ -19,7 +19,10 @@ import { EarningsCalendar } from "@/components/EarningsCalendar";
 import { DividendCalendar } from "@/components/DividendCalendar";
 import { IPOCalendar } from "@/components/IPOCalendar";
 import { CalendarHub } from "@/components/CalendarHub";
+import { HeatmapComponent } from "@/components/HeatmapComponent";
+import type { HeatmapTimePeriod, HeatmapSortField, HeatmapSortDirection } from "@/components/HeatmapComponent";
 import { Footer } from "@/components/Footer";
+import { HeatmapData } from "@/types";
 
 type TabType = "overview" | "financials" | "technicals" | "forecasts" | "seasonals";
 
@@ -35,6 +38,14 @@ export default function Home() {
   const [forecastData, setForecastData] = useState<ForecastData | null>(null);
   const [seasonalData, setSeasonalData] = useState<SeasonalData | null>(null);
   const [financialData, setFinancialData] = useState<FinancialData | null>(null);
+
+  // Heatmap state
+  const [heatmapData, setHeatmapData] = useState<HeatmapData[]>([]);
+  const [heatmapLoading, setHeatmapLoading] = useState(false);
+  const [heatmapPeriod, setHeatmapPeriod] = useState<HeatmapTimePeriod>("1D");
+  const [heatmapSortField, setHeatmapSortField] = useState<HeatmapSortField>("changePercent");
+  const [heatmapSortDirection, setHeatmapSortDirection] = useState<HeatmapSortDirection>("desc");
+  const [heatmapSectorFilter, setHeatmapSectorFilter] = useState<string>("");
 
   // Fetch symbol data when selected
   useEffect(() => {
@@ -105,6 +116,38 @@ export default function Home() {
   const handleTimeRangeChange = (range: TimeRange) => {
     setTimeRange(range);
   };
+
+  // Fetch heatmap data from sectors endpoint
+  const fetchHeatmapData = async () => {
+    setHeatmapLoading(true);
+    try {
+      const res = await fetch(`/api/market/sectors?period=${heatmapPeriod}`);
+      if (res.ok) {
+        const result = await res.json();
+        const items: HeatmapData[] = (result.data ?? []).map(
+          (s: { sector: string; performance: number; changePercent: number }) => ({
+            symbol: s.sector.replace(/\s+/g, "").substring(0, 5).toUpperCase(),
+            name: s.sector,
+            value: s.performance,
+            changePercent: s.changePercent,
+            sector: s.sector,
+          })
+        );
+        setHeatmapData(items);
+      }
+    } catch {
+      // silently degrade — heatmap is supplementary
+    } finally {
+      setHeatmapLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!selectedSymbol) {
+      fetchHeatmapData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [heatmapPeriod, selectedSymbol]);
 
   return (
     <div className="min-h-screen p-8 bg-gray-50 dark:bg-gray-900">
@@ -206,6 +249,31 @@ export default function Home() {
             </div>
             <div className="mt-8">
               <SectorHub />
+            </div>
+            <div className="mt-8">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+                Market Heatmap
+              </h2>
+              <HeatmapComponent
+                data={heatmapData}
+                loading={heatmapLoading}
+                timePeriod={heatmapPeriod}
+                onTimePeriodChange={setHeatmapPeriod}
+                sortField={heatmapSortField}
+                sortDirection={heatmapSortDirection}
+                onSortChange={(field, dir) => {
+                  setHeatmapSortField(field);
+                  setHeatmapSortDirection(dir);
+                }}
+                sectorFilter={heatmapSectorFilter}
+                onSectorFilterChange={setHeatmapSectorFilter}
+                onTileClick={(item) => {
+                  setSelectedSymbol(item.symbol);
+                  setActiveTab("overview");
+                }}
+                refreshInterval={60000}
+                onRefresh={fetchHeatmapData}
+              />
             </div>
             <div className="mt-8">
               <CalendarHub
