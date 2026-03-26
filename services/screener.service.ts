@@ -290,7 +290,7 @@ export class ScreenerService {
     result: ScreenerResult,
     field: string,
   ): string | number | undefined {
-    const value = (result as Record<string, unknown>)[field];
+    const value = (result as unknown as Record<string, unknown>)[field];
     if (typeof value === "string" || typeof value === "number") {
       return value;
     }

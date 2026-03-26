@@ -202,8 +202,6 @@ describe("Property 16: Technical Indicator Color Coding", () => {
           (midpoint, halfSpread) => {
             const upper = midpoint + halfSpread;
             const lower = midpoint - halfSpread;
-            const bandWidth = upper - lower;
-            const nearThreshold = bandWidth * 0.1;
 
             // Test overpriced: price at upper band
             const overpricedPrice = upper;

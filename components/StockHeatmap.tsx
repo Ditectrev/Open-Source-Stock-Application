@@ -76,7 +76,10 @@ export function StockHeatmap({
   });
 
   const loading = !response && !error;
-  const stockData: StockData[] = response?.success ? response.data : [];
+  const stockData: StockData[] = useMemo(
+    () => (response?.success ? response.data : []),
+    [response],
+  );
   const heatmapData = useMemo(() => toHeatmapData(stockData), [stockData]);
 
   const sectors = useMemo(() => {

@@ -78,7 +78,10 @@ export function CryptoHeatmap({
   });
 
   const loading = !response && !error;
-  const cryptoData: CryptoData[] = response?.success ? response.data : [];
+  const cryptoData: CryptoData[] = useMemo(
+    () => (response?.success ? response.data : []),
+    [response],
+  );
   const heatmapData = useMemo(() => toHeatmapData(cryptoData), [cryptoData]);
 
   const categories = useMemo(() => {

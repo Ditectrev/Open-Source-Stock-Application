@@ -49,8 +49,6 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
 
   const [hoveredPoint, setHoveredPoint] = useState<{ x: number; y: number; value: number; date: Date } | null>(null);
 
-  const rangeLimits: Record<string, number> = { "1W": 7, "1M": 30, "3M": 90, "1Y": 365, "5Y": 1825, "YTD": -1, "Max": 0 };
-
   const fetchData = useCallback(async (limit: number = 30) => {
     setLoading(true);
     setError(null);
@@ -73,9 +71,10 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
       setLoading(false);
       return;
     }
+    const limits: Record<string, number> = { "1W": 7, "1M": 30, "3M": 90, "1Y": 365, "5Y": 1825, "YTD": -1, "Max": 0 };
     fetchData(historyRange === "YTD"
       ? Math.ceil((Date.now() - new Date(new Date().getFullYear(), 0, 1).getTime()) / 86400000)
-      : rangeLimits[historyRange]);
+      : limits[historyRange]);
   }, [externalData, fetchData, historyRange]);
 
   // --- Loading state ---
@@ -120,8 +119,6 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
   const cx = 150;
   const cy = 130;
   const r = 100;
-  const startAngle = Math.PI; // 180°
-  const endAngle = 0; // 0°
   const needleAngle = Math.PI - (value / 100) * Math.PI;
 
   // Arc helper
@@ -147,15 +144,6 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
   const needleLen = r - 10;
   const nx = cx + needleLen * Math.cos(needleAngle);
   const ny = cy - needleLen * Math.sin(needleAngle);
-
-  // Range labels positioned around the arc
-  const rangeLabels = [
-    { text: "Extreme Fear", angle: Math.PI * 0.875 },
-    { text: "Fear", angle: Math.PI * 0.65 },
-    { text: "Neutral", angle: Math.PI * 0.5 },
-    { text: "Greed", angle: Math.PI * 0.35 },
-    { text: "Extreme Greed", angle: Math.PI * 0.125 },
-  ];
 
   return (
     <div

@@ -8,7 +8,7 @@
  * Requirements: 25.1, 25.7
  */
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import useSWR from "swr";
 import { useTheme } from "@/lib/theme-context";
 import { HeatmapData, ETFData } from "@/types";
@@ -74,7 +74,10 @@ export function ETFHeatmap({
   });
 
   const loading = !response && !error;
-  const etfData: ETFData[] = response?.success ? response.data : [];
+  const etfData: ETFData[] = useMemo(
+    () => (response?.success ? response.data : []),
+    [response],
+  );
   const heatmapData = useMemo(() => toHeatmapData(etfData), [etfData]);
 
   const categories = useMemo(() => {

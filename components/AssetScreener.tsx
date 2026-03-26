@@ -305,7 +305,6 @@ export function AssetScreener({
 }: AssetScreenerProps) {
   const [filterState, setFilterState] =
     useState<FilterState>(INITIAL_FILTER_STATE);
-  const [results, setResults] = useState<ScreenerResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [resultCount, setResultCount] = useState<number | null>(null);
@@ -421,7 +420,6 @@ export function AssetScreener({
 
       const json = await res.json();
       const data: ScreenerResult[] = json.data ?? [];
-      setResults(data);
       setResultCount(data.length);
       onResultsChange?.(data);
       onFiltersChange?.(filters);
@@ -436,7 +434,6 @@ export function AssetScreener({
 
   const handleClear = useCallback(() => {
     setFilterState({ ...INITIAL_FILTER_STATE });
-    setResults([]);
     setResultCount(null);
     setError(null);
     onResultsChange?.([]);
