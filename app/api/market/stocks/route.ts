@@ -1,0 +1,50 @@
+/**
+ * GET /api/market/stocks
+ * Returns stock performance data grouped by sector
+ * Query params: period (1D, 1W, 1M, 3M, 1Y, 5Y, YTD, MAX) - defaults to 1D
+ */
+
+import { NextRequest, NextResponse } from "next/server";
+import { marketDataService } from "@/services/market-data.service";
+import { logger } from "@/lib/logger";
+
+const PERIOD_MAP: Record<string, string> = {
+  "1D": "1d",
+  "1W": "5d",
+  "1M": "1mo",
+  "3M": "3mo",
+  "1Y": "1y",
+  "5Y": "5y",
+  YTD: "ytd",
+  MAX: "max",
+};
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const rawPeriod = searchParams.get("period") || "1D";
+    const period = PERIOD_MAP[rawPeriod.toUpperCase()] || "1d";
+
+    const data = await marketDataService.getStockPerformance(period);
+
+    return NextResponse.json({
+      success: true,
+      data,
+      timestamp: new Date(),
+    });
+  } catch (error) {
+    logger.error("Failed to fetch stock performance", error as Error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch stock performance",
+        timestamp: new Date(),
+      },
+      { status: 500 },
+    );
+  }
+}

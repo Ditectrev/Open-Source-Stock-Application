@@ -23,6 +23,7 @@ import { HeatmapComponent } from "@/components/HeatmapComponent";
 import type { HeatmapTimePeriod, HeatmapSortField, HeatmapSortDirection } from "@/components/HeatmapComponent";
 import { ETFHeatmap } from "@/components/ETFHeatmap";
 import { CryptoHeatmap } from "@/components/CryptoHeatmap";
+import { StockHeatmap } from "@/components/StockHeatmap";
 import { Footer } from "@/components/Footer";
 import { HeatmapData } from "@/types";
 
@@ -308,6 +309,18 @@ export default function Home() {
               <CryptoHeatmap
                 refreshInterval={60000}
                 onCryptoClick={(symbol) => {
+                  setSelectedSymbol(symbol);
+                  setActiveTab("overview");
+                }}
+              />
+            </div>
+            <div className="mt-8">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+                Stock Heatmap
+              </h2>
+              <StockHeatmap
+                refreshInterval={60000}
+                onStockClick={(symbol) => {
                   setSelectedSymbol(symbol);
                   setActiveTab("overview");
                 }}

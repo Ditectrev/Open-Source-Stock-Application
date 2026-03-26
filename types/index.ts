@@ -342,6 +342,15 @@ export interface CryptoData {
   marketCap?: number;
 }
 
+export interface StockData {
+  symbol: string;
+  name: string;
+  price: number;
+  changePercent: number;
+  sector: string;
+  marketCap?: number;
+}
+
 export type ValuationContext = "overpriced" | "underpriced" | "fair";
 
 export interface ScreenerFilter {

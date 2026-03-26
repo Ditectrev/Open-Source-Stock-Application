@@ -14,6 +14,7 @@ import {
   SectorData,
   ETFData,
   CryptoData,
+  StockData,
   TimeRange,
   TechnicalIndicators,
   ForecastData,
@@ -1027,6 +1028,138 @@ export class YahooFinanceService {
 
     if (results.length === 0) {
       throw new Error("Failed to fetch any crypto performance data");
+    }
+
+    return results;
+  }
+
+  async getStockPerformance(period: string = "1d"): Promise<StockData[]> {
+    const stockList: { symbol: string; name: string; sector: string }[] = [
+      // Technology
+      { symbol: "AAPL", name: "Apple", sector: "Technology" },
+      { symbol: "MSFT", name: "Microsoft", sector: "Technology" },
+      { symbol: "NVDA", name: "NVIDIA", sector: "Technology" },
+      { symbol: "GOOGL", name: "Alphabet", sector: "Technology" },
+      { symbol: "META", name: "Meta Platforms", sector: "Technology" },
+      { symbol: "AVGO", name: "Broadcom", sector: "Technology" },
+      // Financial
+      { symbol: "JPM", name: "JPMorgan Chase", sector: "Financial" },
+      { symbol: "V", name: "Visa", sector: "Financial" },
+      { symbol: "MA", name: "Mastercard", sector: "Financial" },
+      { symbol: "BAC", name: "Bank of America", sector: "Financial" },
+      // Healthcare
+      { symbol: "UNH", name: "UnitedHealth", sector: "Healthcare" },
+      { symbol: "JNJ", name: "Johnson & Johnson", sector: "Healthcare" },
+      { symbol: "LLY", name: "Eli Lilly", sector: "Healthcare" },
+      { symbol: "PFE", name: "Pfizer", sector: "Healthcare" },
+      // Consumer Discretionary
+      { symbol: "AMZN", name: "Amazon", sector: "Consumer Discretionary" },
+      { symbol: "TSLA", name: "Tesla", sector: "Consumer Discretionary" },
+      { symbol: "HD", name: "Home Depot", sector: "Consumer Discretionary" },
+      { symbol: "NKE", name: "Nike", sector: "Consumer Discretionary" },
+      // Energy
+      { symbol: "XOM", name: "Exxon Mobil", sector: "Energy" },
+      { symbol: "CVX", name: "Chevron", sector: "Energy" },
+      { symbol: "COP", name: "ConocoPhillips", sector: "Energy" },
+      // Industrials
+      { symbol: "CAT", name: "Caterpillar", sector: "Industrials" },
+      { symbol: "GE", name: "GE Aerospace", sector: "Industrials" },
+      { symbol: "UPS", name: "UPS", sector: "Industrials" },
+      // Consumer Staples
+      { symbol: "PG", name: "Procter & Gamble", sector: "Consumer Staples" },
+      { symbol: "KO", name: "Coca-Cola", sector: "Consumer Staples" },
+      { symbol: "PEP", name: "PepsiCo", sector: "Consumer Staples" },
+      // Communication
+      { symbol: "NFLX", name: "Netflix", sector: "Communication" },
+      { symbol: "DIS", name: "Walt Disney", sector: "Communication" },
+      { symbol: "CMCSA", name: "Comcast", sector: "Communication" },
+      // Utilities
+      { symbol: "NEE", name: "NextEra Energy", sector: "Utilities" },
+      { symbol: "DUK", name: "Duke Energy", sector: "Utilities" },
+      // Materials
+      { symbol: "LIN", name: "Linde", sector: "Materials" },
+      { symbol: "APD", name: "Air Products", sector: "Materials" },
+      // Real Estate
+      { symbol: "AMT", name: "American Tower", sector: "Real Estate" },
+      { symbol: "PLD", name: "Prologis", sector: "Real Estate" },
+    ];
+
+    const fetches = stockList.map(async (stock) => {
+      try {
+        if (period === "1d") {
+          const summary = await this.fetchQuoteSummary(
+            stock.symbol,
+            "price",
+          );
+          const price = summary.price || {};
+          return {
+            symbol: stock.symbol,
+            name: stock.name,
+            price: price.regularMarketPrice?.raw || 0,
+            changePercent:
+              (price.regularMarketChangePercent?.raw || 0) * 100,
+            sector: stock.sector,
+            marketCap: price.marketCap?.raw,
+          } as StockData;
+        }
+
+        const url = `${this.baseUrl}/v8/finance/chart/${stock.symbol}?range=${period}&interval=1d`;
+        const { crumb, cookie } = await getCrumbSafe(this);
+
+        const headers: Record<string, string> = {
+          Accept: "application/json",
+          "User-Agent": "Mozilla/5.0",
+        };
+        if (cookie) headers["Cookie"] = cookie;
+
+        const finalUrl = crumb
+          ? `${url}&crumb=${encodeURIComponent(crumb)}`
+          : url;
+        const response = await fetch(finalUrl, { headers });
+
+        if (!response.ok) {
+          throw new Error(`Yahoo Finance API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const closes: number[] =
+          data.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
+        const validCloses = closes.filter(
+          (c: number | null) => c != null,
+        );
+
+        if (validCloses.length < 2) {
+          throw new Error("Not enough data points");
+        }
+
+        const startPrice = validCloses[0];
+        const endPrice = validCloses[validCloses.length - 1];
+        const changePct =
+          ((endPrice - startPrice) / startPrice) * 100;
+
+        return {
+          symbol: stock.symbol,
+          name: stock.name,
+          price: endPrice,
+          changePercent: changePct,
+          sector: stock.sector,
+        } as StockData;
+      } catch (error) {
+        logger.warn(
+          `Failed to fetch stock ${stock.symbol} for period ${period}, skipping`,
+          { error: (error as Error).message },
+        );
+        return null;
+      }
+    });
+
+    const settled = await Promise.all(fetches);
+    const results = settled.filter(
+      (item): item is StockData => item !== null,
+    );
+
+    if (results.length === 0) {
+      throw new Error("Failed to fetch any stock performance data");
     }
 
     return results;

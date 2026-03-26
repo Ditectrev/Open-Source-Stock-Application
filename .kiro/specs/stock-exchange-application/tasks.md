@@ -760,19 +760,19 @@ The implementation follows an incremental approach, building core infrastructure
     - Test performance display
     - _Requirements: 25.8_
 
-- [ ] 30. Stock Heatmap
-  - [ ] 30.1 Implement stock heatmap data fetching
+- [x] 30. Stock Heatmap
+  - [x] 30.1 Implement stock heatmap data fetching
     - Fetch stock performance data
     - Group by sector
     - _Requirements: 25.9_
 
-  - [ ] 30.2 Create StockHeatmap component
+  - [x] 30.2 Create StockHeatmap component
     - Extend HeatmapComponent for stocks
     - Display in TradingView style
     - Group by sector
     - _Requirements: 25.1, 25.9_
 
-  - [ ]* 30.3 Write unit tests for StockHeatmap
+  - [x] 30.3 Write unit tests for StockHeatmap
     - Test stock display
     - Test sector grouping
     - Test TradingView style
