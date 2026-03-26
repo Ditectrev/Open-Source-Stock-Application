@@ -87,3 +87,11 @@ export type { CryptoHeatmapProps } from "./CryptoHeatmap";
 
 export { StockHeatmap } from "./StockHeatmap";
 export type { StockHeatmapProps } from "./StockHeatmap";
+
+export { MatrixHeatmap } from "./MatrixHeatmap";
+export type {
+  MatrixHeatmapProps,
+  MatrixColumn,
+  MatrixRow,
+  MatrixCellData,
+} from "./MatrixHeatmap";

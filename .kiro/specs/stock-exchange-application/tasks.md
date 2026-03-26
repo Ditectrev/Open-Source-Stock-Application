@@ -778,18 +778,18 @@ The implementation follows an incremental approach, building core infrastructure
     - Test TradingView style
     - _Requirements: 25.9_
 
-- [ ] 31. Matrix Heatmap
-  - [ ] 31.1 Implement matrix heatmap layout
+- [x] 31. Matrix Heatmap
+  - [x] 31.1 Implement matrix heatmap layout
     - Create matrix format: rows = symbols/sectors, columns = time periods/metrics
     - Color-code cells based on return values or metric values
     - _Requirements: 25.10, 25.11_
 
-  - [ ] 31.2 Create MatrixHeatmap component
+  - [x] 31.2 Create MatrixHeatmap component
     - Extend HeatmapComponent for matrix format
     - Support configurable row and column definitions
     - _Requirements: 25.1, 25.10, 25.11_
 
-  - [ ]* 31.3 Write unit tests for MatrixHeatmap
+  - [x] 31.3 Write unit tests for MatrixHeatmap
     - Test matrix layout
     - Test cell color coding
     - _Requirements: 25.10, 25.11_
