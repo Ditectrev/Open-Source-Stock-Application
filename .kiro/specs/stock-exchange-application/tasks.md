@@ -794,12 +794,12 @@ The implementation follows an incremental approach, building core infrastructure
     - Test cell color coding
     - _Requirements: 25.10, 25.11_
 
-- [ ] 32. Heatmap navigation
-  - [ ] 32.1 Create heatmap navigation component
+- [x] 32. Heatmap navigation
+  - [x] 32.1 Create heatmap navigation component
     - Allow switching between ETF, Crypto, and Stock heatmaps
     - _Requirements: 25.2_
 
-  - [ ]* 32.2 Write unit tests for heatmap navigation
+  - [x] 32.2 Write unit tests for heatmap navigation
     - Test heatmap type switching
     - _Requirements: 25.2_
 

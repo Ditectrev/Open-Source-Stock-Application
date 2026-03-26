@@ -14,18 +14,9 @@ import { FinancialsTable } from "@/components/FinancialsTable";
 import { FearGreedGauge } from "@/components/FearGreedGauge";
 import { WorldMarkets } from "@/components/WorldMarkets";
 import { SectorHub } from "@/components/SectorHub";
-import { EconomicCalendar } from "@/components/EconomicCalendar";
-import { EarningsCalendar } from "@/components/EarningsCalendar";
-import { DividendCalendar } from "@/components/DividendCalendar";
-import { IPOCalendar } from "@/components/IPOCalendar";
 import { CalendarHub } from "@/components/CalendarHub";
-import { HeatmapComponent } from "@/components/HeatmapComponent";
-import type { HeatmapTimePeriod, HeatmapSortField, HeatmapSortDirection } from "@/components/HeatmapComponent";
-import { ETFHeatmap } from "@/components/ETFHeatmap";
-import { CryptoHeatmap } from "@/components/CryptoHeatmap";
-import { StockHeatmap } from "@/components/StockHeatmap";
+import { HeatmapHub } from "@/components/HeatmapHub";
 import { Footer } from "@/components/Footer";
-import { HeatmapData } from "@/types";
 
 type TabType = "overview" | "financials" | "technicals" | "forecasts" | "seasonals";
 
@@ -41,14 +32,6 @@ export default function Home() {
   const [forecastData, setForecastData] = useState<ForecastData | null>(null);
   const [seasonalData, setSeasonalData] = useState<SeasonalData | null>(null);
   const [financialData, setFinancialData] = useState<FinancialData | null>(null);
-
-  // Heatmap state
-  const [heatmapData, setHeatmapData] = useState<HeatmapData[]>([]);
-  const [heatmapLoading, setHeatmapLoading] = useState(false);
-  const [heatmapPeriod, setHeatmapPeriod] = useState<HeatmapTimePeriod>("1D");
-  const [heatmapSortField, setHeatmapSortField] = useState<HeatmapSortField>("changePercent");
-  const [heatmapSortDirection, setHeatmapSortDirection] = useState<HeatmapSortDirection>("desc");
-  const [heatmapSectorFilter, setHeatmapSectorFilter] = useState<string>("");
 
   // Fetch symbol data when selected
   useEffect(() => {
@@ -119,50 +102,6 @@ export default function Home() {
   const handleTimeRangeChange = (range: TimeRange) => {
     setTimeRange(range);
   };
-
-  // Fetch heatmap data from sectors endpoint
-  const fetchHeatmapData = async () => {
-    setHeatmapLoading(true);
-    try {
-      const res = await fetch(`/api/market/sectors?period=${heatmapPeriod}`);
-      if (res.ok) {
-        const result = await res.json();
-        const seen = new Set<string>();
-        const items: HeatmapData[] = (result.data ?? []).reduce(
-          (
-            acc: HeatmapData[],
-            s: { sector: string; performance: number; changePercent: number }
-          ) => {
-            const key = s.sector.replace(/\s+/g, "-").toUpperCase();
-            if (!seen.has(key)) {
-              seen.add(key);
-              acc.push({
-                symbol: key,
-                name: s.sector,
-                value: s.performance,
-                changePercent: s.changePercent,
-                sector: s.sector,
-              });
-            }
-            return acc;
-          },
-          []
-        );
-        setHeatmapData(items);
-      }
-    } catch {
-      // silently degrade — heatmap is supplementary
-    } finally {
-      setHeatmapLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!selectedSymbol) {
-      fetchHeatmapData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [heatmapPeriod, selectedSymbol]);
 
   return (
     <div className="min-h-screen p-8 bg-gray-50 dark:bg-gray-900">
@@ -266,61 +205,9 @@ export default function Home() {
               <SectorHub />
             </div>
             <div className="mt-8">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-                Market Heatmap
-              </h2>
-              <HeatmapComponent
-                data={heatmapData}
-                loading={heatmapLoading}
-                timePeriod={heatmapPeriod}
-                onTimePeriodChange={setHeatmapPeriod}
-                sortField={heatmapSortField}
-                sortDirection={heatmapSortDirection}
-                onSortChange={(field, dir) => {
-                  setHeatmapSortField(field);
-                  setHeatmapSortDirection(dir);
-                }}
-                sectorFilter={heatmapSectorFilter}
-                onSectorFilterChange={setHeatmapSectorFilter}
-                onTileClick={(item) => {
-                  setSelectedSymbol(item.symbol);
-                  setActiveTab("overview");
-                }}
+              <HeatmapHub
                 refreshInterval={60000}
-                onRefresh={fetchHeatmapData}
-              />
-            </div>
-            <div className="mt-8">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-                ETF Heatmap
-              </h2>
-              <ETFHeatmap
-                refreshInterval={60000}
-                onETFClick={(symbol) => {
-                  setSelectedSymbol(symbol);
-                  setActiveTab("overview");
-                }}
-              />
-            </div>
-            <div className="mt-8">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-                Crypto Heatmap
-              </h2>
-              <CryptoHeatmap
-                refreshInterval={60000}
-                onCryptoClick={(symbol) => {
-                  setSelectedSymbol(symbol);
-                  setActiveTab("overview");
-                }}
-              />
-            </div>
-            <div className="mt-8">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-                Stock Heatmap
-              </h2>
-              <StockHeatmap
-                refreshInterval={60000}
-                onStockClick={(symbol) => {
+                onSymbolClick={(symbol) => {
                   setSelectedSymbol(symbol);
                   setActiveTab("overview");
                 }}

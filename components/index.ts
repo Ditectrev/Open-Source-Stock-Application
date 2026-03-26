@@ -95,3 +95,9 @@ export type {
   MatrixRow,
   MatrixCellData,
 } from "./MatrixHeatmap";
+
+export { HeatmapNavigation } from "./HeatmapNavigation";
+export type { HeatmapNavigationProps, HeatmapType } from "./HeatmapNavigation";
+
+export { HeatmapHub } from "./HeatmapHub";
+export type { HeatmapHubProps } from "./HeatmapHub";
