@@ -803,31 +803,31 @@ The implementation follows an incremental approach, building core infrastructure
     - Test heatmap type switching
     - _Requirements: 25.2_
 
-- [ ] 33. Asset Screener infrastructure
-  - [ ] 33.1 Implement screener filter logic
+- [x] 33. Asset Screener infrastructure
+  - [x] 33.1 Implement screener filter logic
     - Create ScreenerFilter interface implementation
     - Support operators: gt, lt, eq, gte, lte, between, in
     - Implement filter matching logic
     - _Requirements: 26.1, 26.8_
 
-  - [ ]* 33.2 Write property test for screener filter conjunction
+  - [x] 33.2 Write property test for screener filter conjunction
     - **Property 17: Screener Filter Conjunction**
     - **Validates: Requirements 26.8**
 
-  - [ ] 33.3 Implement screener data fetching
+  - [x] 33.3 Implement screener data fetching
     - Fetch asset data with all relevant metrics
     - Apply filters to results
     - Calculate valuation context (overpriced/underpriced/fair)
     - _Requirements: 26.8, 26.18_
 
-  - [ ] 33.4 Create screener API routes
+  - [x] 33.4 Create screener API routes
     - Implement POST /api/screener/search
     - Implement GET /api/screener/presets
     - Implement POST /api/screener/presets
     - Implement GET /api/screener/export
     - _Requirements: 26.1, 26.12, 26.15, 26.20_
 
-  - [ ]* 33.5 Write unit tests for screener API
+  - [x] 33.5 Write unit tests for screener API
     - Test filter application
     - Test preset loading
     - Test preset saving
