@@ -349,6 +349,13 @@ export interface StockData {
   changePercent: number;
   sector: string;
   marketCap?: number;
+  volume?: number;
+  peRatio?: number;
+  pbRatio?: number;
+  pegRatio?: number;
+  dividendYield?: number;
+  revenueGrowth?: number;
+  earningsGrowth?: number;
 }
 
 export type ValuationContext = "overpriced" | "underpriced" | "fair";

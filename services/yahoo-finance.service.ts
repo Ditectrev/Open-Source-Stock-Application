@@ -1089,9 +1089,12 @@ export class YahooFinanceService {
         if (period === "1d") {
           const summary = await this.fetchQuoteSummary(
             stock.symbol,
-            "price",
+            "price,summaryDetail,defaultKeyStatistics,financialData",
           );
           const price = summary.price || {};
+          const detail = summary.summaryDetail || {};
+          const keyStats = summary.defaultKeyStatistics || {};
+          const finData = summary.financialData || {};
           return {
             symbol: stock.symbol,
             name: stock.name,
@@ -1100,6 +1103,19 @@ export class YahooFinanceService {
               (price.regularMarketChangePercent?.raw || 0) * 100,
             sector: stock.sector,
             marketCap: price.marketCap?.raw,
+            volume: price.regularMarketVolume?.raw,
+            peRatio: detail.trailingPE?.raw,
+            pbRatio: keyStats.priceToBook?.raw,
+            pegRatio: keyStats.pegRatio?.raw,
+            dividendYield: detail.dividendYield?.raw != null
+              ? detail.dividendYield.raw * 100
+              : undefined,
+            revenueGrowth: finData.revenueGrowth?.raw != null
+              ? finData.revenueGrowth.raw * 100
+              : undefined,
+            earningsGrowth: finData.earningsGrowth?.raw != null
+              ? finData.earningsGrowth.raw * 100
+              : undefined,
           } as StockData;
         }
 

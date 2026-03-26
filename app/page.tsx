@@ -16,6 +16,7 @@ import { WorldMarkets } from "@/components/WorldMarkets";
 import { SectorHub } from "@/components/SectorHub";
 import { CalendarHub } from "@/components/CalendarHub";
 import { HeatmapHub } from "@/components/HeatmapHub";
+import { ScreenerHub } from "@/components/ScreenerHub";
 import { Footer } from "@/components/Footer";
 
 type TabType = "overview" | "financials" | "technicals" | "forecasts" | "seasonals";
@@ -207,6 +208,14 @@ export default function Home() {
             <div className="mt-8">
               <HeatmapHub
                 refreshInterval={60000}
+                onSymbolClick={(symbol) => {
+                  setSelectedSymbol(symbol);
+                  setActiveTab("overview");
+                }}
+              />
+            </div>
+            <div className="mt-8">
+              <ScreenerHub
                 onSymbolClick={(symbol) => {
                   setSelectedSymbol(symbol);
                   setActiveTab("overview");
