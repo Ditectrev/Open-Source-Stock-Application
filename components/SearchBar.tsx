@@ -184,8 +184,9 @@ export function SearchBar({
             }
           }}
           placeholder={placeholder}
-          className="w-full px-4 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg 
+          className="w-full px-4 py-3 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg 
                      bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+                     text-base sm:text-sm
                      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
                      placeholder-gray-400 dark:placeholder-gray-500"
           aria-label="Search stocks"
@@ -248,7 +249,7 @@ export function SearchBar({
                   key={`${result.symbol}-${result.exchange}`}
                   role="option"
                   aria-selected={index === selectedIndex}
-                  className={`px-4 py-3 cursor-pointer transition-colors
+                  className={`px-4 py-3 cursor-pointer transition-colors min-h-[44px]
                     ${
                       index === selectedIndex
                         ? "bg-blue-50 dark:bg-blue-900/20"

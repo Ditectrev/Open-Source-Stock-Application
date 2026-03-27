@@ -446,23 +446,30 @@ export function ChartComponent({
       {/* Hovered Point Info */}
       {hoveredPoint && (
         <div
-          className={`mb-2 p-2 rounded text-sm ${
+          className={`mb-2 p-2 rounded text-xs sm:text-sm ${
             isDark ? "bg-gray-800 text-gray-200" : "bg-gray-50 text-gray-900"
           }`}
         >
           <span className="font-semibold">
             {new Date(hoveredPoint.timestamp).toLocaleDateString()}
           </span>
-          {" - "}
-          <span>O: ${hoveredPoint.open.toFixed(2)}</span>
-          {" | "}
-          <span>H: ${hoveredPoint.high.toFixed(2)}</span>
-          {" | "}
-          <span>L: ${hoveredPoint.low.toFixed(2)}</span>
-          {" | "}
-          <span>C: ${hoveredPoint.close.toFixed(2)}</span>
-          {" | "}
-          <span>Vol: {(hoveredPoint.volume / 1000000).toFixed(2)}M</span>
+          <span className="hidden sm:inline">
+            {" - "}
+            <span>O: ${hoveredPoint.open.toFixed(2)}</span>
+            {" | "}
+            <span>H: ${hoveredPoint.high.toFixed(2)}</span>
+            {" | "}
+            <span>L: ${hoveredPoint.low.toFixed(2)}</span>
+            {" | "}
+            <span>C: ${hoveredPoint.close.toFixed(2)}</span>
+            {" | "}
+            <span>Vol: {(hoveredPoint.volume / 1000000).toFixed(2)}M</span>
+          </span>
+          <div className="sm:hidden mt-1 flex flex-wrap gap-x-3 gap-y-0.5">
+            <span>C: ${hoveredPoint.close.toFixed(2)}</span>
+            <span>H: ${hoveredPoint.high.toFixed(2)}</span>
+            <span>L: ${hoveredPoint.low.toFixed(2)}</span>
+          </div>
         </div>
       )}
 
@@ -473,8 +480,11 @@ export function ChartComponent({
 
       {/* Chart Instructions */}
       <div className={`mt-2 text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}>
-        <p>
+        <p className="hidden sm:block">
           💡 Use mouse wheel to zoom, drag to pan, hover for details
+        </p>
+        <p className="sm:hidden">
+          💡 Pinch to zoom, swipe to pan, tap for details
         </p>
       </div>
     </div>
@@ -499,10 +509,10 @@ function TimeRangeSelector({
         <button
           key={range}
           onClick={() => onRangeChange(range)}
-          className={`px-3 py-1 text-sm rounded transition-colors ${
+          className={`px-3 py-2 text-sm rounded transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center ${
             selectedRange === range
               ? "bg-blue-600 text-white"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
           }`}
         >
           {range}
@@ -536,10 +546,10 @@ function ChartTypeSelector({
         <button
           key={type.value}
           onClick={() => onTypeChange(type.value)}
-          className={`px-3 py-1 text-sm rounded transition-colors ${
+          className={`px-3 py-2 text-sm rounded transition-colors min-h-[44px] flex items-center justify-center ${
             selectedType === type.value
               ? "bg-blue-600 text-white"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
           }`}
         >
           {type.label}

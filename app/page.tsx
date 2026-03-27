@@ -105,22 +105,24 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen p-8 bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100">
+    <div className="min-h-screen p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12 bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-7xl xl:max-w-[1400px] mx-auto">
+        <div className="flex justify-between items-start gap-3">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100">
               Stock Exchange Application
             </h1>
-            <p className="mt-4 text-lg text-gray-700 dark:text-gray-300">
+            <p className="mt-2 sm:mt-4 text-sm sm:text-base md:text-lg text-gray-700 dark:text-gray-300">
               Welcome to the comprehensive web platform for individual long-term
               investors.
             </p>
           </div>
-          <ThemeToggle />
+          <div className="flex-shrink-0">
+            <ThemeToggle />
+          </div>
         </div>
 
-        <div className="mt-8">
+        <div className="mt-4 sm:mt-6 md:mt-8 lg:mt-10">
           <SearchBar 
             placeholder="Search stocks by symbol (e.g., AAPL, TSLA, MSFT)..." 
             onSelect={(symbol) => {
@@ -132,7 +134,7 @@ export default function Home() {
 
         {/* Symbol Detail Section */}
         {selectedSymbol && (
-          <div className="mt-8">
+          <div className="mt-4 sm:mt-6 md:mt-8 lg:mt-10">
             {loading && (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
@@ -197,15 +199,15 @@ export default function Home() {
 
         {/* Welcome Message when no symbol selected */}
         {!selectedSymbol && (
-          <div className="mt-12">
+          <div className="mt-6 sm:mt-8 md:mt-12 lg:mt-14">
             <FearGreedGauge />
-            <div className="mt-8">
+            <div className="mt-6 sm:mt-8 lg:mt-10">
               <WorldMarkets />
             </div>
-            <div className="mt-8">
+            <div className="mt-6 sm:mt-8 lg:mt-10">
               <SectorHub />
             </div>
-            <div className="mt-8">
+            <div className="mt-6 sm:mt-8 lg:mt-10">
               <HeatmapHub
                 refreshInterval={60000}
                 onSymbolClick={(symbol) => {
@@ -214,7 +216,7 @@ export default function Home() {
                 }}
               />
             </div>
-            <div className="mt-8">
+            <div className="mt-6 sm:mt-8 lg:mt-10">
               <ScreenerHub
                 onSymbolClick={(symbol) => {
                   setSelectedSymbol(symbol);
@@ -222,7 +224,7 @@ export default function Home() {
                 }}
               />
             </div>
-            <div className="mt-8">
+            <div className="mt-6 sm:mt-8 lg:mt-10">
               <CalendarHub
                 onSymbolClick={(symbol) => {
                   setSelectedSymbol(symbol);

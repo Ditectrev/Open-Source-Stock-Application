@@ -45,7 +45,7 @@ export function HeatmapNavigation({
             aria-selected={isActive}
             aria-controls={`heatmap-panel-${key}`}
             onClick={() => onHeatmapChange(key)}
-            className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap min-h-[44px] ${
               isActive
                 ? "bg-blue-600 text-white"
                 : isDark

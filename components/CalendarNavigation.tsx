@@ -46,7 +46,7 @@ export function CalendarNavigation({
             aria-selected={isActive}
             aria-controls={`calendar-panel-${key}`}
             onClick={() => onCalendarChange(key)}
-            className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap min-h-[44px] ${
               isActive
                 ? isDark
                   ? "bg-blue-600 text-white"

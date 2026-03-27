@@ -40,27 +40,27 @@ export function OverviewTab({
     <div className="space-y-6">
       {/* Current Price Card */}
       <div
-        className={`p-6 rounded-lg shadow-sm ${
+        className={`p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm ${
           isDark ? "bg-gray-800" : "bg-white"
         }`}
       >
         <h2
-          className={`text-lg font-semibold mb-4 ${
+          className={`text-lg font-semibold mb-3 sm:mb-4 ${
             isDark ? "text-white" : "text-gray-900"
           }`}
         >
           Current Price
         </h2>
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 sm:gap-4">
           <div>
             <div
-              className={`text-4xl font-bold ${
+              className={`text-3xl sm:text-4xl lg:text-5xl font-bold ${
                 isDark ? "text-white" : "text-gray-900"
               }`}
             >
               ${symbolData.price.toFixed(2)}
             </div>
-            <div className={`text-xl font-semibold mt-2 ${changeColor}`}>
+            <div className={`text-lg sm:text-xl font-semibold mt-1 sm:mt-2 ${changeColor}`}>
               {isPositive ? "+" : ""}
               {symbolData.change.toFixed(2)} ({isPositive ? "+" : ""}
               {symbolData.changePercent.toFixed(2)}%)
@@ -76,25 +76,27 @@ export function OverviewTab({
 
       {/* Price Chart */}
       <div
-        className={`p-6 rounded-lg shadow-sm ${
+        className={`p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm ${
           isDark ? "bg-gray-800" : "bg-white"
         }`}
       >
         <h2
-          className={`text-lg font-semibold mb-4 ${
+          className={`text-lg font-semibold mb-3 sm:mb-4 ${
             isDark ? "text-white" : "text-gray-900"
           }`}
         >
           Price Chart
         </h2>
-        <ChartComponent
-          data={historicalData}
-          type="area"
-          initialTimeRange={timeRange}
-          onTimeRangeChange={onTimeRangeChange}
-          responsive={true}
-          height={400}
-        />
+        <div className="h-[300px] md:h-[380px] lg:h-[420px] xl:h-[500px]">
+          <ChartComponent
+            data={historicalData}
+            type="area"
+            initialTimeRange={timeRange}
+            onTimeRangeChange={onTimeRangeChange}
+            responsive={true}
+            height={300}
+          />
+        </div>
       </div>
 
       {/* Key Metrics */}

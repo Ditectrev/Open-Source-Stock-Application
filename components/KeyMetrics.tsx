@@ -75,18 +75,18 @@ export function KeyMetrics({ symbolData }: KeyMetricsProps) {
 
   return (
     <div
-      className={`p-6 rounded-lg shadow-sm ${
+      className={`p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm ${
         isDark ? "bg-gray-800" : "bg-white"
       }`}
     >
       <h2
-        className={`text-lg font-semibold mb-4 ${
+        className={`text-lg font-semibold mb-3 sm:mb-4 lg:mb-5 ${
           isDark ? "text-white" : "text-gray-900"
         }`}
       >
         Key Metrics
       </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-5">
         {metrics.map((metric) => (
           <MetricCard key={metric.label} metric={metric} isDark={isDark} />
         ))}
@@ -105,7 +105,7 @@ function MetricCard({ metric, isDark }: MetricCardProps) {
 
   return (
     <div
-      className={`relative p-4 rounded-lg border ${
+      className={`relative p-3 sm:p-4 rounded-lg border ${
         isDark
           ? "bg-gray-700/50 border-gray-600 hover:bg-gray-700"
           : "bg-gray-50 border-gray-200 hover:bg-gray-100"
@@ -116,14 +116,14 @@ function MetricCard({ metric, isDark }: MetricCardProps) {
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div
-            className={`text-sm font-medium ${
+            className={`text-xs sm:text-sm font-medium ${
               isDark ? "text-gray-300" : "text-gray-600"
             }`}
           >
             {metric.label}
           </div>
           <div
-            className={`text-xl font-bold mt-1 ${
+            className={`text-lg sm:text-xl font-bold mt-1 ${
               isDark ? "text-white" : "text-gray-900"
             }`}
           >

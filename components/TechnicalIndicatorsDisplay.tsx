@@ -136,10 +136,10 @@ export function TechnicalIndicatorsDisplay({ indicators }: TechnicalIndicatorsDi
 
   return (
     <div
-      className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
+      className={`p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
     >
       <h2
-        className={`text-lg font-semibold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}
+        className={`text-lg font-semibold mb-3 sm:mb-4 lg:mb-5 ${isDark ? "text-white" : "text-gray-900"}`}
       >
         Technical Indicators
       </h2>
@@ -147,19 +147,19 @@ export function TechnicalIndicatorsDisplay({ indicators }: TechnicalIndicatorsDi
       {/* Overall Sentiment Gauge */}
       <div
         data-testid="sentiment-gauge"
-        className={`mb-6 p-4 rounded-lg border-2 ${sentimentColors.border} ${
+        className={`mb-4 sm:mb-6 p-3 sm:p-4 lg:p-5 rounded-lg border-2 ${sentimentColors.border} ${
           isDark ? "bg-gray-700/30" : "bg-gray-50"
         }`}
       >
-        <div className="flex items-center gap-3">
-          <div className={`w-3 h-3 rounded-full ${sentimentColors.dot}`} />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
+          <div className={`w-3 h-3 rounded-full flex-shrink-0 ${sentimentColors.dot}`} />
           <span
-            className={`text-base font-semibold ${isDark ? "text-white" : "text-gray-900"}`}
+            className={`text-sm sm:text-base font-semibold ${isDark ? "text-white" : "text-gray-900"}`}
           >
             {SENTIMENT_LABELS[indicators.overallSentiment]}
           </span>
           <span
-            className={`ml-auto px-3 py-1 rounded-full text-sm font-medium ${sentimentColors.badge}`}
+            className={`sm:ml-auto px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${sentimentColors.badge}`}
           >
             {SIGNAL_LABELS[indicators.overallSentiment]}
           </span>
@@ -167,7 +167,7 @@ export function TechnicalIndicatorsDisplay({ indicators }: TechnicalIndicatorsDi
       </div>
 
       {/* Indicator Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 lg:gap-5">
         {cards.map((card) => (
           <IndicatorCard key={card.name} card={card} isDark={isDark} />
         ))}

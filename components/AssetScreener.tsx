@@ -443,12 +443,12 @@ export function AssetScreener({
   // ------ render ------
 
   return (
-    <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+    <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 sm:p-6 lg:p-8 shadow-sm">
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4 lg:mb-5">
         Asset Screener
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {/* ---- Valuation Metrics ---- */}
         <fieldset className="space-y-3">
           <legend className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1">
@@ -594,19 +594,19 @@ export function AssetScreener({
       </div>
 
       {/* ---- Actions & Result Count ---- */}
-      <div className="mt-6 flex flex-wrap items-center gap-3">
+      <div className="mt-4 sm:mt-6 flex flex-wrap items-center gap-3">
         <button
           type="button"
           onClick={handleApply}
           disabled={loading}
-          className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          className="rounded bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors min-h-[44px]"
         >
           {loading ? "Searching…" : "Apply Filters"}
         </button>
         <button
           type="button"
           onClick={handleClear}
-          className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+          className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors min-h-[44px]"
         >
           Clear All
         </button>

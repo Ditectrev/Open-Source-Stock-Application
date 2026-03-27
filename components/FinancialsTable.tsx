@@ -252,15 +252,15 @@ export function FinancialsTable({ financials }: FinancialsTableProps) {
 
   return (
     <div
-      className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
+      className={`p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
     >
       <h2
-        className={`text-lg font-semibold mb-6 ${isDark ? "text-white" : "text-gray-900"}`}
+        className={`text-lg font-semibold mb-4 sm:mb-6 ${isDark ? "text-white" : "text-gray-900"}`}
       >
         Financials
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
         {sections.map((section) => (
           <SectionCard key={section.title} section={section} isDark={isDark} />
         ))}

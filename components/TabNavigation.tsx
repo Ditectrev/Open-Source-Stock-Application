@@ -35,7 +35,7 @@ export function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
           isDark ? "border-gray-700" : "border-gray-200"
         }`}
       >
-        <nav className="-mb-px flex space-x-8 overflow-x-auto" aria-label="Tabs">
+        <nav className="-mb-px flex space-x-2 sm:space-x-8 overflow-x-auto scrollbar-hide" aria-label="Tabs">
           {TABS.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -43,7 +43,7 @@ export function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
                 key={tab.id}
                 onClick={() => onTabChange(tab.id)}
                 className={`
-                  whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors
+                  whitespace-nowrap py-3 sm:py-4 px-2 sm:px-1 border-b-2 font-medium text-sm transition-colors min-h-[44px]
                   ${
                     isActive
                       ? `border-blue-500 ${

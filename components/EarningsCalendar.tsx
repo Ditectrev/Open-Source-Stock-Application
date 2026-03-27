@@ -143,7 +143,7 @@ export function EarningsCalendar({ data: externalData, onSymbolClick }: Earnings
 
   return (
     <div
-      className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
+      className={`p-6 lg:p-8 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
       data-testid="earnings-calendar"
     >
       <h3 className={`text-lg font-semibold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}>

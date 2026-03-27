@@ -1,6 +1,6 @@
 {
   "name": "stock-exchange-app",
-  "version": "0.30.0",
+  "version": "0.32.0",
   "private": true,
   "scripts": {
     "dev": "bun --bun next dev",

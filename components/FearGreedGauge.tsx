@@ -147,11 +147,11 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
 
   return (
     <div
-      className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
+      className={`p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
       data-testid="fear-greed-gauge"
     >
       {/* Header with tooltip */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
         <h3
           className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}
         >
@@ -195,7 +195,7 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
       >
         <svg
           viewBox="0 0 300 160"
-          className="w-full max-w-xs"
+          className="w-full max-w-xs lg:max-w-sm xl:max-w-md"
           aria-label={`Fear and Greed gauge showing ${value} - ${label}`}
           role="img"
         >
@@ -264,7 +264,7 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
       {/* Current value & label */}
       <div className="text-center mt-2">
         <span
-          className="text-3xl font-bold"
+          className="text-3xl lg:text-4xl font-bold"
           style={{ color }}
           data-testid="fear-greed-value"
         >
@@ -279,7 +279,7 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
       </div>
 
       {/* Range legend */}
-      <div className="flex flex-wrap justify-center gap-2 mt-4">
+      <div className="flex flex-wrap justify-center gap-x-2 gap-y-1 mt-3 sm:mt-4">
         {[
           { label: "Extreme Fear", color: "#dc2626" },
           { label: "Fear", color: "#f97316" },
@@ -310,12 +310,12 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
               Historical Timeline
             </h4>
             {!externalData && (
-              <div className="flex gap-1" data-testid="fear-greed-range-selector">
+              <div className="flex gap-1 flex-wrap" data-testid="fear-greed-range-selector">
                 {(["1W", "1M", "3M", "1Y", "5Y", "YTD", "Max"] as const).map((range) => (
                   <button
                     key={range}
                     onClick={() => setHistoryRange(range)}
-                    className={`px-2 py-0.5 text-xs rounded transition-colors ${
+                    className={`px-2.5 py-1.5 text-xs rounded transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center ${
                       historyRange === range
                         ? "bg-blue-600 text-white"
                         : isDark
@@ -329,7 +329,7 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
               </div>
             )}
           </div>
-          <div className="relative h-64">
+          <div className="relative h-64 lg:h-80 xl:h-96">
             <svg
               viewBox={`0 0 ${Math.max(data.history.length * 4, 100)} 100`}
               className="w-full h-full"

@@ -24,4 +24,13 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+
+  /* Hide scrollbar for horizontal scroll containers on mobile */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }

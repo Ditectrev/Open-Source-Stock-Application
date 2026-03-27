@@ -25,22 +25,22 @@ export function SymbolHeader({ symbolData }: SymbolHeaderProps) {
 
   return (
     <div
-      className={`p-6 rounded-lg shadow-sm ${
+      className={`p-4 sm:p-6 rounded-lg shadow-sm ${
         isDark ? "bg-gray-800" : "bg-white"
       }`}
     >
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         {/* Symbol and Name */}
         <div>
           <h1
-            className={`text-3xl font-bold ${
+            className={`text-2xl sm:text-3xl font-bold ${
               isDark ? "text-white" : "text-gray-900"
             }`}
           >
             {symbolData.symbol}
           </h1>
           <p
-            className={`text-lg ${
+            className={`text-base sm:text-lg ${
               isDark ? "text-gray-300" : "text-gray-600"
             }`}
           >
@@ -51,13 +51,13 @@ export function SymbolHeader({ symbolData }: SymbolHeaderProps) {
         {/* Price and Change */}
         <div className="text-left sm:text-right">
           <div
-            className={`text-3xl font-bold ${
+            className={`text-2xl sm:text-3xl font-bold ${
               isDark ? "text-white" : "text-gray-900"
             }`}
           >
             ${symbolData.price.toFixed(2)}
           </div>
-          <div className={`text-lg font-semibold ${changeColor}`}>
+          <div className={`text-base sm:text-lg font-semibold ${changeColor}`}>
             {isPositive ? "+" : ""}
             {symbolData.change.toFixed(2)} ({isPositive ? "+" : ""}
             {symbolData.changePercent.toFixed(2)}%)

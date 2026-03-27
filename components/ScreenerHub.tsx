@@ -168,7 +168,7 @@ export function ScreenerHub({ onSymbolClick, refreshInterval }: ScreenerHubProps
           role="tab"
           aria-selected={viewMode === "table"}
           onClick={() => setViewMode("table")}
-          className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
+          className={`rounded-md px-4 py-2 text-sm font-medium transition-colors min-h-[44px] ${
             viewMode === "table"
               ? "bg-blue-600 text-white"
               : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -182,7 +182,7 @@ export function ScreenerHub({ onSymbolClick, refreshInterval }: ScreenerHubProps
           role="tab"
           aria-selected={viewMode === "heatmap"}
           onClick={() => setViewMode("heatmap")}
-          className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
+          className={`rounded-md px-4 py-2 text-sm font-medium transition-colors min-h-[44px] ${
             viewMode === "heatmap"
               ? "bg-blue-600 text-white"
               : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"

@@ -145,16 +145,16 @@ export function WorldMarkets({
 
   return (
     <div
-      className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
+      className={`p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
       data-testid="world-markets"
     >
       <h3
-        className={`text-lg font-semibold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}
+        className={`text-lg font-semibold mb-3 sm:mb-4 lg:mb-5 ${isDark ? "text-white" : "text-gray-900"}`}
       >
         World Markets
       </h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
         {REGIONS.map((region) => {
           const indices = grouped[region];
           if (indices.length === 0) return null;
@@ -181,7 +181,7 @@ export function WorldMarkets({
                   return (
                     <li
                       key={idx.symbol}
-                      className={`flex items-center justify-between py-1.5 px-2 rounded ${
+                      className={`flex items-center justify-between py-2 sm:py-1.5 px-2 rounded min-h-[44px] ${
                         isDark ? "hover:bg-gray-700/50" : "hover:bg-gray-50"
                       }`}
                       data-testid={`index-${idx.symbol}`}

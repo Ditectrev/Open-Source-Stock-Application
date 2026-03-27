@@ -36,7 +36,7 @@ export function CalendarHub({
   return (
     <div data-testid="calendar-hub">
       <h2
-        className={`text-xl font-semibold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}
+        className={`text-xl font-semibold mb-3 md:mb-4 ${isDark ? "text-white" : "text-gray-900"}`}
       >
         Calendars
       </h2>

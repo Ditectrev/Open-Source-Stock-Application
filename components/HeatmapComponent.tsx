@@ -212,14 +212,14 @@ export function HeatmapComponent({
 
   return (
     <div
-      className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
+      className={`p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
       data-testid="heatmap"
       role="region"
       aria-label="Market heatmap"
     >
       {/* Time period selector */}
       <div
-        className="flex gap-1 mb-4"
+        className="flex gap-1 mb-3 sm:mb-4 flex-wrap"
         data-testid="heatmap-period-selector"
         role="group"
         aria-label="Heatmap time period"
@@ -228,7 +228,7 @@ export function HeatmapComponent({
           <button
             key={period}
             data-testid={`heatmap-period-${period}`}
-            className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+            className={`px-3 py-2 text-xs font-medium rounded transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center ${
               timePeriod === period
                 ? "bg-blue-600 text-white"
                 : isDark
@@ -244,9 +244,9 @@ export function HeatmapComponent({
       </div>
 
       {/* Sort & filter controls */}
-      <div className="flex flex-wrap items-center gap-3 mb-4">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
         <div
-          className="flex gap-1"
+          className="flex gap-1 flex-wrap"
           data-testid="heatmap-sort-controls"
           role="group"
           aria-label="Heatmap sort options"
@@ -261,7 +261,7 @@ export function HeatmapComponent({
             <button
               key={field}
               data-testid={`heatmap-sort-${field}`}
-              className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+              className={`px-3 py-2 text-xs font-medium rounded transition-colors min-h-[36px] ${
                 sortField === field
                   ? "bg-blue-600 text-white"
                   : isDark
@@ -279,7 +279,7 @@ export function HeatmapComponent({
 
         <select
           data-testid="heatmap-sector-filter"
-          className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+          className={`px-3 py-2 text-xs font-medium rounded transition-colors min-h-[36px] ${
             isDark
               ? "bg-gray-700 text-gray-300 border-gray-600"
               : "bg-gray-200 text-gray-600 border-gray-300"
@@ -299,7 +299,7 @@ export function HeatmapComponent({
 
       {/* Tile grid */}
       <div
-        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2"
+        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-1.5 sm:gap-2 lg:gap-3"
         data-testid="heatmap-grid"
       >
         {processedData.map((item) => {
@@ -314,7 +314,7 @@ export function HeatmapComponent({
           return (
             <div
               key={item.symbol}
-              className={`rounded-lg p-3 flex flex-col items-center justify-center min-h-[80px] transition-transform hover:scale-105 cursor-pointer ${textColor}`}
+              className={`rounded-lg p-2 sm:p-3 md:p-3 lg:p-4 flex flex-col items-center justify-center min-h-[70px] sm:min-h-[80px] md:min-h-[90px] lg:min-h-[100px] transition-transform hover:scale-105 active:scale-95 cursor-pointer ${textColor}`}
               style={{ backgroundColor: bgColor }}
               data-testid={`heatmap-tile-${item.symbol}`}
               aria-label={`${item.symbol}: ${formatPercent(item.changePercent)}`}

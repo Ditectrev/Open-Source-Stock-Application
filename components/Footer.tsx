@@ -12,7 +12,7 @@ export function Footer() {
 
   return (
     <footer
-      className={`py-6 mt-12 border-t ${
+      className={`py-4 sm:py-6 mt-8 sm:mt-12 border-t ${
         isDark
           ? "border-gray-700 bg-gray-900 text-gray-400"
           : "border-gray-200 bg-gray-50 text-gray-500"

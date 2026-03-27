@@ -150,7 +150,7 @@ export function IPOCalendar({ data: externalData, onSymbolClick }: IPOCalendarPr
 
   return (
     <div
-      className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
+      className={`p-6 lg:p-8 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
       data-testid="ipo-calendar"
     >
       <h3

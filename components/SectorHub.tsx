@@ -152,9 +152,9 @@ export function SectorHub({
   const maxAbsChange = Math.max(...data.map((s) => Math.abs(s.changePercent)), 0.01);
 
   return (
-    <div className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`} data-testid="sector-hub">
+    <div className={`p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`} data-testid="sector-hub">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 gap-3">
         <h3 className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
           Sectors Hub
         </h3>
@@ -162,7 +162,7 @@ export function SectorHub({
           {/* Sort toggle */}
           <button
             onClick={() => handleSort("changePercent")}
-            className={`text-xs px-2 py-1 rounded ${
+            className={`text-xs px-3 py-2 rounded min-h-[36px] ${
               sortField === "changePercent"
                 ? "bg-blue-600 text-white"
                 : isDark ? "bg-gray-700 text-gray-300" : "bg-gray-100 text-gray-600"
@@ -174,7 +174,7 @@ export function SectorHub({
           </button>
           <button
             onClick={() => handleSort("sector")}
-            className={`text-xs px-2 py-1 rounded ${
+            className={`text-xs px-3 py-2 rounded min-h-[36px] ${
               sortField === "sector"
                 ? "bg-blue-600 text-white"
                 : isDark ? "bg-gray-700 text-gray-300" : "bg-gray-100 text-gray-600"
@@ -188,12 +188,12 @@ export function SectorHub({
       </div>
 
       {/* Time period selector */}
-      <div className="flex gap-1 mb-4" data-testid="time-period-selector">
+      <div className="flex gap-1 mb-3 sm:mb-4 flex-wrap" data-testid="time-period-selector">
         {(["1D", "1W", "1M", "3M", "1Y", "5Y", "YTD", "Max"] as TimePeriod[]).map((period) => (
           <button
             key={period}
             onClick={() => setTimePeriod(period)}
-            className={`text-xs px-2.5 py-1 rounded ${
+            className={`text-xs px-2.5 py-2 rounded min-h-[36px] min-w-[36px] flex items-center justify-center ${
               timePeriod === period
                 ? "bg-blue-600 text-white"
                 : isDark ? "bg-gray-700 text-gray-300 hover:bg-gray-600" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -206,7 +206,7 @@ export function SectorHub({
       </div>
 
       {/* Sector grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" data-testid="sector-grid">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4" data-testid="sector-grid">
         {sortedData.map((sector) => {
           const isPositive = sector.changePercent >= 0;
           const colorClass = isPositive ? "text-green-500" : "text-red-500";
@@ -218,7 +218,7 @@ export function SectorHub({
           return (
             <div
               key={sector.sector}
-              className={`relative p-3 rounded-lg cursor-pointer transition-all ${
+              className={`relative p-3 sm:p-3 rounded-lg cursor-pointer transition-all min-h-[44px] ${
                 isSelected
                   ? isDark ? "ring-2 ring-blue-500 bg-gray-700" : "ring-2 ring-blue-500 bg-blue-50"
                   : isDark ? "bg-gray-700/50 hover:bg-gray-700" : "bg-gray-50 hover:bg-gray-100"
