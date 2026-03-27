@@ -184,7 +184,7 @@ describe("FearGreedGauge", () => {
     render(<FearGreedGauge />);
 
     await waitFor(() => {
-      expect(screen.getByText("Retry")).toBeDefined();
+      expect(screen.getByText("Try again")).toBeDefined();
     });
   });
 });

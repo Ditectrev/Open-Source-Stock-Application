@@ -186,7 +186,7 @@ describe("IPOCalendar", () => {
 
     await waitFor(() => {
       expect(screen.getByTestId("ipo-calendar-error")).toBeDefined();
-      expect(screen.getByText("Retry")).toBeDefined();
+      expect(screen.getByText("Try again")).toBeDefined();
     });
   });
 

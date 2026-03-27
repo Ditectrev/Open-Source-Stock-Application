@@ -11,6 +11,8 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTheme } from "@/lib/theme-context";
 import { IPOEvent } from "@/types";
 import { CalendarDateRangePicker } from "@/components/CalendarDateRangePicker";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { ErrorMessage } from "@/components/ErrorMessage";
 
 export interface IPOCalendarProps {
   data?: IPOEvent[];
@@ -120,9 +122,7 @@ export function IPOCalendar({ data: externalData, onSymbolClick }: IPOCalendarPr
         className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
         data-testid="ipo-calendar-loading"
       >
-        <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-        </div>
+        <LoadingSpinner className="py-8" />
       </div>
     );
   }
@@ -133,17 +133,7 @@ export function IPOCalendar({ data: externalData, onSymbolClick }: IPOCalendarPr
         className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
         data-testid="ipo-calendar-error"
       >
-        <p className="text-red-500 text-center">{error}</p>
-        <button
-          onClick={() => {
-            setLoading(true);
-            fetchData();
-          }}
-          className="mt-2 mx-auto block text-sm text-blue-500 hover:underline"
-          data-testid="retry-button"
-        >
-          Retry
-        </button>
+        <ErrorMessage type="api" message={error} onRetry={() => { setLoading(true); fetchData(); }} />
       </div>
     );
   }

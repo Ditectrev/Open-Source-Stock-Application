@@ -201,7 +201,7 @@ describe("EconomicCalendar", () => {
 
     await waitFor(() => {
       expect(screen.getByTestId("economic-calendar-error")).toBeDefined();
-      expect(screen.getByText("Retry")).toBeDefined();
+      expect(screen.getByText("Try again")).toBeDefined();
     });
   });
 

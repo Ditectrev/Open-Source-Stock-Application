@@ -11,6 +11,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useTheme } from "@/lib/theme-context";
 import { SectorData } from "@/types";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { ErrorMessage } from "@/components/ErrorMessage";
 
 type TimePeriod = "1D" | "1W" | "1M" | "3M" | "1Y" | "5Y" | "YTD" | "Max";
 type SortField = "sector" | "changePercent";
@@ -125,9 +127,7 @@ export function SectorHub({
   if (loading) {
     return (
       <div className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`} data-testid="sector-hub-loading">
-        <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-        </div>
+        <LoadingSpinner className="py-8" />
       </div>
     );
   }
@@ -136,13 +136,7 @@ export function SectorHub({
   if (error) {
     return (
       <div className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`} data-testid="sector-hub-error">
-        <p className="text-red-500 text-center">{error}</p>
-        <button
-          onClick={() => { setLoading(true); fetchData(); }}
-          className="mt-2 mx-auto block text-sm text-blue-500 hover:underline"
-        >
-          Retry
-        </button>
+        <ErrorMessage type="api" message={error} onRetry={() => { setLoading(true); fetchData(); }} />
       </div>
     );
   }

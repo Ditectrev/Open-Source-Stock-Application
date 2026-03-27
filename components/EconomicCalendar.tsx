@@ -11,6 +11,8 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTheme } from "@/lib/theme-context";
 import { EconomicEvent } from "@/types";
 import { CalendarDateRangePicker } from "@/components/CalendarDateRangePicker";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { ErrorMessage } from "@/components/ErrorMessage";
 
 const COUNTRIES = [
   "All",
@@ -172,9 +174,7 @@ export function EconomicCalendar({ data: externalData }: EconomicCalendarProps) 
         className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
         data-testid="economic-calendar-loading"
       >
-        <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-        </div>
+        <LoadingSpinner className="py-8" />
       </div>
     );
   }
@@ -186,16 +186,7 @@ export function EconomicCalendar({ data: externalData }: EconomicCalendarProps) 
         className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
         data-testid="economic-calendar-error"
       >
-        <p className="text-red-500 text-center">{error}</p>
-        <button
-          onClick={() => {
-            setLoading(true);
-            fetchData();
-          }}
-          className="mt-2 mx-auto block text-sm text-blue-500 hover:underline"
-        >
-          Retry
-        </button>
+        <ErrorMessage type="api" message={error} onRetry={() => { setLoading(true); fetchData(); }} />
       </div>
     );
   }

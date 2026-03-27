@@ -146,7 +146,7 @@ describe("WorldMarkets", () => {
 
     await waitFor(() => {
       expect(screen.getByTestId("world-markets-error")).toBeDefined();
-      expect(screen.getByText("Retry")).toBeDefined();
+      expect(screen.getByText("Try again")).toBeDefined();
     });
   });
 

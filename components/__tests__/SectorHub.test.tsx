@@ -169,7 +169,7 @@ describe("SectorHub", () => {
 
     await waitFor(() => {
       expect(screen.getByTestId("sector-hub-error")).toBeDefined();
-      expect(screen.getByText("Retry")).toBeDefined();
+      expect(screen.getByText("Try again")).toBeDefined();
     });
   });
 

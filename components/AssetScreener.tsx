@@ -10,6 +10,7 @@
 
 import { useState, useCallback, useMemo, useEffect } from "react";
 import type { ScreenerFilter, ScreenerResult } from "@/types";
+import { ErrorMessage } from "@/components/ErrorMessage";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -627,8 +628,8 @@ export function AssetScreener({
 
       {/* ---- Error ---- */}
       {error && (
-        <div className="mt-4 rounded bg-red-50 dark:bg-red-900/20 p-3 text-sm text-red-600 dark:text-red-400">
-          {error}
+        <div className="mt-4">
+          <ErrorMessage type="api" message={error} onRetry={handleApply} />
         </div>
       )}
     </div>

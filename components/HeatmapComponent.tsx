@@ -12,6 +12,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "@/lib/theme-context";
 import { HeatmapData } from "@/types";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 export type HeatmapTimePeriod =
   | "1D"
@@ -187,9 +188,7 @@ export function HeatmapComponent({
         className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
         data-testid="heatmap-loading"
       >
-        <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-        </div>
+        <LoadingSpinner className="py-8" />
       </div>
     );
   }

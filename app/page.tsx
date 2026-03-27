@@ -18,6 +18,7 @@ import { CalendarHub } from "@/components/CalendarHub";
 import { HeatmapHub } from "@/components/HeatmapHub";
 import { ScreenerHub } from "@/components/ScreenerHub";
 import { Footer } from "@/components/Footer";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 type TabType = "overview" | "financials" | "technicals" | "forecasts" | "seasonals";
 
@@ -33,6 +34,10 @@ export default function Home() {
   const [forecastData, setForecastData] = useState<ForecastData | null>(null);
   const [seasonalData, setSeasonalData] = useState<SeasonalData | null>(null);
   const [financialData, setFinancialData] = useState<FinancialData | null>(null);
+
+  // Page-level initial loading state (Req 14.1)
+  // Tracks whether the key dashboard sections have mounted
+  const [dashboardReady, setDashboardReady] = useState(false);
 
   // Fetch symbol data when selected
   useEffect(() => {
@@ -137,12 +142,10 @@ export default function Home() {
           <div className="mt-4 sm:mt-6 md:mt-8 lg:mt-10">
             {loading && (
               <div className="flex items-center justify-center py-12">
-                <div className="text-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    Loading {selectedSymbol}...
-                  </p>
-                </div>
+                <LoadingSpinner
+                  size="lg"
+                  message={`Loading ${selectedSymbol}...`}
+                />
               </div>
             )}
 
@@ -200,32 +203,18 @@ export default function Home() {
         {/* Welcome Message when no symbol selected */}
         {!selectedSymbol && (
           <div className="mt-6 sm:mt-8 md:mt-12 lg:mt-14">
-            <FearGreedGauge />
-            <div className="mt-6 sm:mt-8 lg:mt-10">
-              <WorldMarkets />
-            </div>
-            <div className="mt-6 sm:mt-8 lg:mt-10">
-              <SectorHub />
-            </div>
-            <div className="mt-6 sm:mt-8 lg:mt-10">
-              <HeatmapHub
-                refreshInterval={60000}
-                onSymbolClick={(symbol) => {
-                  setSelectedSymbol(symbol);
-                  setActiveTab("overview");
-                }}
-              />
-            </div>
-            <div className="mt-6 sm:mt-8 lg:mt-10">
-              <ScreenerHub
-                onSymbolClick={(symbol) => {
-                  setSelectedSymbol(symbol);
-                  setActiveTab("overview");
-                }}
-              />
-            </div>
-            <div className="mt-6 sm:mt-8 lg:mt-10">
-              <CalendarHub
+            {/* Page-level loading indicator (Req 14.1) */}
+            {!dashboardReady && (
+              <div
+                className="flex items-center justify-center py-16"
+                data-testid="page-loading"
+              >
+                <LoadingSpinner size="lg" message="Loading dashboard..." />
+              </div>
+            )}
+            <div className={dashboardReady ? "" : "sr-only"}>
+              <DashboardContent
+                onReady={() => setDashboardReady(true)}
                 onSymbolClick={(symbol) => {
                   setSelectedSymbol(symbol);
                   setActiveTab("overview");
@@ -237,5 +226,42 @@ export default function Home() {
       </div>
       <Footer />
     </div>
+  );
+}
+
+/** Dashboard content that signals readiness once the first data-fetching component mounts */
+function DashboardContent({
+  onReady,
+  onSymbolClick,
+}: {
+  onReady: () => void;
+  onSymbolClick: (symbol: string) => void;
+}) {
+  useEffect(() => {
+    onReady();
+  }, [onReady]);
+
+  return (
+    <>
+      <FearGreedGauge />
+      <div className="mt-6 sm:mt-8 lg:mt-10">
+        <WorldMarkets />
+      </div>
+      <div className="mt-6 sm:mt-8 lg:mt-10">
+        <SectorHub />
+      </div>
+      <div className="mt-6 sm:mt-8 lg:mt-10">
+        <HeatmapHub
+          refreshInterval={60000}
+          onSymbolClick={onSymbolClick}
+        />
+      </div>
+      <div className="mt-6 sm:mt-8 lg:mt-10">
+        <ScreenerHub onSymbolClick={onSymbolClick} />
+      </div>
+      <div className="mt-6 sm:mt-8 lg:mt-10">
+        <CalendarHub onSymbolClick={onSymbolClick} />
+      </div>
+    </>
   );
 }
