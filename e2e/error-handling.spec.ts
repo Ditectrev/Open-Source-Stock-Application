@@ -13,7 +13,7 @@ test.describe("Error Handling & Loading States", () => {
   // Req 14.1 — Loading indicators
   // ---------------------------------------------------------------------------
   test.describe("Req 14.1: Loading indicators", () => {
-    test("should show page-level loading spinner on initial load", async ({
+    test("should show component-level loading spinners on initial load", async ({
       page,
     }) => {
       // Block all API calls so the page stays in loading state
@@ -29,10 +29,10 @@ test.describe("Error Handling & Loading States", () => {
       });
 
       await page.goto("/");
-      await expect(page.getByTestId("page-loading")).toBeVisible({
+      // Individual dashboard sections show their own loading spinners (Req 14.1)
+      await expect(page.getByText("Loading Fear & Greed...")).toBeVisible({
         timeout: 5000,
       });
-      await expect(page.getByText("Loading dashboard...")).toBeVisible();
     });
 
     test("should show loading spinner for Fear & Greed while data is fetched", async ({

@@ -40,17 +40,17 @@ const FinancialsTable = dynamic(
 
 const FearGreedGauge = dynamic(
   () => import("@/components/FearGreedGauge").then((m) => m.FearGreedGauge),
-  { loading: () => <LoadingSpinner size="md" message="Loading Fear & Greed..." />, ssr: false },
+  { loading: () => <div style={{ minHeight: 320 }}><LoadingSpinner size="md" message="Loading Fear & Greed..." /></div>, ssr: false },
 );
 
 const WorldMarkets = dynamic(
   () => import("@/components/WorldMarkets").then((m) => m.WorldMarkets),
-  { loading: () => <LoadingSpinner size="md" message="Loading world markets..." />, ssr: false },
+  { loading: () => <div style={{ minHeight: 300 }}><LoadingSpinner size="md" message="Loading world markets..." /></div>, ssr: false },
 );
 
 const SectorHub = dynamic(
   () => import("@/components/SectorHub").then((m) => m.SectorHub),
-  { loading: () => <LoadingSpinner size="md" message="Loading sectors..." />, ssr: false },
+  { loading: () => <div style={{ minHeight: 300 }}><LoadingSpinner size="md" message="Loading sectors..." /></div>, ssr: false },
 );
 
 const HeatmapHub = dynamic(
@@ -118,10 +118,6 @@ export default function Home() {
   const [forecastData, setForecastData] = useState<ForecastData | null>(null);
   const [seasonalData, setSeasonalData] = useState<SeasonalData | null>(null);
   const [financialData, setFinancialData] = useState<FinancialData | null>(null);
-
-  // Page-level initial loading state (Req 14.1)
-  // Tracks whether the key dashboard sections have mounted
-  const [dashboardReady, setDashboardReady] = useState(false);
 
   // Fetch symbol data when selected
   useEffect(() => {
@@ -284,27 +280,15 @@ export default function Home() {
           </div>
         )}
 
-        {/* Welcome Message when no symbol selected */}
+        {/* Dashboard when no symbol selected */}
         {!selectedSymbol && (
           <div className="mt-6 sm:mt-8 md:mt-12 lg:mt-14">
-            {/* Page-level loading indicator (Req 14.1) */}
-            {!dashboardReady && (
-              <div
-                className="flex items-center justify-center py-16"
-                data-testid="page-loading"
-              >
-                <LoadingSpinner size="lg" message="Loading dashboard..." />
-              </div>
-            )}
-            <div className={dashboardReady ? "" : "sr-only"}>
-              <DashboardContent
-                onReady={() => setDashboardReady(true)}
-                onSymbolClick={(symbol) => {
-                  setSelectedSymbol(symbol);
-                  setActiveTab("overview");
-                }}
-              />
-            </div>
+            <DashboardContent
+              onSymbolClick={(symbol) => {
+                setSelectedSymbol(symbol);
+                setActiveTab("overview");
+              }}
+            />
           </div>
         )}
       </div>
@@ -313,17 +297,12 @@ export default function Home() {
   );
 }
 
-/** Dashboard content that signals readiness once the first data-fetching component mounts */
+/** Dashboard content rendered when no symbol is selected */
 function DashboardContent({
-  onReady,
   onSymbolClick,
 }: {
-  onReady: () => void;
   onSymbolClick: (symbol: string) => void;
 }) {
-  useEffect(() => {
-    onReady();
-  }, [onReady]);
 
   return (
     <>
