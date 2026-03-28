@@ -10,7 +10,7 @@ test.describe("Seasonals Tab", () => {
     await searchInput.fill(symbol);
     await searchInput.press("Enter");
     await expect(page.getByRole("heading", { name: new RegExp(symbol, "i") })).toBeVisible();
-    await page.getByRole("button", { name: "Seasonals" }).click();
+    await page.getByRole("tab", { name: "Seasonals" }).click();
   }
 
   test("should display Seasonal Patterns heading when Seasonals tab is clicked", async ({ page }) => {
@@ -46,7 +46,7 @@ test.describe("Seasonals Tab", () => {
   test("should switch back to Overview tab from Seasonals", async ({ page }) => {
     await goToSeasonals(page, "AAPL");
     await expect(page.getByText("Seasonal Patterns")).toBeVisible();
-    await page.getByRole("button", { name: "Overview" }).click();
+    await page.getByRole("tab", { name: "Overview" }).click();
     await expect(page.getByText("Key Metrics")).toBeVisible();
   });
 

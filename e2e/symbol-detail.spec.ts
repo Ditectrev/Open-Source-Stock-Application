@@ -43,11 +43,11 @@ test.describe("Symbol Detail on Home Page", () => {
     await searchInput.press("Enter");
 
     // Check for all tabs
-    await expect(page.getByRole("button", { name: "Overview" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Financials" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Technicals" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Forecasts" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Seasonals" })).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Overview" })).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Financials" })).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Technicals" })).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Forecasts" })).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Seasonals" })).toBeVisible();
   });
 
   test("should display Overview tab by default", async ({ page }) => {
@@ -57,8 +57,8 @@ test.describe("Symbol Detail on Home Page", () => {
     await searchInput.press("Enter");
 
     // Overview tab should be active
-    const overviewTab = page.getByRole("button", { name: "Overview" });
-    await expect(overviewTab).toHaveAttribute("aria-current", "page");
+    const overviewTab = page.getByRole("tab", { name: "Overview" });
+    await expect(overviewTab).toHaveAttribute("aria-selected", "true");
   });
 
   test("should display key metrics in Overview tab", async ({ page }) => {
@@ -92,15 +92,15 @@ test.describe("Symbol Detail on Home Page", () => {
     await searchInput.press("Enter");
 
     // Click on Financials tab
-    await page.getByRole("button", { name: "Financials" }).click();
+    await page.getByRole("tab", { name: "Financials" }).click();
     await expect(page.getByText("Financials")).toBeVisible();
 
     // Click on Technicals tab
-    await page.getByRole("button", { name: "Technicals" }).click();
+    await page.getByRole("tab", { name: "Technicals" }).click();
     await expect(page.getByText("Technical Indicators")).toBeVisible();
 
     // Click back to Overview
-    await page.getByRole("button", { name: "Overview" }).click();
+    await page.getByRole("tab", { name: "Overview" }).click();
     await expect(page.getByText("Key Metrics")).toBeVisible();
   });
 

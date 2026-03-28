@@ -10,7 +10,7 @@ test.describe("Forecasts Tab", () => {
     await searchInput.fill(symbol);
     await searchInput.press("Enter");
     await expect(page.getByRole("heading", { name: new RegExp(symbol, "i") })).toBeVisible();
-    await page.getByRole("button", { name: "Forecasts" }).click();
+    await page.getByRole("tab", { name: "Forecasts" }).click();
   }
 
   test("should display Forecast Data heading when Forecasts tab is clicked", async ({ page }) => {
@@ -58,36 +58,32 @@ test.describe("Forecasts Tab", () => {
   // Requirement 6.5: Tooltips
   test("should show tooltip when hovering over Price Targets heading", async ({ page }) => {
     await goToForecasts(page, "NVDA");
-    const heading = page.getByText("Price Targets");
-    await expect(heading).toBeVisible();
-    const hoverTarget = heading.locator("..");
+    const hoverTarget = page.getByLabel("More info about Price Targets");
+    await expect(hoverTarget).toBeVisible();
     await hoverTarget.hover();
     await expect(page.getByText(/Analyst price targets represent/)).toBeVisible({ timeout: 3000 });
   });
 
   test("should show tooltip when hovering over Analyst Ratings heading", async ({ page }) => {
     await goToForecasts(page, "NVDA");
-    const heading = page.getByText("Analyst Ratings");
-    await expect(heading).toBeVisible();
-    const hoverTarget = heading.locator("..");
+    const hoverTarget = page.getByLabel("More info about Analyst Ratings");
+    await expect(hoverTarget).toBeVisible();
     await hoverTarget.hover();
     await expect(page.getByText(/Analyst ratings show the distribution/)).toBeVisible({ timeout: 3000 });
   });
 
   test("should show tooltip when hovering over EPS Forecasts heading", async ({ page }) => {
     await goToForecasts(page, "GOOGL");
-    const heading = page.getByText("EPS Forecasts");
-    await expect(heading).toBeVisible();
-    const hoverTarget = heading.locator("..");
+    const hoverTarget = page.getByLabel("More info about EPS Forecasts");
+    await expect(hoverTarget).toBeVisible();
     await hoverTarget.hover();
     await expect(page.getByText(/Earnings Per Share/)).toBeVisible({ timeout: 3000 });
   });
 
   test("should show tooltip when hovering over Revenue Forecasts heading", async ({ page }) => {
     await goToForecasts(page, "GOOGL");
-    const heading = page.getByText("Revenue Forecasts");
-    await expect(heading).toBeVisible();
-    const hoverTarget = heading.locator("..");
+    const hoverTarget = page.getByLabel("More info about Revenue Forecasts");
+    await expect(hoverTarget).toBeVisible();
     await hoverTarget.hover();
     await expect(page.getByText(/Revenue forecasts compare analyst estimates/)).toBeVisible({ timeout: 3000 });
   });
@@ -103,7 +99,7 @@ test.describe("Forecasts Tab", () => {
   test("should switch back to Overview tab from Forecasts", async ({ page }) => {
     await goToForecasts(page, "AAPL");
     await expect(page.getByText("Forecast Data")).toBeVisible();
-    await page.getByRole("button", { name: "Overview" }).click();
+    await page.getByRole("tab", { name: "Overview" }).click();
     await expect(page.getByText("Key Metrics")).toBeVisible();
   });
 

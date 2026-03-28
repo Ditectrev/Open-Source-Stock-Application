@@ -15,13 +15,13 @@ test.describe("Technical Indicators Tab", () => {
 
   test("should display Technical Indicators heading when Technicals tab is clicked", async ({ page }) => {
     await selectSymbol(page, "AAPL");
-    await page.getByRole("button", { name: "Technicals" }).click();
+    await page.getByRole("tab", { name: "Technicals" }).click();
     await expect(page.getByText("Technical Indicators")).toBeVisible();
   });
 
   test("should display all four indicator sections", async ({ page }) => {
     await selectSymbol(page, "AAPL");
-    await page.getByRole("button", { name: "Technicals" }).click();
+    await page.getByRole("tab", { name: "Technicals" }).click();
 
     await expect(page.getByText("RSI (Relative Strength Index)")).toBeVisible();
     await expect(page.getByText("Moving Averages")).toBeVisible();
@@ -33,7 +33,7 @@ test.describe("Technical Indicators Tab", () => {
 
   test("should display the overall sentiment gauge", async ({ page }) => {
     await selectSymbol(page, "TSLA");
-    await page.getByRole("button", { name: "Technicals" }).click();
+    await page.getByRole("tab", { name: "Technicals" }).click();
 
     const gauge = page.getByTestId("sentiment-gauge");
     await expect(gauge).toBeVisible();
@@ -43,7 +43,7 @@ test.describe("Technical Indicators Tab", () => {
 
   test("should display signal badges with correct labels", async ({ page }) => {
     await selectSymbol(page, "MSFT");
-    await page.getByRole("button", { name: "Technicals" }).click();
+    await page.getByRole("tab", { name: "Technicals" }).click();
 
     // At least one badge should be visible (every indicator has a signal badge)
     const badges = page.locator("text=/^(Overpriced|Underpriced|Fairly Priced)$/");
@@ -54,13 +54,12 @@ test.describe("Technical Indicators Tab", () => {
 
   test("should show tooltip when hovering over an indicator name", async ({ page }) => {
     await selectSymbol(page, "NVDA");
-    await page.getByRole("button", { name: "Technicals" }).click();
+    await page.getByRole("tab", { name: "Technicals" }).click();
 
-    // Hover over RSI indicator name area
-    const rsiLabel = page.getByText("RSI (Relative Strength Index)");
-    await expect(rsiLabel).toBeVisible();
-    const hoverTarget = rsiLabel.locator("..");
-    await hoverTarget.hover();
+    // Hover over RSI indicator info button
+    const rsiButton = page.getByLabel("More info about RSI (Relative Strength Index)");
+    await expect(rsiButton).toBeVisible();
+    await rsiButton.hover();
 
     // Tooltip should appear with RSI explanation
     await expect(page.getByText(/RSI measures the speed and magnitude/)).toBeVisible({ timeout: 3000 });
@@ -68,7 +67,7 @@ test.describe("Technical Indicators Tab", () => {
 
   test("should not contain Buy or Sell language", async ({ page }) => {
     await selectSymbol(page, "GOOGL");
-    await page.getByRole("button", { name: "Technicals" }).click();
+    await page.getByRole("tab", { name: "Technicals" }).click();
 
     // Wait for indicators to load
     await expect(page.getByText("Technical Indicators")).toBeVisible();
@@ -81,7 +80,7 @@ test.describe("Technical Indicators Tab", () => {
 
   test("should display numeric values for indicators", async ({ page }) => {
     await selectSymbol(page, "AMZN");
-    await page.getByRole("button", { name: "Technicals" }).click();
+    await page.getByRole("tab", { name: "Technicals" }).click();
 
     // RSI value should be a number
     await expect(page.getByText("RSI (Relative Strength Index)")).toBeVisible();
@@ -98,7 +97,7 @@ test.describe("Technical Indicators Tab", () => {
 
   test("should display help icons for each indicator", async ({ page }) => {
     await selectSymbol(page, "META");
-    await page.getByRole("button", { name: "Technicals" }).click();
+    await page.getByRole("tab", { name: "Technicals" }).click();
 
     // Each indicator card has a "?" help icon
     const helpIcons = page.locator("text=?");
@@ -110,18 +109,18 @@ test.describe("Technical Indicators Tab", () => {
     await selectSymbol(page, "AAPL");
 
     // Go to Technicals
-    await page.getByRole("button", { name: "Technicals" }).click();
+    await page.getByRole("tab", { name: "Technicals" }).click();
     await expect(page.getByText("Technical Indicators")).toBeVisible();
 
     // Go back to Overview
-    await page.getByRole("button", { name: "Overview" }).click();
+    await page.getByRole("tab", { name: "Overview" }).click();
     await expect(page.getByText("Key Metrics")).toBeVisible();
   });
 
   test("should be responsive on mobile viewport", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await selectSymbol(page, "NFLX");
-    await page.getByRole("button", { name: "Technicals" }).click();
+    await page.getByRole("tab", { name: "Technicals" }).click();
 
     await expect(page.getByText("Technical Indicators")).toBeVisible();
     await expect(page.getByText("RSI (Relative Strength Index)")).toBeVisible();
