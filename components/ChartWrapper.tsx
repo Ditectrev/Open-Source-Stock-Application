@@ -144,6 +144,8 @@ export function ChartWrapper({
       ref={chartContainerRef}
       className="chart-wrapper"
       style={{ position: "relative", width: "100%", height: `${height}px` }}
+      role="img"
+      aria-label="Financial price chart"
     />
   );
 }

@@ -138,6 +138,8 @@ export function WorldMarkets({
     <div
       className={`p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
       data-testid="world-markets"
+      role="region"
+      aria-label="World Markets"
     >
       <h3
         className={`text-lg font-semibold mb-3 sm:mb-4 lg:mb-5 ${isDark ? "text-white" : "text-gray-900"}`}
@@ -151,7 +153,7 @@ export function WorldMarkets({
           if (indices.length === 0) return null;
 
           return (
-            <div key={region} data-testid={`region-${region}`}>
+            <div key={region} data-testid={`region-${region}`} role="region" aria-label={`${region} markets`}>
               <h4
                 className={`text-sm font-semibold mb-3 pb-1 border-b ${
                   isDark
@@ -187,7 +189,7 @@ export function WorldMarkets({
                         </p>
                         <p
                           className={`text-xs ${
-                            isDark ? "text-gray-500" : "text-gray-400"
+                            isDark ? "text-gray-300" : "text-gray-500"
                           }`}
                         >
                           {idx.symbol}

@@ -58,24 +58,30 @@ function TooltipTrigger({ label, tooltip, isDark }: TooltipTriggerProps) {
 
   return (
     <div
-      className="relative flex items-center gap-2 cursor-help"
-      onMouseEnter={() => setShowTooltip(true)}
-      onMouseLeave={() => setShowTooltip(false)}
+      className="relative flex items-center gap-2"
     >
       <h3
         className={`text-base font-semibold ${isDark ? "text-white" : "text-gray-900"}`}
       >
         {label}
       </h3>
-      <span
-        className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs ${
+      <button
+        type="button"
+        className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs cursor-help
+          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
           isDark ? "bg-gray-600 text-gray-300" : "bg-gray-200 text-gray-600"
         }`}
+        aria-label={`More info about ${label}`}
+        onMouseEnter={() => setShowTooltip(true)}
+        onMouseLeave={() => setShowTooltip(false)}
+        onFocus={() => setShowTooltip(true)}
+        onBlur={() => setShowTooltip(false)}
       >
         ?
-      </span>
+      </button>
       {showTooltip && (
         <div
+          role="tooltip"
           className={`absolute z-10 w-64 p-3 rounded-lg shadow-lg text-sm ${
             isDark
               ? "bg-gray-900 text-gray-200 border border-gray-700"
@@ -155,13 +161,13 @@ function PriceTargetRange({
   return (
     <div className="mt-3">
       <div className="flex justify-between mb-1">
-        <span className={`text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+        <span className={`text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}>
           Low: ${low.toFixed(2)}
         </span>
         <span className={`text-xs font-medium ${isDark ? "text-blue-400" : "text-blue-600"}`}>
           Avg: ${average.toFixed(2)}
         </span>
-        <span className={`text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+        <span className={`text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}>
           High: ${high.toFixed(2)}
         </span>
       </div>
@@ -211,7 +217,7 @@ export function ForecastDisplay({ forecast }: ForecastDisplayProps) {
   );
 
   return (
-    <div className={`p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}>
+    <div className={`p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`} role="region" aria-label="Forecast Data">
       <h2 className={`text-lg font-semibold mb-4 sm:mb-6 ${isDark ? "text-white" : "text-gray-900"}`}>
         Forecast Data
       </h2>
@@ -230,19 +236,19 @@ export function ForecastDisplay({ forecast }: ForecastDisplayProps) {
           />
           <div className="mt-3 space-y-2">
             <div className="flex justify-between">
-              <span className={`text-sm ${isDark ? "text-gray-400" : "text-gray-500"}`}>Low</span>
+              <span className={`text-sm ${isDark ? "text-gray-300" : "text-gray-500"}`}>Low</span>
               <span className={`text-sm font-mono font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
                 ${forecast.priceTargets.low.toFixed(2)}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className={`text-sm ${isDark ? "text-gray-400" : "text-gray-500"}`}>Average</span>
+              <span className={`text-sm ${isDark ? "text-gray-300" : "text-gray-500"}`}>Average</span>
               <span className={`text-sm font-mono font-semibold ${isDark ? "text-blue-400" : "text-blue-600"}`}>
                 ${forecast.priceTargets.average.toFixed(2)}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className={`text-sm ${isDark ? "text-gray-400" : "text-gray-500"}`}>High</span>
+              <span className={`text-sm ${isDark ? "text-gray-300" : "text-gray-500"}`}>High</span>
               <span className={`text-sm font-mono font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
                 ${forecast.priceTargets.high.toFixed(2)}
               </span>
@@ -274,7 +280,7 @@ export function ForecastDisplay({ forecast }: ForecastDisplayProps) {
               return (
                 <div key={label} className="flex items-center gap-2">
                   <span
-                    className={`text-xs w-20 shrink-0 ${isDark ? "text-gray-400" : "text-gray-500"}`}
+                    className={`text-xs w-20 shrink-0 ${isDark ? "text-gray-300" : "text-gray-500"}`}
                   >
                     {label}
                   </span>
@@ -323,7 +329,7 @@ export function ForecastDisplay({ forecast }: ForecastDisplayProps) {
                 </span>
                 <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <div className={`text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+                    <div className={`text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}>
                       Est: ${eps.estimate.toFixed(2)}
                     </div>
                     {eps.actual !== undefined && (
@@ -372,7 +378,7 @@ export function ForecastDisplay({ forecast }: ForecastDisplayProps) {
                   </span>
                   <div className="flex items-center gap-3">
                     <div className="text-right">
-                      <div className={`text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+                      <div className={`text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}>
                         Est: {formatCurrency(rev.estimate)}
                       </div>
                       {hasActual && (

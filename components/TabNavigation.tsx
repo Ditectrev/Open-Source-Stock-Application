@@ -3,10 +3,13 @@
 /**
  * TabNavigation Component
  * Navigation tabs for symbol detail page sections
- * 
- * Requirements: 2.4
+ * Supports keyboard navigation per WAI-ARIA tab pattern:
+ * Arrow Left/Right to move between tabs, Home/End for first/last tab.
+ *
+ * Requirements: 2.4, 18.2
  */
 
+import { useRef, useCallback } from "react";
 import { useTheme } from "@/lib/theme-context";
 
 type TabType = "overview" | "financials" | "technicals" | "forecasts" | "seasonals";
@@ -27,6 +30,35 @@ const TABS: { id: TabType; label: string }[] = [
 export function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+      let nextIndex: number | null = null;
+
+      switch (e.key) {
+        case "ArrowRight":
+          nextIndex = (index + 1) % TABS.length;
+          break;
+        case "ArrowLeft":
+          nextIndex = (index - 1 + TABS.length) % TABS.length;
+          break;
+        case "Home":
+          nextIndex = 0;
+          break;
+        case "End":
+          nextIndex = TABS.length - 1;
+          break;
+        default:
+          return;
+      }
+
+      e.preventDefault();
+      onTabChange(TABS[nextIndex].id);
+      tabRefs.current[nextIndex]?.focus();
+    },
+    [onTabChange],
+  );
 
   return (
     <div className="mt-6">
@@ -35,15 +67,21 @@ export function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
           isDark ? "border-gray-700" : "border-gray-200"
         }`}
       >
-        <nav className="-mb-px flex space-x-2 sm:space-x-8 overflow-x-auto scrollbar-hide" aria-label="Tabs">
-          {TABS.map((tab) => {
+        <nav className="-mb-px flex space-x-2 sm:space-x-8 overflow-x-auto scrollbar-hide" role="tablist" aria-label="Symbol detail tabs">
+          {TABS.map((tab, index) => {
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
+                ref={(el) => { tabRefs.current[index] = el; }}
                 onClick={() => onTabChange(tab.id)}
+                onKeyDown={(e) => handleKeyDown(e, index)}
+                role="tab"
+                aria-selected={isActive}
+                tabIndex={isActive ? 0 : -1}
                 className={`
                   whitespace-nowrap py-3 sm:py-4 px-2 sm:px-1 border-b-2 font-medium text-sm transition-colors min-h-[44px]
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1
                   ${
                     isActive
                       ? `border-blue-500 ${
@@ -56,7 +94,6 @@ export function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
                         }`
                   }
                 `}
-                aria-current={isActive ? "page" : undefined}
               >
                 {tab.label}
               </button>

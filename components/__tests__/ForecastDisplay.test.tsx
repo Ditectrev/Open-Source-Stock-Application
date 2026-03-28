@@ -120,40 +120,35 @@ describe("ForecastDisplay", () => {
   // Requirement 6.5: Tooltips on hover
   it("should show tooltip on hover over Price Targets heading", () => {
     render(<ForecastDisplay forecast={mockForecast} />);
-    const heading = screen.getByText("Price Targets");
-    const hoverTarget = heading.closest("div")!;
+    const hoverTarget = screen.getByLabelText("More info about Price Targets");
     fireEvent.mouseEnter(hoverTarget);
     expect(screen.getByText(/Analyst price targets represent/)).toBeInTheDocument();
   });
 
   it("should show tooltip on hover over Analyst Ratings heading", () => {
     render(<ForecastDisplay forecast={mockForecast} />);
-    const heading = screen.getByText("Analyst Ratings");
-    const hoverTarget = heading.closest("div")!;
+    const hoverTarget = screen.getByLabelText("More info about Analyst Ratings");
     fireEvent.mouseEnter(hoverTarget);
     expect(screen.getByText(/Analyst ratings show the distribution/)).toBeInTheDocument();
   });
 
   it("should show tooltip on hover over EPS Forecasts heading", () => {
     render(<ForecastDisplay forecast={mockForecast} />);
-    const heading = screen.getByText("EPS Forecasts");
-    const hoverTarget = heading.closest("div")!;
+    const hoverTarget = screen.getByLabelText("More info about EPS Forecasts");
     fireEvent.mouseEnter(hoverTarget);
     expect(screen.getByText(/Earnings Per Share/)).toBeInTheDocument();
   });
 
   it("should show tooltip on hover over Revenue Forecasts heading", () => {
     render(<ForecastDisplay forecast={mockForecast} />);
-    const heading = screen.getByText("Revenue Forecasts");
-    const hoverTarget = heading.closest("div")!;
+    const hoverTarget = screen.getByLabelText("More info about Revenue Forecasts");
     fireEvent.mouseEnter(hoverTarget);
     expect(screen.getByText(/Revenue forecasts compare analyst estimates/)).toBeInTheDocument();
   });
 
   it("should hide tooltip on mouse leave", () => {
     render(<ForecastDisplay forecast={mockForecast} />);
-    const heading = screen.getByText("Price Targets");
-    const hoverTarget = heading.closest("div")!;
+    const hoverTarget = screen.getByLabelText("More info about Price Targets");
     fireEvent.mouseEnter(hoverTarget);
     expect(screen.getByText(/Analyst price targets represent/)).toBeInTheDocument();
     fireEvent.mouseLeave(hoverTarget);

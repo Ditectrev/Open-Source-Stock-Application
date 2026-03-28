@@ -142,6 +142,8 @@ export function IPOCalendar({ data: externalData, onSymbolClick }: IPOCalendarPr
     <div
       className={`p-6 lg:p-8 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
       data-testid="ipo-calendar"
+      role="region"
+      aria-label="IPO Calendar"
     >
       <h3
         className={`text-lg font-semibold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}
@@ -166,7 +168,7 @@ export function IPOCalendar({ data: externalData, onSymbolClick }: IPOCalendarPr
       {/* Events grouped by day */}
       {filteredEvents.length === 0 ? (
         <p
-          className={`text-center py-4 text-sm ${isDark ? "text-gray-400" : "text-gray-500"}`}
+          className={`text-center py-4 text-sm ${isDark ? "text-gray-300" : "text-gray-500"}`}
           data-testid="no-events"
         >
           No upcoming IPOs match the selected filters.
@@ -209,7 +211,7 @@ export function IPOCalendar({ data: externalData, onSymbolClick }: IPOCalendarPr
                     </span>
                   )}
                   <span
-                    className={`ml-2 text-xs font-normal ${isDark ? "text-gray-400" : "text-gray-500"}`}
+                    className={`ml-2 text-xs font-normal ${isDark ? "text-gray-300" : "text-gray-500"}`}
                   >
                     ({events.length} IPO{events.length !== 1 ? "s" : ""})
                   </span>
@@ -272,7 +274,7 @@ export function IPOCalendar({ data: externalData, onSymbolClick }: IPOCalendarPr
 
                           {/* Details row */}
                           <div
-                            className={`flex flex-wrap gap-3 mt-1 text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}
+                            className={`flex flex-wrap gap-3 mt-1 text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}
                           >
                             {hasPriceRange && (
                               <span data-testid={`price-range-${event.id}`}>

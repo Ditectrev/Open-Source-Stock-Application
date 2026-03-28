@@ -109,7 +109,7 @@ export function ScreenerPresets({
   if (loading) {
     return (
       <div
-        className="text-sm text-gray-500 dark:text-gray-400"
+        className="text-sm text-gray-500 dark:text-gray-300"
         data-testid="presets-loading"
       >
         Loading presets…
@@ -134,7 +134,7 @@ export function ScreenerPresets({
               type="button"
               onClick={() => handlePresetClick(preset)}
               data-testid={`preset-${preset.id}`}
-              className={`relative shrink-0 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
+              className={`relative shrink-0 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
                 selectedPresetId === preset.id
                   ? "border-blue-500 bg-blue-50 text-blue-700 dark:border-blue-400 dark:bg-blue-900/30 dark:text-blue-300"
                   : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:border-gray-500 dark:hover:bg-gray-700"
@@ -176,7 +176,7 @@ export function ScreenerPresets({
             <div className="space-y-1">
               <label
                 htmlFor="preset-name"
-                className="text-xs font-medium text-gray-600 dark:text-gray-400"
+                className="text-xs font-medium text-gray-600 dark:text-gray-300"
               >
                 Name
               </label>
@@ -193,7 +193,7 @@ export function ScreenerPresets({
             <div className="space-y-1">
               <label
                 htmlFor="preset-description"
-                className="text-xs font-medium text-gray-600 dark:text-gray-400"
+                className="text-xs font-medium text-gray-600 dark:text-gray-300"
               >
                 Description
               </label>

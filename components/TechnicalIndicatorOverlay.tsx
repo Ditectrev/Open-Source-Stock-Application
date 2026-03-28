@@ -163,7 +163,7 @@ export function TechnicalIndicatorOverlay({
         <svg
           className={`w-5 h-5 transition-transform ${
             isExpanded ? "rotate-180" : ""
-          } ${isDark ? "text-gray-400" : "text-gray-500"}`}
+          } ${isDark ? "text-gray-300" : "text-gray-500"}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -214,7 +214,7 @@ export function TechnicalIndicatorOverlay({
                       />
                     </div>
                     <p className={`text-xs mt-0.5 ${
-                      isDark ? "text-gray-400" : "text-gray-500"
+                      isDark ? "text-gray-300" : "text-gray-500"
                     }`}>
                       {getIndicatorDescription(indicator)}
                     </p>
@@ -245,7 +245,7 @@ export function TechnicalIndicatorOverlay({
           {/* Info Footer */}
           <div className={`px-3 py-2 border-t text-xs ${
             isDark 
-              ? "bg-gray-900 border-gray-700 text-gray-400" 
+              ? "bg-gray-900 border-gray-700 text-gray-300" 
               : "bg-gray-50 border-gray-200 text-gray-600"
           }`}>
             <p className="mb-2">

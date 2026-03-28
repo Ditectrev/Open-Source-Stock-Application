@@ -45,7 +45,7 @@ export function CalendarDateRangePicker({
     onEndDateChange("");
   };
 
-  const inputClass = `text-sm rounded px-2 py-1 border ${
+  const inputClass = `text-sm rounded px-2 py-1 border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
     isDark
       ? "bg-gray-700 border-gray-600 text-gray-200"
       : "bg-white border-gray-300 text-gray-700"
@@ -60,7 +60,7 @@ export function CalendarDateRangePicker({
     >
       <button
         onClick={handleTodayClick}
-        className={`text-xs px-2.5 py-1 rounded font-medium transition-colors ${
+        className={`text-xs px-2.5 py-1 rounded font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
           isToday
             ? "bg-blue-600 text-white"
             : isDark

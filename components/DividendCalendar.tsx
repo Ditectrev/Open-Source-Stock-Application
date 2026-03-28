@@ -166,6 +166,8 @@ export function DividendCalendar({
     <div
       className={`p-6 lg:p-8 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
       data-testid="dividend-calendar"
+      role="region"
+      aria-label="Dividend Calendar"
     >
       <h3
         className={`text-lg font-semibold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}
@@ -254,7 +256,7 @@ export function DividendCalendar({
       {/* Events grouped by day */}
       {filteredEvents.length === 0 ? (
         <p
-          className={`text-center py-4 text-sm ${isDark ? "text-gray-400" : "text-gray-500"}`}
+          className={`text-center py-4 text-sm ${isDark ? "text-gray-300" : "text-gray-500"}`}
           data-testid="no-events"
         >
           No dividend events match the selected filters.
@@ -296,7 +298,7 @@ export function DividendCalendar({
                     </span>
                   )}
                   <span
-                    className={`ml-2 text-xs font-normal ${isDark ? "text-gray-400" : "text-gray-500"}`}
+                    className={`ml-2 text-xs font-normal ${isDark ? "text-gray-300" : "text-gray-500"}`}
                   >
                     ({events.length} event
                     {events.length !== 1 ? "s" : ""})
@@ -344,7 +346,7 @@ export function DividendCalendar({
                             {event.companyName}
                           </span>
                           <div
-                            className={`flex flex-wrap gap-3 mt-1 text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}
+                            className={`flex flex-wrap gap-3 mt-1 text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}
                           >
                             <span data-testid={`amount-${event.id}`}>
                               Div: {formatCurrency(event.amount)}
@@ -358,8 +360,8 @@ export function DividendCalendar({
                             <span
                               className={`capitalize ${
                                 isDark
-                                  ? "text-gray-500"
-                                  : "text-gray-400"
+                                  ? "text-gray-400"
+                                  : "text-gray-500"
                               }`}
                               data-testid={`frequency-${event.id}`}
                             >

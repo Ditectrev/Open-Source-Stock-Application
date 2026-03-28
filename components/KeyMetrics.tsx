@@ -130,20 +130,26 @@ function MetricCard({ metric, isDark }: MetricCardProps) {
             {metric.value}
           </div>
         </div>
-        <div
-          className={`ml-2 flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs ${
+        <button
+          type="button"
+          aria-label={`More info about ${metric.label}`}
+          onFocus={() => setShowTooltip(true)}
+          onBlur={() => setShowTooltip(false)}
+          className={`ml-2 flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
             isDark
               ? "bg-gray-600 text-gray-300"
               : "bg-gray-200 text-gray-600"
           }`}
         >
           ?
-        </div>
+        </button>
       </div>
 
       {/* Tooltip */}
       {showTooltip && (
         <div
+          role="tooltip"
           className={`absolute z-10 w-64 p-3 rounded-lg shadow-lg text-sm ${
             isDark
               ? "bg-gray-900 text-gray-200 border border-gray-700"

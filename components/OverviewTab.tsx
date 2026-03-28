@@ -37,12 +37,13 @@ export function OverviewTab({
     : "bg-red-50 dark:bg-red-900/20";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" role="tabpanel" aria-label="Overview">
       {/* Current Price Card */}
       <div
         className={`p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm ${
           isDark ? "bg-gray-800" : "bg-white"
         }`}
+        aria-label="Current price information"
       >
         <h2
           className={`text-lg font-semibold mb-3 sm:mb-4 ${

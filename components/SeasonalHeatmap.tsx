@@ -56,7 +56,7 @@ function getCellColor(value: number | undefined, isDark: boolean): string {
 
 function getCellTextColor(value: number | undefined, isDark: boolean): string {
   if (value === undefined) {
-    return isDark ? "text-gray-500" : "text-gray-400";
+    return isDark ? "text-gray-300" : "text-gray-500";
   }
   const abs = Math.abs(value);
   if (abs >= 2) return "text-white";
@@ -96,7 +96,7 @@ export function SeasonalHeatmap({ data }: SeasonalHeatmapProps) {
         <h2 className={`text-lg font-semibold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}>
           Seasonal Patterns
         </h2>
-        <p className={`text-sm ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+        <p className={`text-sm ${isDark ? "text-gray-300" : "text-gray-500"}`}>
           No seasonal data available.
         </p>
       </div>
@@ -111,12 +111,12 @@ export function SeasonalHeatmap({ data }: SeasonalHeatmapProps) {
 
       {/* Heatmap grid */}
       <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
-        <table className="w-full border-collapse text-xs md:text-sm lg:text-base">
+        <table className="w-full border-collapse text-xs md:text-sm lg:text-base" role="grid" aria-label="Seasonal returns heatmap by month and year">
           <thead>
             <tr>
               <th
                 className={`px-2 py-2 text-left font-medium ${
-                  isDark ? "text-gray-400" : "text-gray-500"
+                  isDark ? "text-gray-300" : "text-gray-500"
                 }`}
               >
                 Year
@@ -125,7 +125,7 @@ export function SeasonalHeatmap({ data }: SeasonalHeatmapProps) {
                 <th
                   key={m}
                   className={`px-2 py-2 text-center font-medium ${
-                    isDark ? "text-gray-400" : "text-gray-500"
+                    isDark ? "text-gray-300" : "text-gray-500"
                   }`}
                 >
                   {getMonthLabel(m)}
@@ -239,29 +239,29 @@ export function SeasonalHeatmap({ data }: SeasonalHeatmapProps) {
 
       {/* Legend */}
       <div className="mt-3 sm:mt-4 flex items-center gap-2 sm:gap-4 text-xs flex-wrap">
-        <span className={isDark ? "text-gray-400" : "text-gray-500"}>Legend:</span>
+        <span className={isDark ? "text-gray-300" : "text-gray-500"}>Legend:</span>
         <div className="flex items-center gap-1">
           <div className={`w-4 h-4 rounded ${isDark ? "bg-green-600" : "bg-green-500"}`} />
-          <span className={isDark ? "text-gray-400" : "text-gray-500"}>Strong positive</span>
+          <span className={isDark ? "text-gray-300" : "text-gray-500"}>Strong positive</span>
         </div>
         <div className="flex items-center gap-1">
           <div className={`w-4 h-4 rounded ${isDark ? "bg-green-800" : "bg-green-200"}`} />
-          <span className={isDark ? "text-gray-400" : "text-gray-500"}>Mild positive</span>
+          <span className={isDark ? "text-gray-300" : "text-gray-500"}>Mild positive</span>
         </div>
         <div className="flex items-center gap-1">
           <div className={`w-4 h-4 rounded ${isDark ? "bg-red-800" : "bg-red-200"}`} />
-          <span className={isDark ? "text-gray-400" : "text-gray-500"}>Mild negative</span>
+          <span className={isDark ? "text-gray-300" : "text-gray-500"}>Mild negative</span>
         </div>
         <div className="flex items-center gap-1">
           <div className={`w-4 h-4 rounded ${isDark ? "bg-red-600" : "bg-red-500"}`} />
-          <span className={isDark ? "text-gray-400" : "text-gray-500"}>Strong negative</span>
+          <span className={isDark ? "text-gray-300" : "text-gray-500"}>Strong negative</span>
         </div>
       </div>
 
       {/* Disclaimer - Requirement 7.3 */}
       <p
         className={`mt-4 text-xs italic ${
-          isDark ? "text-gray-500" : "text-gray-400"
+          isDark ? "text-gray-300" : "text-gray-500"
         }`}
       >
         Past seasonality does not guarantee future performance

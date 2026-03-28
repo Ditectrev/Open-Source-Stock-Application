@@ -479,7 +479,7 @@ export function ChartComponent({
       </ChartWrapper>
 
       {/* Chart Instructions */}
-      <div className={`mt-2 text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+      <div className={`mt-2 text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}>
         <p className="hidden sm:block">
           💡 Use mouse wheel to zoom, drag to pan, hover for details
         </p>

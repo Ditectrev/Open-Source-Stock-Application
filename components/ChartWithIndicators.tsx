@@ -47,7 +47,7 @@ export function ChartWithIndicators({
   }, []);
 
   return (
-    <div className="chart-with-indicators space-y-4">
+    <div className="chart-with-indicators space-y-4" role="region" aria-label="Price chart with technical indicators">
       {/* Technical Indicator Controls */}
       <TechnicalIndicatorOverlay
         onIndicatorsChange={handleIndicatorsChange}

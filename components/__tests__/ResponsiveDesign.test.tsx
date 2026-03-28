@@ -317,7 +317,7 @@ describe("Responsive Design", () => {
       });
 
       render(<SearchBar />);
-      const input = screen.getByRole("textbox");
+      const input = screen.getByRole("combobox");
 
       // Trigger search
       const { fireEvent } = await import("@testing-library/react");

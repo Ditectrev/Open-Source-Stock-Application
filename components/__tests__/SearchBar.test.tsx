@@ -42,7 +42,7 @@ describe("SearchBar", () => {
     );
 
     render(<SearchBar />);
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("combobox");
 
     fireEvent.change(input, { target: { value: "AAPL" } });
 
@@ -63,7 +63,7 @@ describe("SearchBar", () => {
     });
 
     render(<SearchBar />);
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("combobox");
 
     // Type multiple characters quickly
     fireEvent.change(input, { target: { value: "A" } });
@@ -103,7 +103,7 @@ describe("SearchBar", () => {
     });
 
     render(<SearchBar />);
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("combobox");
 
     fireEvent.change(input, { target: { value: "AAPL" } });
 
@@ -133,7 +133,7 @@ describe("SearchBar", () => {
     });
 
     render(<SearchBar onSelect={mockOnSelect} />);
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("combobox");
 
     fireEvent.change(input, { target: { value: "AAPL" } });
 
@@ -171,7 +171,7 @@ describe("SearchBar", () => {
     });
 
     render(<SearchBar onSelect={mockOnSelect} />);
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("combobox");
 
     fireEvent.change(input, { target: { value: "AAPL" } });
 
@@ -214,7 +214,7 @@ describe("SearchBar", () => {
     });
 
     render(<SearchBar />);
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("combobox");
 
     fireEvent.change(input, { target: { value: "AAPL" } });
 
@@ -267,7 +267,7 @@ describe("SearchBar", () => {
     });
 
     render(<SearchBar onSelect={mockOnSelect} />);
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("combobox");
 
     fireEvent.change(input, { target: { value: "AAPL" } });
 
@@ -305,7 +305,7 @@ describe("SearchBar", () => {
     });
 
     render(<SearchBar />);
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("combobox");
 
     fireEvent.change(input, { target: { value: "AAPL" } });
 
@@ -332,7 +332,7 @@ describe("SearchBar", () => {
     });
 
     render(<SearchBar />);
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("combobox");
 
     fireEvent.change(input, { target: { value: "AAPL" } });
 
@@ -351,7 +351,7 @@ describe("SearchBar", () => {
     });
 
     render(<SearchBar />);
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("combobox");
 
     fireEvent.change(input, { target: { value: "INVALIDXYZ" } });
 
@@ -385,7 +385,7 @@ describe("SearchBar", () => {
       </div>
     );
 
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("combobox");
 
     fireEvent.change(input, { target: { value: "AAPL" } });
 
@@ -429,7 +429,7 @@ describe("SearchBar", () => {
     });
 
     render(<SearchBar />);
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("combobox");
 
     fireEvent.change(input, { target: { value: "AAPL" } });
 
@@ -470,7 +470,7 @@ describe("SearchBar", () => {
     });
 
     render(<SearchBar />);
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("combobox");
 
     fireEvent.change(input, { target: { value: "AAPL" } });
 
@@ -502,7 +502,7 @@ describe("SearchBar", () => {
   it("should navigate directly when pressing Enter without dropdown", async () => {
     const mockOnSelect = vi.fn();
     render(<SearchBar onSelect={mockOnSelect} />);
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("combobox");
 
     // Type a symbol without triggering autocomplete
     fireEvent.change(input, { target: { value: "TSLA" } });
@@ -537,7 +537,7 @@ describe("SearchBar", () => {
     });
 
     render(<SearchBar />);
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("combobox");
 
     fireEvent.change(input, { target: { value: "AAPL" } });
 
@@ -575,7 +575,7 @@ describe("SearchBar", () => {
     });
 
     render(<SearchBar />);
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("combobox");
 
     // Trigger search
     fireEvent.change(input, { target: { value: "AAPL" } });
@@ -606,7 +606,7 @@ describe("SearchBar", () => {
 
   it("should not trigger search for empty or whitespace-only query", async () => {
     render(<SearchBar />);
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("combobox");
 
     // Type whitespace
     fireEvent.change(input, { target: { value: "   " } });
@@ -647,7 +647,7 @@ describe("SearchBar", () => {
     });
 
     render(<SearchBar />);
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("combobox");
 
     // Trigger search
     fireEvent.change(input, { target: { value: "AAPL" } });

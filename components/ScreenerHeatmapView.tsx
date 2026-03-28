@@ -61,7 +61,7 @@ export function ScreenerHeatmapView({
   if (results.length === 0) {
     return (
       <div
-        className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-8 text-center text-gray-500 dark:text-gray-400"
+        className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-8 text-center text-gray-500 dark:text-gray-300"
         data-testid="screener-heatmap-empty"
       >
         No results
@@ -70,7 +70,7 @@ export function ScreenerHeatmapView({
   }
 
   return (
-    <div data-testid="screener-heatmap-view">
+    <div data-testid="screener-heatmap-view" role="region" aria-label="Screener heatmap results">
       {/* Placeholder: mini charts per asset will be added when historical data is available in screener results */}
       <HeatmapComponent data={heatmapData} onTileClick={handleTileClick} />
     </div>

@@ -150,7 +150,7 @@ export function ScreenerTableView({
 
   if (results.length === 0) {
     return (
-      <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-8 text-center text-gray-500 dark:text-gray-400">
+      <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-8 text-center text-gray-500 dark:text-gray-300">
         No results
       </div>
     );
@@ -159,7 +159,7 @@ export function ScreenerTableView({
   return (
     <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden">
       <div className="overflow-x-auto -mx-0">
-        <table className="w-full text-sm md:text-sm lg:text-base">
+        <table className="w-full text-sm md:text-sm lg:text-base" aria-label="Screener results">
           <thead>
             <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
               {COLUMNS.map((col) => (
@@ -218,7 +218,7 @@ export function ScreenerTableView({
                         ? "text-green-600 dark:text-green-400"
                         : row.changePercent < 0
                           ? "text-red-600 dark:text-red-400"
-                          : "text-gray-600 dark:text-gray-400"
+                          : "text-gray-600 dark:text-gray-300"
                     }`}
                   >
                     {formatChangePercent(row.changePercent)}
@@ -266,7 +266,7 @@ export function ScreenerTableView({
           >
             Previous
           </button>
-          <span className="text-sm text-gray-600 dark:text-gray-400">
+          <span className="text-sm text-gray-600 dark:text-gray-300">
             Page {page + 1} of {totalPages}
           </span>
           <button

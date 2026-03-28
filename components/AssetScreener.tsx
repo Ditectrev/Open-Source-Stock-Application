@@ -218,24 +218,30 @@ function buildFilters(state: FilterState): ScreenerFilter[] {
 
 function Tooltip({ text }: { text: string }) {
   return (
-    <span className="group relative ml-1 inline-flex cursor-help">
-      <svg
-        className="h-4 w-4 text-gray-400 dark:text-gray-500"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        aria-hidden="true"
+    <span className="group relative ml-1 inline-flex">
+      <button
+        type="button"
+        className="cursor-help focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-full"
+        aria-label="More info"
       >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"
-        />
-      </svg>
+        <svg
+          className="h-4 w-4 text-gray-400 dark:text-gray-300"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"
+          />
+        </svg>
+      </button>
       <span
         role="tooltip"
-        className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 w-56 -translate-x-1/2 rounded bg-gray-900 dark:bg-gray-700 px-3 py-2 text-xs text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus:opacity-100"
+        className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 w-56 -translate-x-1/2 rounded bg-gray-900 dark:bg-gray-700 px-3 py-2 text-xs text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
       >
         {text}
       </span>
@@ -279,16 +285,16 @@ function RangeInput({
           aria-label={`${label} minimum`}
           value={value.min}
           onChange={(e) => onChange({ ...value, min: e.target.value })}
-          className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
-        <span className="text-gray-400 dark:text-gray-500 text-xs">–</span>
+        <span className="text-gray-400 dark:text-gray-300 text-xs">–</span>
         <input
           type="number"
           placeholder="Max"
           aria-label={`${label} maximum`}
           value={value.max}
           onChange={(e) => onChange({ ...value, max: e.target.value })}
-          className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
       </div>
     </div>
@@ -588,7 +594,7 @@ export function AssetScreener({
                   minVolume: e.target.value,
                 }))
               }
-              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
           </div>
         </fieldset>
@@ -613,13 +619,13 @@ export function AssetScreener({
         </button>
 
         {resultCount !== null && (
-          <span className="text-sm text-gray-600 dark:text-gray-400">
+          <span className="text-sm text-gray-600 dark:text-gray-300">
             {resultCount} {resultCount === 1 ? "asset" : "assets"} found
           </span>
         )}
 
         {activeFilters.length > 0 && (
-          <span className="text-xs text-gray-500 dark:text-gray-500">
+          <span className="text-xs text-gray-500 dark:text-gray-300">
             ({activeFilters.length}{" "}
             {activeFilters.length === 1 ? "filter" : "filters"} active)
           </span>

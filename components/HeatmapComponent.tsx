@@ -201,7 +201,7 @@ export function HeatmapComponent({
         data-testid="heatmap-empty"
       >
         <p
-          className={`text-center ${isDark ? "text-gray-400" : "text-gray-500"}`}
+          className={`text-center ${isDark ? "text-gray-300" : "text-gray-500"}`}
         >
           No heatmap data available.
         </p>
@@ -371,7 +371,7 @@ export function HeatmapComponent({
       >
         <div className="flex items-center justify-center gap-2 flex-wrap">
           <span
-            className={`text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}
+            className={`text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}
           >
             Strong decline
           </span>
@@ -394,7 +394,7 @@ export function HeatmapComponent({
             ))}
           </div>
           <span
-            className={`text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}
+            className={`text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}
           >
             Strong gain
           </span>

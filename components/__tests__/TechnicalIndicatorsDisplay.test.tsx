@@ -86,9 +86,8 @@ describe("TechnicalIndicatorsDisplay", () => {
   it("should show tooltip on hover over indicator name", () => {
     render(<TechnicalIndicatorsDisplay indicators={mockIndicators} />);
 
-    const rsiLabel = screen.getByText("RSI (Relative Strength Index)");
-    const hoverTarget = rsiLabel.closest("div")!;
-    fireEvent.mouseEnter(hoverTarget);
+    const rsiButton = screen.getByLabelText("More info about RSI (Relative Strength Index)");
+    fireEvent.mouseEnter(rsiButton);
 
     expect(
       screen.getByText(/RSI measures the speed and magnitude/)
@@ -98,12 +97,11 @@ describe("TechnicalIndicatorsDisplay", () => {
   it("should hide tooltip on mouse leave", () => {
     render(<TechnicalIndicatorsDisplay indicators={mockIndicators} />);
 
-    const rsiLabel = screen.getByText("RSI (Relative Strength Index)");
-    const hoverTarget = rsiLabel.closest("div")!;
-    fireEvent.mouseEnter(hoverTarget);
+    const rsiButton = screen.getByLabelText("More info about RSI (Relative Strength Index)");
+    fireEvent.mouseEnter(rsiButton);
     expect(screen.getByText(/RSI measures the speed and magnitude/)).toBeInTheDocument();
 
-    fireEvent.mouseLeave(hoverTarget);
+    fireEvent.mouseLeave(rsiButton);
     expect(screen.queryByText(/RSI measures the speed and magnitude/)).not.toBeInTheDocument();
   });
 
@@ -153,10 +151,7 @@ describe("TechnicalIndicatorsDisplay", () => {
 
   it("should show tooltip on hover over MACD indicator name", () => {
     render(<TechnicalIndicatorsDisplay indicators={mockIndicators} />);
-    const macdLabels = screen.getAllByText("MACD");
-    // The indicator card name is the one inside the card header
-    const macdLabel = macdLabels[0];
-    const hoverTarget = macdLabel.closest("div")!;
+    const hoverTarget = screen.getByLabelText("More info about MACD");
     fireEvent.mouseEnter(hoverTarget);
     expect(
       screen.getByText(/Moving Average Convergence Divergence/)
@@ -165,8 +160,7 @@ describe("TechnicalIndicatorsDisplay", () => {
 
   it("should show tooltip on hover over Moving Averages indicator name", () => {
     render(<TechnicalIndicatorsDisplay indicators={mockIndicators} />);
-    const maLabel = screen.getByText("Moving Averages");
-    const hoverTarget = maLabel.closest("div")!;
+    const hoverTarget = screen.getByLabelText("More info about Moving Averages");
     fireEvent.mouseEnter(hoverTarget);
     expect(
       screen.getByText(/Moving averages smooth out price data/)
@@ -175,8 +169,7 @@ describe("TechnicalIndicatorsDisplay", () => {
 
   it("should show tooltip on hover over Bollinger Bands indicator name", () => {
     render(<TechnicalIndicatorsDisplay indicators={mockIndicators} />);
-    const bbLabel = screen.getByText("Bollinger Bands");
-    const hoverTarget = bbLabel.closest("div")!;
+    const hoverTarget = screen.getByLabelText("More info about Bollinger Bands");
     fireEvent.mouseEnter(hoverTarget);
     expect(
       screen.getByText(/Bollinger Bands consist of a middle band/)

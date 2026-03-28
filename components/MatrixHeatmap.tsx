@@ -118,7 +118,7 @@ export function MatrixHeatmap({
         data-testid="matrix-heatmap-empty"
       >
         <p
-          className={`text-center ${isDark ? "text-gray-400" : "text-gray-500"}`}
+          className={`text-center ${isDark ? "text-gray-300" : "text-gray-500"}`}
         >
           No matrix data available.
         </p>
@@ -145,14 +145,14 @@ export function MatrixHeatmap({
               {/* Top-left corner cell */}
               <th
                 className={`px-3 py-2 text-left text-xs font-medium ${
-                  isDark ? "text-gray-400" : "text-gray-500"
+                  isDark ? "text-gray-300" : "text-gray-500"
                 }`}
               />
               {columns.map((col) => (
                 <th
                   key={col.key}
                   className={`px-3 py-2 text-center text-xs font-medium ${
-                    isDark ? "text-gray-400" : "text-gray-500"
+                    isDark ? "text-gray-300" : "text-gray-500"
                   }`}
                   data-testid={`matrix-col-header-${col.key}`}
                 >
@@ -224,7 +224,7 @@ export function MatrixHeatmap({
       >
         <div className="flex items-center justify-center gap-2 flex-wrap">
           <span
-            className={`text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}
+            className={`text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}
           >
             Strong decline
           </span>
@@ -246,7 +246,7 @@ export function MatrixHeatmap({
             ))}
           </div>
           <span
-            className={`text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}
+            className={`text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}
           >
             Strong gain
           </span>

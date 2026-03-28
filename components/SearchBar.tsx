@@ -188,7 +188,8 @@ export function SearchBar({
                      bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
                      text-base sm:text-sm
                      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                     placeholder-gray-400 dark:placeholder-gray-500"
+                     placeholder-gray-500 dark:placeholder-gray-400"
+          role="combobox"
           aria-label="Search stocks"
           aria-autocomplete="list"
           aria-controls="search-results"
@@ -204,7 +205,7 @@ export function SearchBar({
 
         {/* Search Icon */}
         {!isLoading && (
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true">
             <svg
               className="w-5 h-5"
               fill="none"
@@ -237,7 +238,7 @@ export function SearchBar({
           )}
 
           {!error && results.length === 0 && !isLoading && (
-            <div className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+            <div className="px-4 py-3 text-sm text-gray-500 dark:text-gray-300">
               No results found
             </div>
           )}
@@ -263,7 +264,7 @@ export function SearchBar({
                       <div className="font-semibold text-gray-900 dark:text-gray-100">
                         {result.symbol}
                       </div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                      <div className="text-sm text-gray-600 dark:text-gray-300 truncate">
                         {result.name}
                       </div>
                     </div>

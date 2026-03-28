@@ -146,7 +146,7 @@ export function SectorHub({
   const maxAbsChange = Math.max(...data.map((s) => Math.abs(s.changePercent)), 0.01);
 
   return (
-    <div className={`p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`} data-testid="sector-hub">
+    <div className={`p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`} data-testid="sector-hub" role="region" aria-label="Sectors Hub">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 gap-3">
         <h3 className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
@@ -246,7 +246,7 @@ export function SectorHub({
               {/* Tooltip on hover */}
               {isHovered && SECTOR_DESCRIPTIONS[sector.sector] && (
                 <div
-                  className={`mt-2 text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}
+                  className={`mt-2 text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}
                   role="tooltip"
                   data-testid={`tooltip-${sector.sector.replace(/\s+/g, "-")}`}
                 >

@@ -217,7 +217,7 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
                 y1={cy - inner * Math.sin(a)}
                 x2={cx + outer * Math.cos(a)}
                 y2={cy - outer * Math.sin(a)}
-                stroke={isDark ? "#9ca3af" : "#6b7280"}
+                stroke={isDark ? "#d1d5db" : "#6b7280"}
                 strokeWidth={2}
               />
             );
@@ -234,7 +234,7 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
                 y={cy - labelR * Math.sin(a) + 4}
                 textAnchor="middle"
                 fontSize="10"
-                fill={isDark ? "#9ca3af" : "#6b7280"}
+                fill={isDark ? "#d1d5db" : "#6b7280"}
               >
                 {tick}
               </text>
@@ -283,7 +283,7 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
         ].map((r) => (
           <span
             key={r.label}
-            className={`inline-flex items-center gap-1 text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}
+            className={`inline-flex items-center gap-1 text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}
           >
             <span
               className="inline-block w-2 h-2 rounded-full"
@@ -414,12 +414,12 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
             {/* Y-axis labels */}
             <div className="absolute top-0 left-0 h-full flex flex-col justify-between pointer-events-none">
               <span
-                className={`text-[10px] ${isDark ? "text-gray-500" : "text-gray-400"}`}
+                className={`text-[10px] ${isDark ? "text-gray-300" : "text-gray-500"}`}
               >
                 100
               </span>
               <span
-                className={`text-[10px] ${isDark ? "text-gray-500" : "text-gray-400"}`}
+                className={`text-[10px] ${isDark ? "text-gray-300" : "text-gray-500"}`}
               >
                 0
               </span>
@@ -428,12 +428,12 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
           {/* Date range */}
           <div className="flex justify-between mt-1">
             <span
-              className={`text-[10px] ${isDark ? "text-gray-500" : "text-gray-400"}`}
+              className={`text-[10px] ${isDark ? "text-gray-300" : "text-gray-500"}`}
             >
               {new Date(data.history[0].date).toLocaleDateString()}
             </span>
             <span
-              className={`text-[10px] ${isDark ? "text-gray-500" : "text-gray-400"}`}
+              className={`text-[10px] ${isDark ? "text-gray-300" : "text-gray-500"}`}
             >
               {new Date(
                 data.history[data.history.length - 1].date

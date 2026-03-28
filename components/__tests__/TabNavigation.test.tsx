@@ -52,19 +52,20 @@ describe("TabNavigation", () => {
     expect(overviewTab).toHaveClass("border-transparent");
   });
 
-  it("should set aria-current on active tab", () => {
+  it("should set aria-selected on active tab", () => {
     const onTabChange = vi.fn();
     render(<TabNavigation activeTab="forecasts" onTabChange={onTabChange} />);
     
     const forecastsTab = screen.getByText("Forecasts");
-    expect(forecastsTab).toHaveAttribute("aria-current", "page");
+    expect(forecastsTab).toHaveAttribute("aria-selected", "true");
+    expect(forecastsTab).toHaveAttribute("role", "tab");
   });
 
-  it("should not set aria-current on inactive tabs", () => {
+  it("should not set aria-selected=true on inactive tabs", () => {
     const onTabChange = vi.fn();
     render(<TabNavigation activeTab="overview" onTabChange={onTabChange} />);
     
     const financialsTab = screen.getByText("Financials");
-    expect(financialsTab).not.toHaveAttribute("aria-current");
+    expect(financialsTab).toHaveAttribute("aria-selected", "false");
   });
 });

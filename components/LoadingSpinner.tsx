@@ -32,6 +32,7 @@ export function LoadingSpinner({
     <div
       className={`flex flex-col items-center justify-center ${className}`}
       role="status"
+      aria-live="polite"
       aria-label={message ?? "Loading"}
       data-testid="loading-spinner"
     >

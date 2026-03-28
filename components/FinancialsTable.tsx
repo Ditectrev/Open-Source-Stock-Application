@@ -253,6 +253,8 @@ export function FinancialsTable({ financials }: FinancialsTableProps) {
   return (
     <div
       className={`p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
+      role="region"
+      aria-label="Financial data"
     >
       <h2
         className={`text-lg font-semibold mb-4 sm:mb-6 ${isDark ? "text-white" : "text-gray-900"}`}
@@ -339,24 +341,30 @@ function MetricRow({ metric, isDark }: MetricRowProps) {
       }`}
     >
       <div
-        className="relative flex items-center gap-2 cursor-help"
-        onMouseEnter={() => setShowTooltip(true)}
-        onMouseLeave={() => setShowTooltip(false)}
+        className="relative flex items-center gap-2"
       >
         <span
           className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}
         >
           {metric.label}
         </span>
-        <span
-          className={`flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center text-[10px] ${
+        <button
+          type="button"
+          className={`flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center text-[10px] cursor-help
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
             isDark ? "bg-gray-600 text-gray-300" : "bg-gray-200 text-gray-600"
           }`}
+          aria-label={`More info about ${metric.label}`}
+          onMouseEnter={() => setShowTooltip(true)}
+          onMouseLeave={() => setShowTooltip(false)}
+          onFocus={() => setShowTooltip(true)}
+          onBlur={() => setShowTooltip(false)}
         >
           ?
-        </span>
+        </button>
         {showTooltip && (
           <div
+            role="tooltip"
             className={`absolute z-10 w-64 p-3 rounded-lg shadow-lg text-sm ${
               isDark
                 ? "bg-gray-900 text-gray-200 border border-gray-700"

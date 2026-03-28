@@ -135,6 +135,8 @@ export function EarningsCalendar({ data: externalData, onSymbolClick }: Earnings
     <div
       className={`p-6 lg:p-8 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
       data-testid="earnings-calendar"
+      role="region"
+      aria-label="Earnings Calendar"
     >
       <h3 className={`text-lg font-semibold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}>
         Earnings Calendar
@@ -154,7 +156,7 @@ export function EarningsCalendar({ data: externalData, onSymbolClick }: Earnings
       {/* Events grouped by day */}
       {filteredEvents.length === 0 ? (
         <p
-          className={`text-center py-4 text-sm ${isDark ? "text-gray-400" : "text-gray-500"}`}
+          className={`text-center py-4 text-sm ${isDark ? "text-gray-300" : "text-gray-500"}`}
           data-testid="no-events"
         >
           No earnings events match the selected filters.
@@ -191,7 +193,7 @@ export function EarningsCalendar({ data: externalData, onSymbolClick }: Earnings
                       Today
                     </span>
                   )}
-                  <span className={`ml-2 text-xs font-normal ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+                  <span className={`ml-2 text-xs font-normal ${isDark ? "text-gray-300" : "text-gray-500"}`}>
                     ({events.length} event{events.length !== 1 ? "s" : ""})
                   </span>
                 </div>
@@ -207,7 +209,7 @@ export function EarningsCalendar({ data: externalData, onSymbolClick }: Earnings
                       ? "text-green-600 dark:text-green-400"
                       : isMiss
                         ? "text-red-600 dark:text-red-400"
-                        : "text-gray-500 dark:text-gray-400";
+                        : "text-gray-500 dark:text-gray-300";
 
                     return (
                       <div
@@ -250,7 +252,7 @@ export function EarningsCalendar({ data: externalData, onSymbolClick }: Earnings
                           </div>
 
                           {/* EPS row */}
-                          <div className={`flex flex-wrap gap-3 mt-1 text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+                          <div className={`flex flex-wrap gap-3 mt-1 text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}>
                             <span data-testid={`eps-estimate-${event.id}`}>
                               Est: {formatEps(event.epsEstimate)}
                             </span>

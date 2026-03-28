@@ -137,6 +137,8 @@ export function TechnicalIndicatorsDisplay({ indicators }: TechnicalIndicatorsDi
   return (
     <div
       className={`p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
+      role="region"
+      aria-label="Technical Indicators"
     >
       <h2
         className={`text-lg font-semibold mb-3 sm:mb-4 lg:mb-5 ${isDark ? "text-white" : "text-gray-900"}`}
@@ -195,26 +197,32 @@ function IndicatorCard({ card, isDark }: IndicatorCardProps) {
     >
       <div className="flex items-start justify-between mb-3">
         <div
-          className="relative flex items-center gap-2 cursor-help"
-          onMouseEnter={() => setShowTooltip(true)}
-          onMouseLeave={() => setShowTooltip(false)}
+          className="relative flex items-center gap-2"
         >
           <span
             className={`text-sm font-medium ${isDark ? "text-gray-200" : "text-gray-800"}`}
           >
             {card.name}
           </span>
-          <span
-            className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs ${
+          <button
+            type="button"
+            className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs cursor-help
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
               isDark ? "bg-gray-600 text-gray-300" : "bg-gray-200 text-gray-600"
             }`}
+            aria-label={`More info about ${card.name}`}
+            onMouseEnter={() => setShowTooltip(true)}
+            onMouseLeave={() => setShowTooltip(false)}
+            onFocus={() => setShowTooltip(true)}
+            onBlur={() => setShowTooltip(false)}
           >
             ?
-          </span>
+          </button>
 
           {/* Tooltip — positioned relative to the name row */}
           {showTooltip && (
             <div
+              role="tooltip"
               className={`absolute z-10 w-64 p-3 rounded-lg shadow-lg text-sm ${
                 isDark
                   ? "bg-gray-900 text-gray-200 border border-gray-700"
@@ -237,7 +245,7 @@ function IndicatorCard({ card, isDark }: IndicatorCardProps) {
         {card.values.map((v) => (
           <div key={v.label} className="flex justify-between items-center">
             <span
-              className={`text-sm ${isDark ? "text-gray-400" : "text-gray-500"}`}
+              className={`text-sm ${isDark ? "text-gray-300" : "text-gray-500"}`}
             >
               {v.label}
             </span>
