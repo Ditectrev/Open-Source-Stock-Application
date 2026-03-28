@@ -1,6 +1,6 @@
 {
   "name": "stock-exchange-app",
-  "version": "0.33.0",
+  "version": "0.34.0",
   "private": true,
   "scripts": {
     "dev": "bun --bun next dev",
@@ -13,7 +13,9 @@
     "test:coverage": "vitest --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:market-data": "bun run scripts/test-market-data.ts"
+    "test:market-data": "bun run scripts/test-market-data.ts",
+    "analyze": "ANALYZE=true bun run build",
+    "lighthouse": "lhci autorun"
   },
   "dependencies": {
     "lightweight-charts": "^5.1.0",
@@ -25,6 +27,8 @@
     "swr": "^2.2.5"
   },
   "devDependencies": {
+    "@lhci/cli": "^0.15.1",
+    "@next/bundle-analyzer": "^16.2.1",
     "@playwright/test": "^1.58.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",

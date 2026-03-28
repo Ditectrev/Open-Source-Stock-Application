@@ -12,7 +12,7 @@ env:
 
 jobs:
   test:
-    name: Test
+    name: Lint & Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,11 +21,68 @@ jobs:
 
       - run: bun install
 
-      - run: bun run vitest run
+      - name: Lint
+        run: bun run lint
+
+      - name: Unit tests
+        run: bun run test -- --run
+
+  e2e:
+    name: E2E Tests
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - run: bun install
+
+      - name: Install Playwright browsers
+        run: bunx playwright install --with-deps chromium
+
+      - name: Build
+        run: bun run build
+
+      - name: Run E2E tests
+        run: bun run test:e2e
+
+      - name: Upload E2E report
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
+
+  lighthouse:
+    name: Lighthouse Audit
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - run: bun install
+
+      - name: Build
+        run: bun run build
+
+      - name: Run Lighthouse CI
+        run: bun run lighthouse
+
+      - name: Upload Lighthouse report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-report
+          path: .lighthouseci/
+          retention-days: 14
 
   deploy-preview:
     name: Deploy Preview
-    needs: test
+    needs: [test, e2e, lighthouse]
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
@@ -45,7 +102,7 @@ jobs:
 
   deploy-production:
     name: Deploy Production
-    needs: test
+    needs: [test, e2e, lighthouse]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:

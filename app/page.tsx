@@ -1,24 +1,73 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { SearchBar } from "@/components/SearchBar";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useState, useEffect } from "react";
 import { SymbolData, PriceData, TechnicalIndicators, ForecastData, SeasonalData, FinancialData, TimeRange } from "@/types";
 import { SymbolHeader } from "@/components/SymbolHeader";
 import { TabNavigation } from "@/components/TabNavigation";
-import { OverviewTab } from "@/components/OverviewTab";
-import { TechnicalIndicatorsDisplay } from "@/components/TechnicalIndicatorsDisplay";
-import { ForecastDisplay } from "@/components/ForecastDisplay";
-import { SeasonalHeatmap } from "@/components/SeasonalHeatmap";
-import { FinancialsTable } from "@/components/FinancialsTable";
-import { FearGreedGauge } from "@/components/FearGreedGauge";
-import { WorldMarkets } from "@/components/WorldMarkets";
-import { SectorHub } from "@/components/SectorHub";
-import { CalendarHub } from "@/components/CalendarHub";
-import { HeatmapHub } from "@/components/HeatmapHub";
-import { ScreenerHub } from "@/components/ScreenerHub";
 import { Footer } from "@/components/Footer";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+
+// ---------------------------------------------------------------------------
+// Dynamically imported heavy components (code splitting – Req 15.2)
+// ---------------------------------------------------------------------------
+
+const OverviewTab = dynamic(
+  () => import("@/components/OverviewTab").then((m) => m.OverviewTab),
+  { loading: () => <LoadingSpinner size="md" message="Loading overview..." />, ssr: false },
+);
+
+const TechnicalIndicatorsDisplay = dynamic(
+  () => import("@/components/TechnicalIndicatorsDisplay").then((m) => m.TechnicalIndicatorsDisplay),
+  { loading: () => <LoadingSpinner size="md" message="Loading technicals..." />, ssr: false },
+);
+
+const ForecastDisplay = dynamic(
+  () => import("@/components/ForecastDisplay").then((m) => m.ForecastDisplay),
+  { loading: () => <LoadingSpinner size="md" message="Loading forecasts..." />, ssr: false },
+);
+
+const SeasonalHeatmap = dynamic(
+  () => import("@/components/SeasonalHeatmap").then((m) => m.SeasonalHeatmap),
+  { loading: () => <LoadingSpinner size="md" message="Loading seasonals..." />, ssr: false },
+);
+
+const FinancialsTable = dynamic(
+  () => import("@/components/FinancialsTable").then((m) => m.FinancialsTable),
+  { loading: () => <LoadingSpinner size="md" message="Loading financials..." />, ssr: false },
+);
+
+const FearGreedGauge = dynamic(
+  () => import("@/components/FearGreedGauge").then((m) => m.FearGreedGauge),
+  { loading: () => <LoadingSpinner size="md" message="Loading Fear & Greed..." />, ssr: false },
+);
+
+const WorldMarkets = dynamic(
+  () => import("@/components/WorldMarkets").then((m) => m.WorldMarkets),
+  { loading: () => <LoadingSpinner size="md" message="Loading world markets..." />, ssr: false },
+);
+
+const SectorHub = dynamic(
+  () => import("@/components/SectorHub").then((m) => m.SectorHub),
+  { loading: () => <LoadingSpinner size="md" message="Loading sectors..." />, ssr: false },
+);
+
+const HeatmapHub = dynamic(
+  () => import("@/components/HeatmapHub").then((m) => m.HeatmapHub),
+  { loading: () => <LoadingSpinner size="md" message="Loading heatmaps..." />, ssr: false },
+);
+
+const ScreenerHub = dynamic(
+  () => import("@/components/ScreenerHub").then((m) => m.ScreenerHub),
+  { loading: () => <LoadingSpinner size="md" message="Loading screener..." />, ssr: false },
+);
+
+const CalendarHub = dynamic(
+  () => import("@/components/CalendarHub").then((m) => m.CalendarHub),
+  { loading: () => <LoadingSpinner size="md" message="Loading calendars..." />, ssr: false },
+);
 
 type TabType = "overview" | "financials" | "technicals" | "forecasts" | "seasonals";
 
