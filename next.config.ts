@@ -2,6 +2,14 @@ import type { NextConfig } from "next";
 import withBundleAnalyzer from "@next/bundle-analyzer";
 
 const nextConfig: NextConfig = {
+  reactStrictMode: true,
+  experimental: {
+    optimizePackageImports: [
+      "lightweight-charts",
+      "swr",
+      "react-github-btn",
+    ],
+  },
   images: {
     formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],

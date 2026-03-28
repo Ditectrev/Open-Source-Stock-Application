@@ -67,6 +67,7 @@ describe("Lazy loading behavior (Req 15.2)", () => {
     "HeatmapHub",
     "ScreenerHub",
     "CalendarHub",
+    "Footer",
   ];
 
   it("should use next/dynamic for code splitting", () => {
@@ -84,19 +85,20 @@ describe("Lazy loading behavior (Req 15.2)", () => {
 
   it("should disable SSR for all dynamically imported components", () => {
     // Every dynamic() call should include ssr: false
-    const dynamicCalls = pageSource.match(/dynamic\(\s*\n?\s*\(\)/g);
+    const dynamicCallCount = (pageSource.match(/=\s*dynamic\(/g) || []).length;
     const ssrFalseCount = (pageSource.match(/ssr:\s*false/g) || []).length;
-    expect(dynamicCalls).not.toBeNull();
-    expect(ssrFalseCount).toBe(dynamicCalls!.length);
+    expect(ssrFalseCount).toBe(dynamicCallCount);
   });
 
-  it("should provide a loading fallback for each dynamic component", () => {
+  it("should provide a loading fallback for heavy dynamic components", () => {
+    // All dynamic components except Footer should have a loading fallback
     const loadingCount = (pageSource.match(/loading:\s*\(\)\s*=>/g) || [])
       .length;
     const dynamicCount = (
-      pageSource.match(/dynamic\(\s*\n?\s*\(\)/g) || []
+      pageSource.match(/=\s*dynamic\(/g) || []
     ).length;
-    expect(loadingCount).toBe(dynamicCount);
+    // Footer is lightweight and doesn't need a loading fallback
+    expect(loadingCount).toBeGreaterThanOrEqual(dynamicCount - 1);
   });
 
   it("should not statically import any lazy-loaded component", () => {
@@ -122,7 +124,6 @@ describe("Lazy loading behavior (Req 15.2)", () => {
       "ThemeToggle",
       "SymbolHeader",
       "TabNavigation",
-      "Footer",
       "LoadingSpinner",
     ];
 
@@ -134,5 +135,37 @@ describe("Lazy loading behavior (Req 15.2)", () => {
         expect(allowedStatic).toContain(componentMatch[1]);
       }
     }
+  });
+
+  it("should defer below-the-fold sections with LazySection", () => {
+    // HeatmapHub, ScreenerHub, CalendarHub should be wrapped in LazySection
+    const lazySections = ["HeatmapHub", "ScreenerHub", "CalendarHub"];
+    for (const component of lazySections) {
+      const pattern = new RegExp(
+        `<LazySection[^>]*>[\\s\\S]*?<${component}[\\s\\S]*?<\\/LazySection>`
+      );
+      expect(pageSource).toMatch(pattern);
+    }
+  });
+
+  it("should use IntersectionObserver in LazySection for viewport-based loading", () => {
+    expect(pageSource).toContain("IntersectionObserver");
+    expect(pageSource).toContain("rootMargin");
+  });
+});
+
+describe("Next.js performance configuration (Req 15.2, 15.5)", () => {
+  it("should enable reactStrictMode", async () => {
+    const { default: nextConfig } = await import("../next.config");
+    expect(nextConfig.reactStrictMode).toBe(true);
+  });
+
+  it("should configure optimizePackageImports for heavy libraries", async () => {
+    const { default: nextConfig } = await import("../next.config");
+    const optimized = (nextConfig as Record<string, unknown>).experimental as
+      | { optimizePackageImports?: string[] }
+      | undefined;
+    expect(optimized?.optimizePackageImports).toBeDefined();
+    expect(optimized!.optimizePackageImports).toContain("lightweight-charts");
   });
 });

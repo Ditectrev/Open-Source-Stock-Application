@@ -3,11 +3,10 @@
 import dynamic from "next/dynamic";
 import { SearchBar } from "@/components/SearchBar";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { SymbolData, PriceData, TechnicalIndicators, ForecastData, SeasonalData, FinancialData, TimeRange } from "@/types";
 import { SymbolHeader } from "@/components/SymbolHeader";
 import { TabNavigation } from "@/components/TabNavigation";
-import { Footer } from "@/components/Footer";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 // ---------------------------------------------------------------------------
@@ -68,6 +67,42 @@ const CalendarHub = dynamic(
   () => import("@/components/CalendarHub").then((m) => m.CalendarHub),
   { loading: () => <LoadingSpinner size="md" message="Loading calendars..." />, ssr: false },
 );
+
+const Footer = dynamic(
+  () => import("@/components/Footer").then((m) => m.Footer),
+  { ssr: false },
+);
+
+/**
+ * Defers rendering of children until the wrapper scrolls near the viewport.
+ * Reduces initial JS execution and DOM size for below-the-fold sections.
+ */
+function LazySection({ children, className }: { children: React.ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className={className}>
+      {visible ? children : <div style={{ minHeight: 200 }} />}
+    </div>
+  );
+}
 
 type TabType = "overview" | "financials" | "technicals" | "forecasts" | "seasonals";
 
@@ -299,18 +334,18 @@ function DashboardContent({
       <div className="mt-6 sm:mt-8 lg:mt-10">
         <SectorHub />
       </div>
-      <div className="mt-6 sm:mt-8 lg:mt-10">
+      <LazySection className="mt-6 sm:mt-8 lg:mt-10">
         <HeatmapHub
           refreshInterval={60000}
           onSymbolClick={onSymbolClick}
         />
-      </div>
-      <div className="mt-6 sm:mt-8 lg:mt-10">
+      </LazySection>
+      <LazySection className="mt-6 sm:mt-8 lg:mt-10">
         <ScreenerHub onSymbolClick={onSymbolClick} />
-      </div>
-      <div className="mt-6 sm:mt-8 lg:mt-10">
+      </LazySection>
+      <LazySection className="mt-6 sm:mt-8 lg:mt-10">
         <CalendarHub onSymbolClick={onSymbolClick} />
-      </div>
+      </LazySection>
     </>
   );
 }
