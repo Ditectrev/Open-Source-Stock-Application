@@ -20,11 +20,46 @@ vi.mock("@/lib/theme-context", () => ({
 }));
 
 const mockData: HeatmapData[] = [
-  { symbol: "AAPL", name: "Apple Inc.", value: 195.5, changePercent: 2.5, sector: "Technology", marketCap: 3e12 },
-  { symbol: "MSFT", name: "Microsoft Corp.", value: 420.1, changePercent: -1.3, sector: "Technology", marketCap: 2.8e12 },
-  { symbol: "JPM", name: "JPMorgan Chase", value: 198.0, changePercent: 0.8, sector: "Financial", marketCap: 570e9 },
-  { symbol: "XOM", name: "Exxon Mobil", value: 105.2, changePercent: -3.5, sector: "Energy", marketCap: 450e9 },
-  { symbol: "JNJ", name: "Johnson & Johnson", value: 155.0, changePercent: 0, sector: "Healthcare", marketCap: 380e9 },
+  {
+    symbol: "AAPL",
+    name: "Apple Inc.",
+    value: 195.5,
+    changePercent: 2.5,
+    sector: "Technology",
+    marketCap: 3e12,
+  },
+  {
+    symbol: "MSFT",
+    name: "Microsoft Corp.",
+    value: 420.1,
+    changePercent: -1.3,
+    sector: "Technology",
+    marketCap: 2.8e12,
+  },
+  {
+    symbol: "JPM",
+    name: "JPMorgan Chase",
+    value: 198.0,
+    changePercent: 0.8,
+    sector: "Financial",
+    marketCap: 570e9,
+  },
+  {
+    symbol: "XOM",
+    name: "Exxon Mobil",
+    value: 105.2,
+    changePercent: -3.5,
+    sector: "Energy",
+    marketCap: 450e9,
+  },
+  {
+    symbol: "JNJ",
+    name: "Johnson & Johnson",
+    value: 155.0,
+    changePercent: 0,
+    sector: "Healthcare",
+    marketCap: 380e9,
+  },
 ];
 
 describe("HeatmapComponent", () => {
@@ -45,8 +80,12 @@ describe("HeatmapComponent", () => {
   it("should display symbol and percentage change on each tile", () => {
     render(<HeatmapComponent data={mockData} />);
     expect(screen.getByTestId("heatmap-symbol-AAPL").textContent).toBe("AAPL");
-    expect(screen.getByTestId("heatmap-change-AAPL").textContent).toBe("+2.50%");
-    expect(screen.getByTestId("heatmap-change-MSFT").textContent).toBe("-1.30%");
+    expect(screen.getByTestId("heatmap-change-AAPL").textContent).toBe(
+      "+2.50%"
+    );
+    expect(screen.getByTestId("heatmap-change-MSFT").textContent).toBe(
+      "-1.30%"
+    );
     expect(screen.getByTestId("heatmap-change-JNJ").textContent).toBe("+0.00%");
   });
 
@@ -75,7 +114,9 @@ describe("HeatmapComponent", () => {
   it("should call onTileClick on Enter key press", () => {
     const onClick = vi.fn();
     render(<HeatmapComponent data={mockData} onTileClick={onClick} />);
-    fireEvent.keyDown(screen.getByTestId("heatmap-tile-AAPL"), { key: "Enter" });
+    fireEvent.keyDown(screen.getByTestId("heatmap-tile-AAPL"), {
+      key: "Enter",
+    });
     expect(onClick).toHaveBeenCalledWith(mockData[0]);
   });
 
@@ -112,7 +153,9 @@ describe("HeatmapComponent", () => {
     const bigTile = screen.getByTestId("heatmap-tile-BIG");
 
     // Both green, but big should have higher opacity
-    const smallAlpha = parseFloat(smallTile.style.backgroundColor.split(",")[3]);
+    const smallAlpha = parseFloat(
+      smallTile.style.backgroundColor.split(",")[3]
+    );
     const bigAlpha = parseFloat(bigTile.style.backgroundColor.split(",")[3]);
     expect(bigAlpha).toBeGreaterThan(smallAlpha);
   });
@@ -208,7 +251,11 @@ describe("HeatmapComponent", () => {
 
   it("should sort by marketCap descending when configured", () => {
     render(
-      <HeatmapComponent data={mockData} sortField="marketCap" sortDirection="desc" />
+      <HeatmapComponent
+        data={mockData}
+        sortField="marketCap"
+        sortDirection="desc"
+      />
     );
     const grid = screen.getByTestId("heatmap-grid");
     const tiles = grid.querySelectorAll("[data-testid^='heatmap-tile-']");
@@ -238,7 +285,9 @@ describe("HeatmapComponent", () => {
 
   it("should call onSectorFilterChange when sector is selected", () => {
     const onFilter = vi.fn();
-    render(<HeatmapComponent data={mockData} onSectorFilterChange={onFilter} />);
+    render(
+      <HeatmapComponent data={mockData} onSectorFilterChange={onFilter} />
+    );
     fireEvent.change(screen.getByTestId("heatmap-sector-filter"), {
       target: { value: "Energy" },
     });
@@ -264,7 +313,11 @@ describe("HeatmapComponent", () => {
     vi.useFakeTimers();
     const onRefresh = vi.fn();
     render(
-      <HeatmapComponent data={mockData} refreshInterval={5000} onRefresh={onRefresh} />
+      <HeatmapComponent
+        data={mockData}
+        refreshInterval={5000}
+        onRefresh={onRefresh}
+      />
     );
     expect(onRefresh).not.toHaveBeenCalled();
     vi.advanceTimersByTime(5000);
@@ -278,7 +331,11 @@ describe("HeatmapComponent", () => {
     vi.useFakeTimers();
     const onRefresh = vi.fn();
     render(
-      <HeatmapComponent data={mockData} refreshInterval={0} onRefresh={onRefresh} />
+      <HeatmapComponent
+        data={mockData}
+        refreshInterval={0}
+        onRefresh={onRefresh}
+      />
     );
     vi.advanceTimersByTime(10000);
     expect(onRefresh).not.toHaveBeenCalled();

@@ -4,23 +4,43 @@ test.describe("Seasonals Tab", () => {
   /**
    * Helper: search for a symbol and navigate to the Seasonals tab
    */
-  async function goToSeasonals(page: import("@playwright/test").Page, symbol: string) {
+  async function goToSeasonals(
+    page: import("@playwright/test").Page,
+    symbol: string
+  ) {
     await page.goto("http://localhost:3000");
     const searchInput = page.getByPlaceholder(/search stocks/i);
     await searchInput.fill(symbol);
     await searchInput.press("Enter");
-    await expect(page.getByRole("heading", { name: new RegExp(symbol, "i") })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: new RegExp(symbol, "i") })
+    ).toBeVisible();
     await page.getByRole("tab", { name: "Seasonals" }).click();
   }
 
-  test("should display Seasonal Patterns heading when Seasonals tab is clicked", async ({ page }) => {
+  test("should display Seasonal Patterns heading when Seasonals tab is clicked", async ({
+    page,
+  }) => {
     await goToSeasonals(page, "AAPL");
     await expect(page.getByText("Seasonal Patterns")).toBeVisible();
   });
 
   test("should display month column headers", async ({ page }) => {
     await goToSeasonals(page, "AAPL");
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
     for (const month of months) {
       await expect(page.getByText(month, { exact: true })).toBeVisible();
     }
@@ -43,7 +63,9 @@ test.describe("Seasonals Tab", () => {
   });
 
   // Navigation
-  test("should switch back to Overview tab from Seasonals", async ({ page }) => {
+  test("should switch back to Overview tab from Seasonals", async ({
+    page,
+  }) => {
     await goToSeasonals(page, "AAPL");
     await expect(page.getByText("Seasonal Patterns")).toBeVisible();
     await page.getByRole("tab", { name: "Overview" }).click();

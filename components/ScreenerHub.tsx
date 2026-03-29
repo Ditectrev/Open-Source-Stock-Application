@@ -39,7 +39,10 @@ const DEFAULT_REFRESH_INTERVAL = 60_000; // 60 seconds
 // Component
 // ---------------------------------------------------------------------------
 
-export function ScreenerHub({ onSymbolClick, refreshInterval }: ScreenerHubProps) {
+export function ScreenerHub({
+  onSymbolClick,
+  refreshInterval,
+}: ScreenerHubProps) {
   const [results, setResults] = useState<ScreenerResult[]>([]);
   const [viewMode, setViewMode] = useState<ScreenerViewMode>("table");
   const [currentFilters, setCurrentFilters] = useState<ScreenerFilter[]>([]);
@@ -86,31 +89,28 @@ export function ScreenerHub({ onSymbolClick, refreshInterval }: ScreenerHubProps
     }
   }, []);
 
-  const handlePresetSelect = useCallback(
-    async (preset: ScreenerPreset) => {
-      // Set initialFilters so AssetScreener populates its UI
-      setPresetFilters(preset.filters);
+  const handlePresetSelect = useCallback(async (preset: ScreenerPreset) => {
+    // Set initialFilters so AssetScreener populates its UI
+    setPresetFilters(preset.filters);
 
-      // Also fire a search using the preset id
-      try {
-        const res = await fetch("/api/screener/search", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ preset: preset.id }),
-        });
+    // Also fire a search using the preset id
+    try {
+      const res = await fetch("/api/screener/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ preset: preset.id }),
+      });
 
-        if (res.ok) {
-          const json = await res.json();
-          const data: ScreenerResult[] = json.data ?? [];
-          setResults(data);
-          setCurrentFilters(preset.filters);
-        }
-      } catch {
-        // Silently fail — user can still apply filters manually
+      if (res.ok) {
+        const json = await res.json();
+        const data: ScreenerResult[] = json.data ?? [];
+        setResults(data);
+        setCurrentFilters(preset.filters);
       }
-    },
-    [],
-  );
+    } catch {
+      // Silently fail — user can still apply filters manually
+    }
+  }, []);
 
   // Auto-refresh: re-fetch results at a configurable interval (Req 26.25)
   const interval =
@@ -196,10 +196,7 @@ export function ScreenerHub({ onSymbolClick, refreshInterval }: ScreenerHubProps
       {/* Active view */}
       <div role="tabpanel">
         {viewMode === "table" ? (
-          <ScreenerTableView
-            results={results}
-            onSymbolClick={onSymbolClick}
-          />
+          <ScreenerTableView results={results} onSymbolClick={onSymbolClick} />
         ) : (
           <ScreenerHeatmapView
             results={results}

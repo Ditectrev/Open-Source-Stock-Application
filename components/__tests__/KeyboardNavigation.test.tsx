@@ -21,7 +21,7 @@ global.fetch = vi.fn(() =>
   Promise.resolve({
     ok: true,
     json: () => Promise.resolve({ success: true, data: [] }),
-  } as Response),
+  } as Response)
 );
 
 import { TabNavigation } from "../TabNavigation";
@@ -119,7 +119,10 @@ describe("Keyboard Navigation - CalendarNavigation (Req 18.2)", () => {
   it("should move focus right with ArrowRight key", () => {
     const onChange = vi.fn();
     render(
-      <CalendarNavigation activeCalendar="economic" onCalendarChange={onChange} />,
+      <CalendarNavigation
+        activeCalendar="economic"
+        onCalendarChange={onChange}
+      />
     );
     const tabs = screen.getAllByRole("tab");
     tabs[0].focus();
@@ -130,7 +133,7 @@ describe("Keyboard Navigation - CalendarNavigation (Req 18.2)", () => {
   it("should wrap from last to first with ArrowRight", () => {
     const onChange = vi.fn();
     render(
-      <CalendarNavigation activeCalendar="ipos" onCalendarChange={onChange} />,
+      <CalendarNavigation activeCalendar="ipos" onCalendarChange={onChange} />
     );
     const tabs = screen.getAllByRole("tab");
     tabs[3].focus();
@@ -144,7 +147,7 @@ describe("Keyboard Navigation - CalendarNavigation (Req 18.2)", () => {
       <CalendarNavigation
         activeCalendar="earnings"
         onCalendarChange={onChange}
-      />,
+      />
     );
     const tabs = screen.getAllByRole("tab");
     tabs[1].focus();
@@ -162,7 +165,7 @@ describe("Keyboard Navigation - CalendarNavigation (Req 18.2)", () => {
       <CalendarNavigation
         activeCalendar="dividends"
         onCalendarChange={vi.fn()}
-      />,
+      />
     );
     const tabs = screen.getAllByRole("tab");
     expect(tabs[2]).toHaveAttribute("tabindex", "0"); // dividends
@@ -177,7 +180,7 @@ describe("Keyboard Navigation - HeatmapNavigation (Req 18.2)", () => {
   it("should move focus right with ArrowRight key", () => {
     const onChange = vi.fn();
     render(
-      <HeatmapNavigation activeHeatmap="etf" onHeatmapChange={onChange} />,
+      <HeatmapNavigation activeHeatmap="etf" onHeatmapChange={onChange} />
     );
     const tabs = screen.getAllByRole("tab");
     tabs[0].focus();
@@ -188,7 +191,7 @@ describe("Keyboard Navigation - HeatmapNavigation (Req 18.2)", () => {
   it("should wrap from last to first with ArrowRight", () => {
     const onChange = vi.fn();
     render(
-      <HeatmapNavigation activeHeatmap="stock" onHeatmapChange={onChange} />,
+      <HeatmapNavigation activeHeatmap="stock" onHeatmapChange={onChange} />
     );
     const tabs = screen.getAllByRole("tab");
     tabs[2].focus();
@@ -198,7 +201,7 @@ describe("Keyboard Navigation - HeatmapNavigation (Req 18.2)", () => {
 
   it("should set tabIndex roving correctly", () => {
     render(
-      <HeatmapNavigation activeHeatmap="crypto" onHeatmapChange={vi.fn()} />,
+      <HeatmapNavigation activeHeatmap="crypto" onHeatmapChange={vi.fn()} />
     );
     const tabs = screen.getAllByRole("tab");
     expect(tabs[1]).toHaveAttribute("tabindex", "0"); // crypto
@@ -251,11 +254,11 @@ describe("Keyboard Navigation - Tooltip Focus (Req 18.2)", () => {
     };
     render(<TechnicalIndicatorsDisplay indicators={mockIndicators} />);
     const infoBtn = screen.getByLabelText(
-      "More info about RSI (Relative Strength Index)",
+      "More info about RSI (Relative Strength Index)"
     );
     fireEvent.focus(infoBtn);
     expect(
-      screen.getByText(/RSI measures the speed and magnitude/),
+      screen.getByText(/RSI measures the speed and magnitude/)
     ).toBeInTheDocument();
   });
 
@@ -276,7 +279,7 @@ describe("Keyboard Navigation - Tooltip Focus (Req 18.2)", () => {
     const infoBtn = screen.getByLabelText("More info about Price Targets");
     fireEvent.focus(infoBtn);
     expect(
-      screen.getByText(/Analyst price targets represent/),
+      screen.getByText(/Analyst price targets represent/)
     ).toBeInTheDocument();
   });
 });

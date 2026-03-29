@@ -5,13 +5,17 @@ test.describe("World Markets", () => {
     await page.goto("/");
   });
 
-  test("should display the World Markets section on the home page", async ({ page }) => {
+  test("should display the World Markets section on the home page", async ({
+    page,
+  }) => {
     const worldMarkets = page.getByTestId("world-markets");
     await expect(worldMarkets).toBeVisible({ timeout: 10000 });
     await expect(worldMarkets.getByText("World Markets")).toBeVisible();
   });
 
-  test("should display indices grouped by region (Req 10.1)", async ({ page }) => {
+  test("should display indices grouped by region (Req 10.1)", async ({
+    page,
+  }) => {
     const worldMarkets = page.getByTestId("world-markets");
     await expect(worldMarkets).toBeVisible({ timeout: 10000 });
 
@@ -21,16 +25,22 @@ test.describe("World Markets", () => {
     await expect(worldMarkets.getByText("Europe")).toBeVisible();
   });
 
-  test("should display index names, values, and percentage changes (Req 10.2)", async ({ page }) => {
+  test("should display index names, values, and percentage changes (Req 10.2)", async ({
+    page,
+  }) => {
     const worldMarkets = page.getByTestId("world-markets");
     await expect(worldMarkets).toBeVisible({ timeout: 10000 });
 
     // At least one index should show a numeric value and a percentage change
-    const changeLocator = worldMarkets.locator("text=/[+-]?\\d+\\.\\d+%/").first();
+    const changeLocator = worldMarkets
+      .locator("text=/[+-]?\\d+\\.\\d+%/")
+      .first();
     await expect(changeLocator).toBeVisible();
   });
 
-  test("should color-code positive changes green and negative changes red (Req 10.3)", async ({ page }) => {
+  test("should color-code positive changes green and negative changes red (Req 10.3)", async ({
+    page,
+  }) => {
     const worldMarkets = page.getByTestId("world-markets");
     await expect(worldMarkets).toBeVisible({ timeout: 10000 });
 
@@ -53,7 +63,9 @@ test.describe("World Markets", () => {
     await expect(loading).toBeVisible({ timeout: 5000 });
   });
 
-  test("should hide World Markets when a symbol is selected", async ({ page }) => {
+  test("should hide World Markets when a symbol is selected", async ({
+    page,
+  }) => {
     const worldMarkets = page.getByTestId("world-markets");
     await expect(worldMarkets).toBeVisible({ timeout: 10000 });
 

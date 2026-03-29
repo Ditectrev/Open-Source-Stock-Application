@@ -135,8 +135,14 @@ class RateLimiter {
   /**
    * Get rate limit statistics
    */
-  getStats(): Record<string, { count: number; remaining: number; resetIn: number }> {
-    const stats: Record<string, { count: number; remaining: number; resetIn: number }> = {};
+  getStats(): Record<
+    string,
+    { count: number; remaining: number; resetIn: number }
+  > {
+    const stats: Record<
+      string,
+      { count: number; remaining: number; resetIn: number }
+    > = {};
     const now = Date.now();
 
     for (const [endpoint, entry] of this.limits.entries()) {

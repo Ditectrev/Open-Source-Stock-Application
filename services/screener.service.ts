@@ -25,15 +25,27 @@ export class ScreenerService {
 
     switch (filter.operator) {
       case "gt":
-        return typeof fieldValue === "number" && fieldValue > (filter.value as number);
+        return (
+          typeof fieldValue === "number" &&
+          fieldValue > (filter.value as number)
+        );
       case "lt":
-        return typeof fieldValue === "number" && fieldValue < (filter.value as number);
+        return (
+          typeof fieldValue === "number" &&
+          fieldValue < (filter.value as number)
+        );
       case "eq":
         return fieldValue === filter.value;
       case "gte":
-        return typeof fieldValue === "number" && fieldValue >= (filter.value as number);
+        return (
+          typeof fieldValue === "number" &&
+          fieldValue >= (filter.value as number)
+        );
       case "lte":
-        return typeof fieldValue === "number" && fieldValue <= (filter.value as number);
+        return (
+          typeof fieldValue === "number" &&
+          fieldValue <= (filter.value as number)
+        );
       case "between": {
         if (
           typeof fieldValue !== "number" ||
@@ -49,7 +61,9 @@ export class ScreenerService {
         if (!Array.isArray(filter.value)) {
           return false;
         }
-        return (filter.value as (string | number)[]).includes(fieldValue as string | number);
+        return (filter.value as (string | number)[]).includes(
+          fieldValue as string | number
+        );
       }
       default:
         return false;
@@ -62,7 +76,7 @@ export class ScreenerService {
    */
   matchesAllFilters(
     result: ScreenerResult,
-    filters: ScreenerFilter[],
+    filters: ScreenerFilter[]
   ): boolean {
     return filters.every((filter) => this.matchesFilter(result, filter));
   }
@@ -72,7 +86,7 @@ export class ScreenerService {
    */
   filterResults(
     results: ScreenerResult[],
-    filters: ScreenerFilter[],
+    filters: ScreenerFilter[]
   ): ScreenerResult[] {
     if (filters.length === 0) {
       return results;
@@ -124,7 +138,7 @@ export class ScreenerService {
    * and calculate valuation context for each result.
    */
   async fetchScreenerData(
-    filters: ScreenerFilter[],
+    filters: ScreenerFilter[]
   ): Promise<ScreenerResult[]> {
     const stocks = await marketDataService.getStockPerformance();
 
@@ -288,7 +302,7 @@ export class ScreenerService {
    */
   private getFieldValue(
     result: ScreenerResult,
-    field: string,
+    field: string
   ): string | number | undefined {
     const value = (result as unknown as Record<string, unknown>)[field];
     if (typeof value === "string" || typeof value === "number") {

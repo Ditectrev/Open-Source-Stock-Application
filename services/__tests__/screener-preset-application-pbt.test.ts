@@ -9,7 +9,12 @@
 import { describe, it, expect } from "vitest";
 import fc from "fast-check";
 import { screenerService } from "@/services/screener.service";
-import type { ScreenerFilter, ScreenerPreset, ScreenerResult, ValuationContext } from "@/types";
+import type {
+  ScreenerFilter,
+  ScreenerPreset,
+  ScreenerResult,
+  ValuationContext,
+} from "@/types";
 
 // ---------------------------------------------------------------------------
 // Arbitraries
@@ -18,7 +23,7 @@ import type { ScreenerFilter, ScreenerPreset, ScreenerResult, ValuationContext }
 const valuationArb: fc.Arbitrary<ValuationContext> = fc.constantFrom(
   "overpriced",
   "underpriced",
-  "fair",
+  "fair"
 );
 
 const sectorArb = fc.constantFrom(
@@ -26,7 +31,7 @@ const sectorArb = fc.constantFrom(
   "Healthcare",
   "Energy",
   "Financial",
-  "Consumer Discretionary",
+  "Consumer Discretionary"
 );
 
 const resultArb: fc.Arbitrary<ScreenerResult> = fc
@@ -41,15 +46,9 @@ const resultArb: fc.Arbitrary<ScreenerResult> = fc
     peRatio: fc.option(fc.double({ min: 0, max: 200, noNaN: true })),
     pbRatio: fc.option(fc.double({ min: 0, max: 50, noNaN: true })),
     pegRatio: fc.option(fc.double({ min: 0, max: 10, noNaN: true })),
-    dividendYield: fc.option(
-      fc.double({ min: 0, max: 20, noNaN: true }),
-    ),
-    revenueGrowth: fc.option(
-      fc.double({ min: -100, max: 500, noNaN: true }),
-    ),
-    earningsGrowth: fc.option(
-      fc.double({ min: -100, max: 500, noNaN: true }),
-    ),
+    dividendYield: fc.option(fc.double({ min: 0, max: 20, noNaN: true })),
+    revenueGrowth: fc.option(fc.double({ min: -100, max: 500, noNaN: true })),
+    earningsGrowth: fc.option(fc.double({ min: -100, max: 500, noNaN: true })),
     valuationContext: valuationArb,
     matchScore: fc.integer({ min: 0, max: 100 }),
   })
@@ -72,7 +71,7 @@ const operatorArb = fc.constantFrom(
   "gt" as const,
   "lt" as const,
   "gte" as const,
-  "lte" as const,
+  "lte" as const
 );
 
 const numericFieldArb = fc.constantFrom(
@@ -81,7 +80,7 @@ const numericFieldArb = fc.constantFrom(
   "volume",
   "marketCap",
   "peRatio",
-  "dividendYield",
+  "dividendYield"
 );
 
 const numericFilterArb: fc.Arbitrary<ScreenerFilter> = fc
@@ -101,7 +100,7 @@ const sectorFilterArb: fc.Arbitrary<ScreenerFilter> = fc
       "Financial",
       "Consumer Discretionary",
     ],
-    { minLength: 1 },
+    { minLength: 1 }
   )
   .map((sectors) => ({
     field: "sector",
@@ -112,14 +111,14 @@ const sectorFilterArb: fc.Arbitrary<ScreenerFilter> = fc
 
 const filterArb: fc.Arbitrary<ScreenerFilter> = fc.oneof(
   { weight: 3, arbitrary: numericFilterArb },
-  { weight: 1, arbitrary: sectorFilterArb },
+  { weight: 1, arbitrary: sectorFilterArb }
 );
 
 const customPresetArb: fc.Arbitrary<ScreenerPreset> = fc
   .record({
-    id: fc.string({ minLength: 3, maxLength: 20 }).map((s) =>
-      `custom-${s.replace(/\s+/g, "-")}`,
-    ),
+    id: fc
+      .string({ minLength: 3, maxLength: 20 })
+      .map((s) => `custom-${s.replace(/\s+/g, "-")}`),
     name: fc.string({ minLength: 1, maxLength: 30 }),
     description: fc.string({ minLength: 0, maxLength: 50 }),
     filters: fc.array(filterArb, { minLength: 1, maxLength: 5 }),
@@ -148,18 +147,18 @@ describe("Property 18: Screener Preset Application", () => {
           // The filters used for filtering must be identical to the preset
           const filtered = screenerService.filterResults(
             results,
-            appliedFilters,
+            appliedFilters
           );
           const expected = screenerService.filterResults(
             results,
-            preset.filters,
+            preset.filters
           );
 
           expect(filtered).toEqual(expected);
           expect(appliedFilters).toEqual(preset.filters);
-        },
+        }
       ),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
@@ -174,18 +173,18 @@ describe("Property 18: Screener Preset Application", () => {
 
           const filtered = screenerService.filterResults(
             results,
-            appliedFilters,
+            appliedFilters
           );
           const expected = screenerService.filterResults(
             results,
-            preset.filters,
+            preset.filters
           );
 
           expect(filtered).toEqual(expected);
           expect(appliedFilters).toEqual(preset.filters);
-        },
+        }
       ),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
@@ -200,16 +199,12 @@ describe("Property 18: Screener Preset Application", () => {
 
         for (let i = 0; i < appliedFilters.length; i++) {
           expect(appliedFilters[i].field).toBe(preset.filters[i].field);
-          expect(appliedFilters[i].operator).toBe(
-            preset.filters[i].operator,
-          );
-          expect(appliedFilters[i].value).toEqual(
-            preset.filters[i].value,
-          );
+          expect(appliedFilters[i].operator).toBe(preset.filters[i].operator);
+          expect(appliedFilters[i].value).toEqual(preset.filters[i].value);
           expect(appliedFilters[i].label).toBe(preset.filters[i].label);
         }
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
@@ -222,19 +217,13 @@ describe("Property 18: Screener Preset Application", () => {
         (presetIdx, results) => {
           const preset = defaultPresets[presetIdx];
 
-          const first = screenerService.filterResults(
-            results,
-            preset.filters,
-          );
-          const second = screenerService.filterResults(
-            results,
-            preset.filters,
-          );
+          const first = screenerService.filterResults(results, preset.filters);
+          const second = screenerService.filterResults(results, preset.filters);
 
           expect(first).toEqual(second);
-        },
+        }
       ),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
@@ -252,17 +241,17 @@ describe("Property 18: Screener Preset Application", () => {
           // Simulate selecting preset A then switching to preset B
           const resultsA = screenerService.filterResults(
             results,
-            presetA.filters,
+            presetA.filters
           );
           const resultsB = screenerService.filterResults(
             results,
-            presetB.filters,
+            presetB.filters
           );
 
           // Results from B should only reflect B's filters, not A's
           const expectedB = screenerService.filterResults(
             results,
-            presetB.filters,
+            presetB.filters
           );
           expect(resultsB).toEqual(expectedB);
 
@@ -271,13 +260,13 @@ describe("Property 18: Screener Preset Application", () => {
             // At minimum, B's results should be independent of A
             const reBFromScratch = screenerService.filterResults(
               results,
-              presetB.filters,
+              presetB.filters
             );
             expect(resultsB).toEqual(reBFromScratch);
           }
-        },
+        }
       ),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
@@ -300,7 +289,7 @@ describe("Property 18: Screener Preset Application", () => {
           const preset = defaultPresets[presetIdx];
           const presetResults = screenerService.filterResults(
             results,
-            preset.filters,
+            preset.filters
           );
 
           // Manually verify each result passes every preset filter
@@ -312,14 +301,12 @@ describe("Property 18: Screener Preset Application", () => {
 
           // Verify no matching result was excluded
           const manualCount = results.filter((r) =>
-            preset.filters.every((f) =>
-              screenerService.matchesFilter(r, f),
-            ),
+            preset.filters.every((f) => screenerService.matchesFilter(r, f))
           ).length;
           expect(presetResults.length).toBe(manualCount);
-        },
+        }
       ),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 });

@@ -11,8 +11,7 @@ describe("Lighthouse CI configuration", () => {
   it("should assert performance score >= 0.8", () => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const config = require("../lighthouserc.js");
-    const perfAssertion =
-      config.ci.assert.assertions["categories:performance"];
+    const perfAssertion = config.ci.assert.assertions["categories:performance"];
     expect(perfAssertion).toBeDefined();
     // assertion format: ["error", { minScore: 0.8 }]
     expect(perfAssertion[0]).toBe("error");

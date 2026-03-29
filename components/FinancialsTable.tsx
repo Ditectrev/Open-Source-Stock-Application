@@ -36,18 +36,24 @@ function getFavorabilityColors(favorability: Favorability, isDark: boolean) {
     case "favorable":
       return {
         text: isDark ? "text-green-400" : "text-green-600",
-        badge: isDark ? "bg-green-900/60 text-green-300" : "bg-green-100 text-green-700",
+        badge: isDark
+          ? "bg-green-900/60 text-green-300"
+          : "bg-green-100 text-green-700",
       };
     case "unfavorable":
       return {
         text: isDark ? "text-red-400" : "text-red-600",
-        badge: isDark ? "bg-red-900/60 text-red-300" : "bg-red-100 text-red-700",
+        badge: isDark
+          ? "bg-red-900/60 text-red-300"
+          : "bg-red-100 text-red-700",
       };
     case "neutral":
     default:
       return {
         text: isDark ? "text-gray-300" : "text-gray-700",
-        badge: isDark ? "bg-gray-700 text-gray-300" : "bg-gray-100 text-gray-600",
+        badge: isDark
+          ? "bg-gray-700 text-gray-300"
+          : "bg-gray-100 text-gray-600",
       };
   }
 }
@@ -131,7 +137,8 @@ function buildSections(data: FinancialData): MetricSection[] {
           value: formatCurrency(data.keyFacts.netIncome),
           tooltip:
             "The company's total profit after subtracting all expenses, taxes, and costs. Green if positive (profitable), red if negative (loss-making).",
-          favorability: data.keyFacts.netIncome > 0 ? "favorable" : "unfavorable",
+          favorability:
+            data.keyFacts.netIncome > 0 ? "favorable" : "unfavorable",
         },
         {
           label: "Profit Margin",
@@ -215,7 +222,9 @@ function buildSections(data: FinancialData): MetricSection[] {
           value: formatPercent(data.profitability.operatingMargin),
           tooltip:
             "The percentage of revenue remaining after paying operating expenses. Green above 15% (efficient), red below 5% (thin margins), gray in between.",
-          favorability: getMarginFavorability(data.profitability.operatingMargin),
+          favorability: getMarginFavorability(
+            data.profitability.operatingMargin
+          ),
         },
       ],
     },
@@ -340,9 +349,7 @@ function MetricRow({ metric, isDark }: MetricRowProps) {
         isDark ? "border-gray-600" : "border-gray-200"
       }`}
     >
-      <div
-        className="relative flex items-center gap-2"
-      >
+      <div className="relative flex items-center gap-2">
         <span
           className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}
         >
@@ -352,8 +359,8 @@ function MetricRow({ metric, isDark }: MetricRowProps) {
           type="button"
           className={`flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center text-[10px] cursor-help
             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
-            isDark ? "bg-gray-600 text-gray-300" : "bg-gray-200 text-gray-600"
-          }`}
+              isDark ? "bg-gray-600 text-gray-300" : "bg-gray-200 text-gray-600"
+            }`}
           aria-label={`More info about ${metric.label}`}
           onMouseEnter={() => setShowTooltip(true)}
           onMouseLeave={() => setShowTooltip(false)}

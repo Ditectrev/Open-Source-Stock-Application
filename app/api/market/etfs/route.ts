@@ -15,8 +15,8 @@ const PERIOD_MAP: Record<string, string> = {
   "3M": "3mo",
   "1Y": "1y",
   "5Y": "5y",
-  "YTD": "ytd",
-  "MAX": "max",
+  YTD: "ytd",
+  MAX: "max",
 };
 
 export async function GET(request: NextRequest) {

@@ -28,20 +28,20 @@ describe("SymbolHeader", () => {
 
   it("should render symbol and name", () => {
     render(<SymbolHeader symbolData={mockSymbolData} />);
-    
+
     expect(screen.getByText("AAPL")).toBeInTheDocument();
     expect(screen.getByText("Apple Inc.")).toBeInTheDocument();
   });
 
   it("should display current price", () => {
     render(<SymbolHeader symbolData={mockSymbolData} />);
-    
+
     expect(screen.getByText("$150.25")).toBeInTheDocument();
   });
 
   it("should display positive change with green color", () => {
     render(<SymbolHeader symbolData={mockSymbolData} />);
-    
+
     const changeElement = screen.getByText(/\+2\.50/);
     expect(changeElement).toBeInTheDocument();
     expect(changeElement).toHaveClass("text-green-600");
@@ -53,9 +53,9 @@ describe("SymbolHeader", () => {
       change: -2.5,
       changePercent: -1.69,
     };
-    
+
     render(<SymbolHeader symbolData={negativeData} />);
-    
+
     const changeElement = screen.getByText(/-2\.50/);
     expect(changeElement).toBeInTheDocument();
     expect(changeElement).toHaveClass("text-red-600");
@@ -63,13 +63,13 @@ describe("SymbolHeader", () => {
 
   it("should display change percentage", () => {
     render(<SymbolHeader symbolData={mockSymbolData} />);
-    
+
     expect(screen.getByText(/\+1\.69%/)).toBeInTheDocument();
   });
 
   it("should display last updated timestamp", () => {
     render(<SymbolHeader symbolData={mockSymbolData} />);
-    
+
     expect(screen.getByText(/Last updated:/)).toBeInTheDocument();
   });
 
@@ -79,9 +79,9 @@ describe("SymbolHeader", () => {
       change: 0,
       changePercent: 0,
     };
-    
+
     render(<SymbolHeader symbolData={zeroChangeData} />);
-    
+
     expect(screen.getByText(/\+0\.00/)).toBeInTheDocument();
   });
 });

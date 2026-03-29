@@ -66,7 +66,7 @@ global.fetch = vi.fn(() =>
   Promise.resolve({
     ok: true,
     json: () => Promise.resolve({ success: true, data: [] }),
-  } as Response),
+  } as Response)
 );
 
 // ---------------------------------------------------------------------------
@@ -93,7 +93,6 @@ import { SectorHub } from "../SectorHub";
 import { CalendarHub } from "../CalendarHub";
 import { HeatmapHub } from "../HeatmapHub";
 import { ScreenerHub } from "../ScreenerHub";
-
 
 // ---------------------------------------------------------------------------
 // Mock data
@@ -123,9 +122,30 @@ const mockFearGreedData = {
 };
 
 const mockWorldMarketsData = [
-  { name: "S&P 500", symbol: "SPX", value: 4800, change: 25, changePercent: 0.52, region: "Americas" as const },
-  { name: "FTSE 100", symbol: "UKX", value: 7600, change: -10, changePercent: -0.13, region: "Europe" as const },
-  { name: "Nikkei 225", symbol: "NI225", value: 35000, change: 200, changePercent: 0.57, region: "Asia-Pacific" as const },
+  {
+    name: "S&P 500",
+    symbol: "SPX",
+    value: 4800,
+    change: 25,
+    changePercent: 0.52,
+    region: "Americas" as const,
+  },
+  {
+    name: "FTSE 100",
+    symbol: "UKX",
+    value: 7600,
+    change: -10,
+    changePercent: -0.13,
+    region: "Europe" as const,
+  },
+  {
+    name: "Nikkei 225",
+    symbol: "NI225",
+    value: 35000,
+    change: 200,
+    changePercent: 0.57,
+    region: "Asia-Pacific" as const,
+  },
 ];
 
 const mockForecast = {
@@ -137,14 +157,28 @@ const mockForecast = {
 
 const mockIndicators = {
   rsi: { value: 55, signal: "fair" as const },
-  macd: { value: 1.5, signal: 1.2, histogram: 0.3, trend: "underpriced" as const },
+  macd: {
+    value: 1.5,
+    signal: 1.2,
+    histogram: 0.3,
+    trend: "underpriced" as const,
+  },
   movingAverages: { ma50: 155, ma200: 148, signal: "fair" as const },
-  bollingerBands: { upper: 170, middle: 150, lower: 130, signal: "fair" as const },
+  bollingerBands: {
+    upper: 170,
+    middle: 150,
+    lower: 130,
+    signal: "fair" as const,
+  },
   overallSentiment: "fair" as const,
 };
 
 const mockFinancials = {
-  keyFacts: { revenue: 400000000000, netIncome: 100000000000, profitMargin: 0.25 },
+  keyFacts: {
+    revenue: 400000000000,
+    netIncome: 100000000000,
+    profitMargin: 0.25,
+  },
   valuation: { peRatio: 28, pbRatio: 45, pegRatio: 1.5 },
   growth: { revenueGrowth: 0.08, earningsGrowth: 0.12 },
   profitability: { roe: 0.15, roa: 0.06, operatingMargin: 0.3 },
@@ -160,9 +194,24 @@ const mockSeasonalData = {
 };
 
 const mockSectorData = [
-  { sector: "Technology", performance: 25, changePercent: 1.5, constituents: 50 },
-  { sector: "Healthcare", performance: 10, changePercent: -0.3, constituents: 40 },
-  { sector: "Financial", performance: 15, changePercent: 0.8, constituents: 45 },
+  {
+    sector: "Technology",
+    performance: 25,
+    changePercent: 1.5,
+    constituents: 50,
+  },
+  {
+    sector: "Healthcare",
+    performance: 10,
+    changePercent: -0.3,
+    constituents: 40,
+  },
+  {
+    sector: "Financial",
+    performance: 15,
+    changePercent: 0.8,
+    constituents: 45,
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -177,7 +226,9 @@ describe("Axe Accessibility Audit – WCAG 2.1 Level AA", () => {
   });
 
   it("ErrorMessage has no violations", async () => {
-    const { container } = render(<ErrorMessage type="api" onRetry={() => {}} />);
+    const { container } = render(
+      <ErrorMessage type="api" onRetry={() => {}} />
+    );
     const results = await axe(container);
     expect(results).toHaveNoViolations();
   });
@@ -196,7 +247,7 @@ describe("Axe Accessibility Audit – WCAG 2.1 Level AA", () => {
 
   it("TabNavigation has no violations", async () => {
     const { container } = render(
-      <TabNavigation activeTab="overview" onTabChange={vi.fn()} />,
+      <TabNavigation activeTab="overview" onTabChange={vi.fn()} />
     );
     const results = await axe(container);
     expect(results).toHaveNoViolations();
@@ -234,7 +285,10 @@ describe("Axe Accessibility Audit – WCAG 2.1 Level AA", () => {
 
   it("CalendarNavigation has no violations", async () => {
     const { container } = render(
-      <CalendarNavigation activeCalendar="economic" onCalendarChange={vi.fn()} />,
+      <CalendarNavigation
+        activeCalendar="economic"
+        onCalendarChange={vi.fn()}
+      />
     );
     const results = await axe(container);
     expect(results).toHaveNoViolations();
@@ -242,7 +296,7 @@ describe("Axe Accessibility Audit – WCAG 2.1 Level AA", () => {
 
   it("HeatmapNavigation has no violations", async () => {
     const { container } = render(
-      <HeatmapNavigation activeHeatmap="etf" onHeatmapChange={vi.fn()} />,
+      <HeatmapNavigation activeHeatmap="etf" onHeatmapChange={vi.fn()} />
     );
     const results = await axe(container);
     expect(results).toHaveNoViolations();
@@ -256,7 +310,7 @@ describe("Axe Accessibility Audit – WCAG 2.1 Level AA", () => {
 
   it("TechnicalIndicatorsDisplay has no violations", async () => {
     const { container } = render(
-      <TechnicalIndicatorsDisplay indicators={mockIndicators} />,
+      <TechnicalIndicatorsDisplay indicators={mockIndicators} />
     );
     const results = await axe(container);
     expect(results).toHaveNoViolations();
@@ -264,23 +318,21 @@ describe("Axe Accessibility Audit – WCAG 2.1 Level AA", () => {
 
   it("FinancialsTable has no violations", async () => {
     const { container } = render(
-      <FinancialsTable financials={mockFinancials} />,
+      <FinancialsTable financials={mockFinancials} />
     );
     const results = await axe(container);
     expect(results).toHaveNoViolations();
   });
 
   it("SeasonalHeatmap has no violations", async () => {
-    const { container } = render(
-      <SeasonalHeatmap data={mockSeasonalData} />,
-    );
+    const { container } = render(<SeasonalHeatmap data={mockSeasonalData} />);
     const results = await axe(container);
     expect(results).toHaveNoViolations();
   });
 
   it("SectorHub has no violations", async () => {
     const { container } = render(
-      <SectorHub data={mockSectorData} refreshInterval={0} />,
+      <SectorHub data={mockSectorData} refreshInterval={0} />
     );
     const results = await axe(container);
     expect(results).toHaveNoViolations();

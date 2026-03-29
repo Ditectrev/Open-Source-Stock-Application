@@ -19,7 +19,7 @@ export async function GET() {
         data: presets,
         timestamp: new Date(),
       },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error) {
     logger.error("Failed to fetch screener presets", error as Error);
@@ -28,12 +28,10 @@ export async function GET() {
       {
         success: false,
         error:
-          error instanceof Error
-            ? error.message
-            : "Failed to fetch presets",
+          error instanceof Error ? error.message : "Failed to fetch presets",
         timestamp: new Date(),
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -51,11 +49,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error:
-            "Name and at least one filter are required",
+          error: "Name and at least one filter are required",
           timestamp: new Date(),
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -74,7 +71,7 @@ export async function POST(request: NextRequest) {
         data: preset,
         timestamp: new Date(),
       },
-      { status: 201 },
+      { status: 201 }
     );
   } catch (error) {
     logger.error("Failed to save screener preset", error as Error);
@@ -82,13 +79,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to save preset",
+        error: error instanceof Error ? error.message : "Failed to save preset",
         timestamp: new Date(),
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

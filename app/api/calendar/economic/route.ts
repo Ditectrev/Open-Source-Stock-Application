@@ -16,7 +16,10 @@ export async function GET(request: NextRequest) {
     const country = searchParams.get("country") || undefined;
     const rawImportance = searchParams.get("importance");
     const importance =
-      rawImportance && VALID_IMPORTANCE.includes(rawImportance as (typeof VALID_IMPORTANCE)[number])
+      rawImportance &&
+      VALID_IMPORTANCE.includes(
+        rawImportance as (typeof VALID_IMPORTANCE)[number]
+      )
         ? (rawImportance as "high" | "medium" | "low")
         : undefined;
 
@@ -33,7 +36,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Failed to fetch economic events",
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch economic events",
         timestamp: new Date(),
       },
       { status: 500 }

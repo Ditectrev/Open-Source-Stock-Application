@@ -44,7 +44,7 @@ function resultsToCsv(results: ScreenerResult[]): string {
       r.earningsGrowth ?? "",
       r.valuationContext,
       r.matchScore,
-    ].join(","),
+    ].join(",")
   );
 
   return [headers.join(","), ...rows].join("\n");
@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
             error: "Invalid filters parameter",
             timestamp: new Date(),
           },
-          { status: 400 },
+          { status: 400 }
         );
       }
     }
@@ -78,8 +78,7 @@ export async function GET(request: NextRequest) {
       status: 200,
       headers: {
         "Content-Type": "text/csv",
-        "Content-Disposition":
-          'attachment; filename="screener-results.csv"',
+        "Content-Disposition": 'attachment; filename="screener-results.csv"',
       },
     });
   } catch (error) {
@@ -94,7 +93,7 @@ export async function GET(request: NextRequest) {
             : "Failed to export screener results",
         timestamp: new Date(),
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

@@ -92,12 +92,8 @@ describe("ETFHeatmap", () => {
   it("should display ETF symbols and change percentages", () => {
     render(<ETFHeatmap />);
     expect(screen.getByTestId("heatmap-symbol-SPY").textContent).toBe("SPY");
-    expect(screen.getByTestId("heatmap-change-SPY").textContent).toBe(
-      "+1.20%"
-    );
-    expect(screen.getByTestId("heatmap-change-QQQ").textContent).toBe(
-      "-0.80%"
-    );
+    expect(screen.getByTestId("heatmap-change-SPY").textContent).toBe("+1.20%");
+    expect(screen.getByTestId("heatmap-change-QQQ").textContent).toBe("-0.80%");
   });
 
   it("should call onETFClick when a tile is clicked", () => {

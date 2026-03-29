@@ -4,28 +4,28 @@
  * Task 6.4 - Requirements: 4.2, 11.2, 11.4
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { ChartComponent } from '../ChartComponent';
-import { ThemeProvider } from '@/lib/theme-context';
-import { PriceData, ChartIndicator } from '@/types';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { ChartComponent } from "../ChartComponent";
+import { ThemeProvider } from "@/lib/theme-context";
+import { PriceData, ChartIndicator } from "@/types";
 
 // Mock data generator
 const generateMockData = (days: number = 30): PriceData[] => {
   const data: PriceData[] = [];
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - days);
-  
+
   let price = 100;
-  
+
   for (let i = 0; i < days; i++) {
     const date = new Date(startDate);
     date.setDate(date.getDate() + i);
-    
+
     const change = (Math.random() - 0.5) * 5;
     const open = price;
     const close = price + change;
-    
+
     data.push({
       timestamp: date,
       open,
@@ -34,10 +34,10 @@ const generateMockData = (days: number = 30): PriceData[] => {
       close,
       volume: Math.floor(Math.random() * 10000000) + 1000000,
     });
-    
+
     price = close;
   }
-  
+
   return data;
 };
 
@@ -48,65 +48,65 @@ const ChartWithTheme = (props: any) => (
   </ThemeProvider>
 );
 
-describe('ChartComponent', () => {
+describe("ChartComponent", () => {
   const mockData = generateMockData(365);
-  
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe('Chart Type Switching', () => {
-    it('should render with default line chart type', () => {
+  describe("Chart Type Switching", () => {
+    it("should render with default line chart type", () => {
       render(<ChartWithTheme data={mockData} type="line" />);
-      
-      const lineButton = screen.getByText('Line');
-      expect(lineButton).toHaveClass('bg-blue-600');
+
+      const lineButton = screen.getByText("Line");
+      expect(lineButton).toHaveClass("bg-blue-600");
     });
 
-    it('should switch to area chart when Area button is clicked', async () => {
+    it("should switch to area chart when Area button is clicked", async () => {
       render(<ChartWithTheme data={mockData} type="line" />);
-      
-      const areaButton = screen.getByText('Area');
+
+      const areaButton = screen.getByText("Area");
       fireEvent.click(areaButton);
-      
+
       await waitFor(() => {
-        expect(areaButton).toHaveClass('bg-blue-600');
+        expect(areaButton).toHaveClass("bg-blue-600");
       });
     });
 
-    it('should switch to candlestick chart when Candles button is clicked', async () => {
+    it("should switch to candlestick chart when Candles button is clicked", async () => {
       render(<ChartWithTheme data={mockData} type="line" />);
-      
-      const candlesButton = screen.getByText('Candles');
+
+      const candlesButton = screen.getByText("Candles");
       fireEvent.click(candlesButton);
-      
+
       await waitFor(() => {
-        expect(candlesButton).toHaveClass('bg-blue-600');
+        expect(candlesButton).toHaveClass("bg-blue-600");
       });
     });
 
-    it('should maintain selected chart type after switching', async () => {
+    it("should maintain selected chart type after switching", async () => {
       render(<ChartWithTheme data={mockData} type="line" />);
-      
-      const areaButton = screen.getByText('Area');
+
+      const areaButton = screen.getByText("Area");
       fireEvent.click(areaButton);
-      
+
       await waitFor(() => {
-        expect(areaButton).toHaveClass('bg-blue-600');
-        expect(screen.getByText('Line')).not.toHaveClass('bg-blue-600');
+        expect(areaButton).toHaveClass("bg-blue-600");
+        expect(screen.getByText("Line")).not.toHaveClass("bg-blue-600");
       });
     });
   });
 
-  describe('Time Range Changes', () => {
-    it('should render with default time range', () => {
+  describe("Time Range Changes", () => {
+    it("should render with default time range", () => {
       render(<ChartWithTheme data={mockData} initialTimeRange="1M" />);
-      
-      const oneMonthButton = screen.getByText('1M');
-      expect(oneMonthButton).toHaveClass('bg-blue-600');
+
+      const oneMonthButton = screen.getByText("1M");
+      expect(oneMonthButton).toHaveClass("bg-blue-600");
     });
 
-    it('should switch time range when button is clicked', async () => {
+    it("should switch time range when button is clicked", async () => {
       const onTimeRangeChange = vi.fn();
       render(
         <ChartWithTheme
@@ -115,133 +115,129 @@ describe('ChartComponent', () => {
           onTimeRangeChange={onTimeRangeChange}
         />
       );
-      
-      const oneWeekButton = screen.getByText('1W');
+
+      const oneWeekButton = screen.getByText("1W");
       fireEvent.click(oneWeekButton);
-      
+
       await waitFor(() => {
-        expect(oneWeekButton).toHaveClass('bg-blue-600');
-        expect(onTimeRangeChange).toHaveBeenCalledWith('1W');
+        expect(oneWeekButton).toHaveClass("bg-blue-600");
+        expect(onTimeRangeChange).toHaveBeenCalledWith("1W");
       });
     });
 
-    it('should render all time range options', () => {
+    it("should render all time range options", () => {
       render(<ChartWithTheme data={mockData} />);
-      
-      expect(screen.getByText('1D')).toBeInTheDocument();
-      expect(screen.getByText('1W')).toBeInTheDocument();
-      expect(screen.getByText('1M')).toBeInTheDocument();
-      expect(screen.getByText('3M')).toBeInTheDocument();
-      expect(screen.getByText('1Y')).toBeInTheDocument();
-      expect(screen.getByText('5Y')).toBeInTheDocument();
-      expect(screen.getByText('Max')).toBeInTheDocument();
+
+      expect(screen.getByText("1D")).toBeInTheDocument();
+      expect(screen.getByText("1W")).toBeInTheDocument();
+      expect(screen.getByText("1M")).toBeInTheDocument();
+      expect(screen.getByText("3M")).toBeInTheDocument();
+      expect(screen.getByText("1Y")).toBeInTheDocument();
+      expect(screen.getByText("5Y")).toBeInTheDocument();
+      expect(screen.getByText("Max")).toBeInTheDocument();
     });
 
-    it('should call onTimeRangeChange callback with correct range', async () => {
+    it("should call onTimeRangeChange callback with correct range", async () => {
       const onTimeRangeChange = vi.fn();
       render(
-        <ChartWithTheme
-          data={mockData}
-          onTimeRangeChange={onTimeRangeChange}
-        />
+        <ChartWithTheme data={mockData} onTimeRangeChange={onTimeRangeChange} />
       );
-      
-      fireEvent.click(screen.getByText('1Y'));
-      
+
+      fireEvent.click(screen.getByText("1Y"));
+
       await waitFor(() => {
-        expect(onTimeRangeChange).toHaveBeenCalledWith('1Y');
+        expect(onTimeRangeChange).toHaveBeenCalledWith("1Y");
       });
     });
   });
 
-  describe('Indicator Toggles', () => {
-    it('should render chart with indicators', () => {
+  describe("Indicator Toggles", () => {
+    it("should render chart with indicators", () => {
       const indicators: ChartIndicator[] = [
-        { type: 'MA', period: 50, color: '#FF6B6B', visible: true },
+        { type: "MA", period: 50, color: "#FF6B6B", visible: true },
       ];
-      
+
       render(<ChartWithTheme data={mockData} indicators={indicators} />);
-      
+
       // Chart should render without errors
-      expect(screen.getByText('Line')).toBeInTheDocument();
+      expect(screen.getByText("Line")).toBeInTheDocument();
     });
 
-    it('should handle multiple indicators', () => {
+    it("should handle multiple indicators", () => {
       const indicators: ChartIndicator[] = [
-        { type: 'MA', period: 50, color: '#FF6B6B', visible: true },
-        { type: 'EMA', period: 20, color: '#4ECDC4', visible: true },
+        { type: "MA", period: 50, color: "#FF6B6B", visible: true },
+        { type: "EMA", period: 20, color: "#4ECDC4", visible: true },
       ];
-      
+
       render(<ChartWithTheme data={mockData} indicators={indicators} />);
-      
-      expect(screen.getByText('Line')).toBeInTheDocument();
+
+      expect(screen.getByText("Line")).toBeInTheDocument();
     });
 
-    it('should not render invisible indicators', () => {
+    it("should not render invisible indicators", () => {
       const indicators: ChartIndicator[] = [
-        { type: 'MA', period: 50, color: '#FF6B6B', visible: false },
+        { type: "MA", period: 50, color: "#FF6B6B", visible: false },
       ];
-      
+
       render(<ChartWithTheme data={mockData} indicators={indicators} />);
-      
+
       // Chart should render without errors
-      expect(screen.getByText('Line')).toBeInTheDocument();
+      expect(screen.getByText("Line")).toBeInTheDocument();
     });
   });
 
-  describe('Error Handling', () => {
-    it('should display error message when data is empty', () => {
+  describe("Error Handling", () => {
+    it("should display error message when data is empty", () => {
       render(<ChartWithTheme data={[]} />);
-      
-      expect(screen.getByText('No data available')).toBeInTheDocument();
+
+      expect(screen.getByText("No data available")).toBeInTheDocument();
     });
 
-    it('should display error message when data is invalid', () => {
+    it("should display error message when data is invalid", () => {
       render(<ChartWithTheme data={null as any} />);
-      
-      expect(screen.getByText('No data available')).toBeInTheDocument();
+
+      expect(screen.getByText("No data available")).toBeInTheDocument();
     });
   });
 
-  describe('Responsive Behavior', () => {
-    it('should render with custom height', () => {
+  describe("Responsive Behavior", () => {
+    it("should render with custom height", () => {
       const { container } = render(
         <ChartWithTheme data={mockData} height={600} />
       );
-      
-      const chartWrapper = container.querySelector('.chart-wrapper');
-      expect(chartWrapper).toHaveStyle({ height: '600px' });
+
+      const chartWrapper = container.querySelector(".chart-wrapper");
+      expect(chartWrapper).toHaveStyle({ height: "600px" });
     });
 
-    it('should render with default height when not specified', () => {
+    it("should render with default height when not specified", () => {
       const { container } = render(<ChartWithTheme data={mockData} />);
-      
-      const chartWrapper = container.querySelector('.chart-wrapper');
-      expect(chartWrapper).toHaveStyle({ height: '400px' });
+
+      const chartWrapper = container.querySelector(".chart-wrapper");
+      expect(chartWrapper).toHaveStyle({ height: "400px" });
     });
   });
 
-  describe('Data Point Hover', () => {
-    it('should call onDataPointHover callback when hovering', async () => {
+  describe("Data Point Hover", () => {
+    it("should call onDataPointHover callback when hovering", async () => {
       const onDataPointHover = vi.fn();
       render(
-        <ChartWithTheme
-          data={mockData}
-          onDataPointHover={onDataPointHover}
-        />
+        <ChartWithTheme data={mockData} onDataPointHover={onDataPointHover} />
       );
-      
+
       // Chart should render
-      expect(screen.getByText('Line')).toBeInTheDocument();
+      expect(screen.getByText("Line")).toBeInTheDocument();
     });
   });
 
-  describe('Chart Instructions', () => {
-    it('should display usage instructions', () => {
+  describe("Chart Instructions", () => {
+    it("should display usage instructions", () => {
       render(<ChartWithTheme data={mockData} />);
-      
+
       expect(
-        screen.getByText(/Use mouse wheel to zoom, drag to pan, hover for details/)
+        screen.getByText(
+          /Use mouse wheel to zoom, drag to pan, hover for details/
+        )
       ).toBeInTheDocument();
     });
   });

@@ -86,14 +86,10 @@ test.describe("Market Heatmap", () => {
     const grid = page.getByTestId("heatmap-grid");
     await expect(grid).toBeVisible({ timeout: 15000 });
 
-    const firstTile = grid
-      .locator("[data-testid^='heatmap-tile-']")
-      .first();
+    const firstTile = grid.locator("[data-testid^='heatmap-tile-']").first();
     await firstTile.hover();
 
-    const tooltip = grid
-      .locator("[data-testid^='heatmap-tooltip-']")
-      .first();
+    const tooltip = grid.locator("[data-testid^='heatmap-tooltip-']").first();
     await expect(tooltip).toBeVisible({ timeout: 3000 });
   });
 
@@ -107,9 +103,7 @@ test.describe("Market Heatmap", () => {
     await expect(legend.getByText("Strong gain")).toBeVisible();
   });
 
-  test("should show loading state while data is fetching", async ({
-    page,
-  }) => {
+  test("should show loading state while data is fetching", async ({ page }) => {
     await page.route("**/api/market/sectors*", async (route) => {
       await new Promise((r) => setTimeout(r, 3000));
       await route.continue();

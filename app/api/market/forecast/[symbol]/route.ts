@@ -37,7 +37,10 @@ export async function GET(
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Failed to fetch forecast data",
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch forecast data",
         timestamp: new Date(),
       },
       { status: 500 }

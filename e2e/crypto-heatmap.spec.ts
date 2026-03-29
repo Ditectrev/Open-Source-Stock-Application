@@ -112,16 +112,7 @@ test.describe("Crypto Heatmap", () => {
     const cryptoHeatmap = page.getByTestId("crypto-heatmap");
     await expect(cryptoHeatmap).toBeVisible({ timeout: 15000 });
 
-    for (const period of [
-      "1D",
-      "1W",
-      "1M",
-      "3M",
-      "1Y",
-      "5Y",
-      "YTD",
-      "MAX",
-    ]) {
+    for (const period of ["1D", "1W", "1M", "3M", "1Y", "5Y", "YTD", "MAX"]) {
       await expect(
         cryptoHeatmap.getByTestId(`heatmap-period-${period}`)
       ).toBeVisible();
@@ -147,9 +138,6 @@ test.describe("Crypto Heatmap", () => {
 
     const group = page.getByTestId("crypto-category-filter");
     await expect(group).toHaveAttribute("role", "group");
-    await expect(group).toHaveAttribute(
-      "aria-label",
-      "Crypto category filter"
-    );
+    await expect(group).toHaveAttribute("aria-label", "Crypto category filter");
   });
 });

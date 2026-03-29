@@ -10,10 +10,7 @@
 
 import { useState } from "react";
 import { useTheme } from "@/lib/theme-context";
-import {
-  HeatmapNavigation,
-  HeatmapType,
-} from "@/components/HeatmapNavigation";
+import { HeatmapNavigation, HeatmapType } from "@/components/HeatmapNavigation";
 import { ETFHeatmap } from "@/components/ETFHeatmap";
 import { CryptoHeatmap } from "@/components/CryptoHeatmap";
 import { StockHeatmap } from "@/components/StockHeatmap";

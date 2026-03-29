@@ -72,7 +72,12 @@ const mockPresets = [
     name: "Day Gainers",
     description: "Stocks with the highest daily gains",
     filters: [
-      { field: "changePercent", operator: "gt", value: 3, label: "Change > 3%" },
+      {
+        field: "changePercent",
+        operator: "gt",
+        value: 3,
+        label: "Change > 3%",
+      },
     ],
     isDefault: true,
     createdAt: new Date(),
@@ -101,12 +106,22 @@ describe("POST /api/screener/search", () => {
   it("should return results for valid filters", async () => {
     (screenerService.fetchScreenerData as any).mockResolvedValue(mockResults);
 
-    const request = new NextRequest("http://localhost:3000/api/screener/search", {
-      method: "POST",
-      body: JSON.stringify({
-        filters: [{ field: "price", operator: "gt", value: 100, label: "Price > $100" }],
-      }),
-    });
+    const request = new NextRequest(
+      "http://localhost:3000/api/screener/search",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          filters: [
+            {
+              field: "price",
+              operator: "gt",
+              value: 100,
+              label: "Price > $100",
+            },
+          ],
+        }),
+      }
+    );
 
     const response = await POST(request);
     const data = await response.json();
@@ -121,10 +136,13 @@ describe("POST /api/screener/search", () => {
     (screenerService.fetchScreenerData as any).mockResolvedValue(mockResults);
     (screenerService.getDefaultPresets as any).mockReturnValue(mockPresets);
 
-    const request = new NextRequest("http://localhost:3000/api/screener/search", {
-      method: "POST",
-      body: JSON.stringify({ filters: [], preset: "day-gainers" }),
-    });
+    const request = new NextRequest(
+      "http://localhost:3000/api/screener/search",
+      {
+        method: "POST",
+        body: JSON.stringify({ filters: [], preset: "day-gainers" }),
+      }
+    );
 
     const response = await POST(request);
     const data = await response.json();
@@ -132,7 +150,7 @@ describe("POST /api/screener/search", () => {
     expect(response.status).toBe(200);
     expect(data.success).toBe(true);
     expect(screenerService.fetchScreenerData).toHaveBeenCalledWith(
-      mockPresets[0].filters,
+      mockPresets[0].filters
     );
   });
 
@@ -140,11 +158,16 @@ describe("POST /api/screener/search", () => {
     (screenerService.fetchScreenerData as any).mockResolvedValue([]);
     (screenerService.getDefaultPresets as any).mockReturnValue(mockPresets);
 
-    const filters = [{ field: "price", operator: "lt", value: 5, label: "Price < $5" }];
-    const request = new NextRequest("http://localhost:3000/api/screener/search", {
-      method: "POST",
-      body: JSON.stringify({ filters, preset: "nonexistent" }),
-    });
+    const filters = [
+      { field: "price", operator: "lt", value: 5, label: "Price < $5" },
+    ];
+    const request = new NextRequest(
+      "http://localhost:3000/api/screener/search",
+      {
+        method: "POST",
+        body: JSON.stringify({ filters, preset: "nonexistent" }),
+      }
+    );
 
     const response = await POST(request);
 
@@ -155,10 +178,13 @@ describe("POST /api/screener/search", () => {
   it("should default to empty filters when none provided", async () => {
     (screenerService.fetchScreenerData as any).mockResolvedValue(mockResults);
 
-    const request = new NextRequest("http://localhost:3000/api/screener/search", {
-      method: "POST",
-      body: JSON.stringify({}),
-    });
+    const request = new NextRequest(
+      "http://localhost:3000/api/screener/search",
+      {
+        method: "POST",
+        body: JSON.stringify({}),
+      }
+    );
 
     const response = await POST(request);
     const data = await response.json();
@@ -169,17 +195,32 @@ describe("POST /api/screener/search", () => {
   });
 
   it("should pass multiple filters to service for AND logic (Req 26.8)", async () => {
-    (screenerService.fetchScreenerData as any).mockResolvedValue([mockResults[0]]);
+    (screenerService.fetchScreenerData as any).mockResolvedValue([
+      mockResults[0],
+    ]);
 
     const filters = [
-      { field: "sector", operator: "eq", value: "Technology", label: "Sector = Tech" },
+      {
+        field: "sector",
+        operator: "eq",
+        value: "Technology",
+        label: "Sector = Tech",
+      },
       { field: "price", operator: "gt", value: 100, label: "Price > $100" },
-      { field: "volume", operator: "gte", value: 1_000_000, label: "Vol >= 1M" },
+      {
+        field: "volume",
+        operator: "gte",
+        value: 1_000_000,
+        label: "Vol >= 1M",
+      },
     ];
-    const request = new NextRequest("http://localhost:3000/api/screener/search", {
-      method: "POST",
-      body: JSON.stringify({ filters }),
-    });
+    const request = new NextRequest(
+      "http://localhost:3000/api/screener/search",
+      {
+        method: "POST",
+        body: JSON.stringify({ filters }),
+      }
+    );
 
     const response = await POST(request);
     const data = await response.json();
@@ -193,30 +234,38 @@ describe("POST /api/screener/search", () => {
     (screenerService.fetchScreenerData as any).mockResolvedValue(mockResults);
     (screenerService.getDefaultPresets as any).mockReturnValue(mockPresets);
 
-    const request = new NextRequest("http://localhost:3000/api/screener/search", {
-      method: "POST",
-      body: JSON.stringify({
-        filters: [{ field: "price", operator: "gt", value: 999, label: "ignored" }],
-        preset: "day-gainers",
-      }),
-    });
+    const request = new NextRequest(
+      "http://localhost:3000/api/screener/search",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          filters: [
+            { field: "price", operator: "gt", value: 999, label: "ignored" },
+          ],
+          preset: "day-gainers",
+        }),
+      }
+    );
 
     await POST(request);
 
     expect(screenerService.fetchScreenerData).toHaveBeenCalledWith(
-      mockPresets[0].filters,
+      mockPresets[0].filters
     );
   });
 
   it("should return 500 on service error", async () => {
     (screenerService.fetchScreenerData as any).mockRejectedValue(
-      new Error("Service unavailable"),
+      new Error("Service unavailable")
     );
 
-    const request = new NextRequest("http://localhost:3000/api/screener/search", {
-      method: "POST",
-      body: JSON.stringify({ filters: [] }),
-    });
+    const request = new NextRequest(
+      "http://localhost:3000/api/screener/search",
+      {
+        method: "POST",
+        body: JSON.stringify({ filters: [] }),
+      }
+    );
 
     const response = await POST(request);
     const data = await response.json();
@@ -229,10 +278,13 @@ describe("POST /api/screener/search", () => {
   it("should return 500 with generic message for non-Error throws", async () => {
     (screenerService.fetchScreenerData as any).mockRejectedValue("unknown");
 
-    const request = new NextRequest("http://localhost:3000/api/screener/search", {
-      method: "POST",
-      body: JSON.stringify({ filters: [] }),
-    });
+    const request = new NextRequest(
+      "http://localhost:3000/api/screener/search",
+      {
+        method: "POST",
+        body: JSON.stringify({ filters: [] }),
+      }
+    );
 
     const response = await POST(request);
     const data = await response.json();
@@ -315,14 +367,19 @@ describe("POST /api/screener/presets", () => {
   });
 
   it("should create a custom preset", async () => {
-    const request = new NextRequest("http://localhost:3000/api/screener/presets", {
-      method: "POST",
-      body: JSON.stringify({
-        name: "My Custom Preset",
-        description: "Custom filter combo",
-        filters: [{ field: "price", operator: "gt", value: 50, label: "Price > $50" }],
-      }),
-    });
+    const request = new NextRequest(
+      "http://localhost:3000/api/screener/presets",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          name: "My Custom Preset",
+          description: "Custom filter combo",
+          filters: [
+            { field: "price", operator: "gt", value: 50, label: "Price > $50" },
+          ],
+        }),
+      }
+    );
 
     const response = await POST(request);
     const data = await response.json();
@@ -337,12 +394,17 @@ describe("POST /api/screener/presets", () => {
   });
 
   it("should return 400 when name is missing", async () => {
-    const request = new NextRequest("http://localhost:3000/api/screener/presets", {
-      method: "POST",
-      body: JSON.stringify({
-        filters: [{ field: "price", operator: "gt", value: 50, label: "Price > $50" }],
-      }),
-    });
+    const request = new NextRequest(
+      "http://localhost:3000/api/screener/presets",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          filters: [
+            { field: "price", operator: "gt", value: 50, label: "Price > $50" },
+          ],
+        }),
+      }
+    );
 
     const response = await POST(request);
     const data = await response.json();
@@ -352,10 +414,13 @@ describe("POST /api/screener/presets", () => {
   });
 
   it("should return 400 when filters are empty", async () => {
-    const request = new NextRequest("http://localhost:3000/api/screener/presets", {
-      method: "POST",
-      body: JSON.stringify({ name: "Test", filters: [] }),
-    });
+    const request = new NextRequest(
+      "http://localhost:3000/api/screener/presets",
+      {
+        method: "POST",
+        body: JSON.stringify({ name: "Test", filters: [] }),
+      }
+    );
 
     const response = await POST(request);
     const data = await response.json();
@@ -365,10 +430,13 @@ describe("POST /api/screener/presets", () => {
   });
 
   it("should return 400 when filters are missing", async () => {
-    const request = new NextRequest("http://localhost:3000/api/screener/presets", {
-      method: "POST",
-      body: JSON.stringify({ name: "Test" }),
-    });
+    const request = new NextRequest(
+      "http://localhost:3000/api/screener/presets",
+      {
+        method: "POST",
+        body: JSON.stringify({ name: "Test" }),
+      }
+    );
 
     const response = await POST(request);
     const data = await response.json();
@@ -380,13 +448,26 @@ describe("POST /api/screener/presets", () => {
   it("should preserve exact filter combination in saved preset (Req 26.15)", async () => {
     const filters = [
       { field: "peRatio", operator: "lt", value: 15, label: "P/E < 15" },
-      { field: "sector", operator: "in", value: ["Technology", "Healthcare"], label: "Sector in list" },
-      { field: "price", operator: "between", value: [10, 200], label: "Price $10-$200" },
+      {
+        field: "sector",
+        operator: "in",
+        value: ["Technology", "Healthcare"],
+        label: "Sector in list",
+      },
+      {
+        field: "price",
+        operator: "between",
+        value: [10, 200],
+        label: "Price $10-$200",
+      },
     ];
-    const request = new NextRequest("http://localhost:3000/api/screener/presets", {
-      method: "POST",
-      body: JSON.stringify({ name: "Round Trip", filters }),
-    });
+    const request = new NextRequest(
+      "http://localhost:3000/api/screener/presets",
+      {
+        method: "POST",
+        body: JSON.stringify({ name: "Round Trip", filters }),
+      }
+    );
 
     const response = await POST(request);
     const data = await response.json();
@@ -396,13 +477,18 @@ describe("POST /api/screener/presets", () => {
   });
 
   it("should default description to empty string when omitted", async () => {
-    const request = new NextRequest("http://localhost:3000/api/screener/presets", {
-      method: "POST",
-      body: JSON.stringify({
-        name: "No Desc",
-        filters: [{ field: "price", operator: "gt", value: 1, label: "Price > $1" }],
-      }),
-    });
+    const request = new NextRequest(
+      "http://localhost:3000/api/screener/presets",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          name: "No Desc",
+          filters: [
+            { field: "price", operator: "gt", value: 1, label: "Price > $1" },
+          ],
+        }),
+      }
+    );
 
     const response = await POST(request);
     const data = await response.json();
@@ -412,13 +498,23 @@ describe("POST /api/screener/presets", () => {
   });
 
   it("should generate kebab-case id from name with spaces", async () => {
-    const request = new NextRequest("http://localhost:3000/api/screener/presets", {
-      method: "POST",
-      body: JSON.stringify({
-        name: "High  Growth  Tech",
-        filters: [{ field: "sector", operator: "eq", value: "Technology", label: "Tech" }],
-      }),
-    });
+    const request = new NextRequest(
+      "http://localhost:3000/api/screener/presets",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          name: "High  Growth  Tech",
+          filters: [
+            {
+              field: "sector",
+              operator: "eq",
+              value: "Technology",
+              label: "Tech",
+            },
+          ],
+        }),
+      }
+    );
 
     const response = await POST(request);
     const data = await response.json();
@@ -439,7 +535,9 @@ describe("GET /api/screener/export", () => {
   it("should return CSV with correct headers", async () => {
     (screenerService.fetchScreenerData as any).mockResolvedValue(mockResults);
 
-    const request = new NextRequest("http://localhost:3000/api/screener/export");
+    const request = new NextRequest(
+      "http://localhost:3000/api/screener/export"
+    );
 
     const response = await GET(request);
     const text = await response.text();
@@ -447,7 +545,7 @@ describe("GET /api/screener/export", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("Content-Type")).toBe("text/csv");
     expect(response.headers.get("Content-Disposition")).toBe(
-      'attachment; filename="screener-results.csv"',
+      'attachment; filename="screener-results.csv"'
     );
 
     const lines = text.split("\n");
@@ -460,7 +558,9 @@ describe("GET /api/screener/export", () => {
   it("should include result data in CSV rows", async () => {
     (screenerService.fetchScreenerData as any).mockResolvedValue(mockResults);
 
-    const request = new NextRequest("http://localhost:3000/api/screener/export");
+    const request = new NextRequest(
+      "http://localhost:3000/api/screener/export"
+    );
 
     const response = await GET(request);
     const text = await response.text();
@@ -478,7 +578,7 @@ describe("GET /api/screener/export", () => {
       { field: "price", operator: "gt", value: 100, label: "Price > $100" },
     ]);
     const request = new NextRequest(
-      `http://localhost:3000/api/screener/export?filters=${encodeURIComponent(filters)}`,
+      `http://localhost:3000/api/screener/export?filters=${encodeURIComponent(filters)}`
     );
 
     const response = await GET(request);
@@ -491,7 +591,7 @@ describe("GET /api/screener/export", () => {
 
   it("should return 400 for invalid filters JSON", async () => {
     const request = new NextRequest(
-      "http://localhost:3000/api/screener/export?filters=invalid-json",
+      "http://localhost:3000/api/screener/export?filters=invalid-json"
     );
 
     const response = await GET(request);
@@ -504,10 +604,12 @@ describe("GET /api/screener/export", () => {
 
   it("should return 500 on service error", async () => {
     (screenerService.fetchScreenerData as any).mockRejectedValue(
-      new Error("Export failed"),
+      new Error("Export failed")
     );
 
-    const request = new NextRequest("http://localhost:3000/api/screener/export");
+    const request = new NextRequest(
+      "http://localhost:3000/api/screener/export"
+    );
 
     const response = await GET(request);
     const data = await response.json();
@@ -520,7 +622,9 @@ describe("GET /api/screener/export", () => {
   it("should return header-only CSV when no results match", async () => {
     (screenerService.fetchScreenerData as any).mockResolvedValue([]);
 
-    const request = new NextRequest("http://localhost:3000/api/screener/export");
+    const request = new NextRequest(
+      "http://localhost:3000/api/screener/export"
+    );
 
     const response = await GET(request);
     const text = await response.text();
@@ -546,10 +650,12 @@ describe("GET /api/screener/export", () => {
       },
     ];
     (screenerService.fetchScreenerData as any).mockResolvedValue(
-      resultWithoutOptionals,
+      resultWithoutOptionals
     );
 
-    const request = new NextRequest("http://localhost:3000/api/screener/export");
+    const request = new NextRequest(
+      "http://localhost:3000/api/screener/export"
+    );
 
     const response = await GET(request);
     const text = await response.text();
@@ -580,10 +686,12 @@ describe("GET /api/screener/export", () => {
       },
     ];
     (screenerService.fetchScreenerData as any).mockResolvedValue(
-      resultWithQuotes,
+      resultWithQuotes
     );
 
-    const request = new NextRequest("http://localhost:3000/api/screener/export");
+    const request = new NextRequest(
+      "http://localhost:3000/api/screener/export"
+    );
 
     const response = await GET(request);
     const text = await response.text();
@@ -594,7 +702,9 @@ describe("GET /api/screener/export", () => {
   it("should export with no filters when param is absent", async () => {
     (screenerService.fetchScreenerData as any).mockResolvedValue(mockResults);
 
-    const request = new NextRequest("http://localhost:3000/api/screener/export");
+    const request = new NextRequest(
+      "http://localhost:3000/api/screener/export"
+    );
 
     await GET(request);
 

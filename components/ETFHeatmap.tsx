@@ -68,7 +68,11 @@ export function ETFHeatmap({
 
   const apiUrl = `/api/market/etfs?period=${PERIOD_PARAM[timePeriod]}`;
 
-  const { data: response, error, mutate } = useSWR(apiUrl, fetcher, {
+  const {
+    data: response,
+    error,
+    mutate,
+  } = useSWR(apiUrl, fetcher, {
     refreshInterval: refreshInterval > 0 ? refreshInterval : 0,
     revalidateOnFocus: false,
   });
@@ -76,7 +80,7 @@ export function ETFHeatmap({
   const loading = !response && !error;
   const etfData: ETFData[] = useMemo(
     () => (response?.success ? response.data : []),
-    [response],
+    [response]
   );
   const heatmapData = useMemo(() => toHeatmapData(etfData), [etfData]);
 

@@ -100,15 +100,15 @@ describe("MatrixHeatmap", () => {
     render(
       <MatrixHeatmap rows={mockRows} columns={mockColumns} cells={mockCells} />
     );
-    expect(
-      screen.getByTestId("matrix-cell-AAPL-1D").textContent
-    ).toBe("+2.50%");
-    expect(
-      screen.getByTestId("matrix-cell-MSFT-1D").textContent
-    ).toBe("-3.10%");
-    expect(
-      screen.getByTestId("matrix-cell-MSFT-1W").textContent
-    ).toBe("+0.00%");
+    expect(screen.getByTestId("matrix-cell-AAPL-1D").textContent).toBe(
+      "+2.50%"
+    );
+    expect(screen.getByTestId("matrix-cell-MSFT-1D").textContent).toBe(
+      "-3.10%"
+    );
+    expect(screen.getByTestId("matrix-cell-MSFT-1W").textContent).toBe(
+      "+0.00%"
+    );
   });
 
   it("should use displayValue override when provided", () => {
@@ -122,9 +122,9 @@ describe("MatrixHeatmap", () => {
         cells={cells}
       />
     );
-    expect(
-      screen.getByTestId("matrix-cell-AAPL-1D").textContent
-    ).toBe("Custom");
+    expect(screen.getByTestId("matrix-cell-AAPL-1D").textContent).toBe(
+      "Custom"
+    );
   });
 
   // --- Cell color coding (Req 25.11) ---
@@ -283,9 +283,7 @@ describe("MatrixHeatmap", () => {
   // --- Missing cell data ---
 
   it("should render +0.00% for cells with no matching data", () => {
-    render(
-      <MatrixHeatmap rows={mockRows} columns={mockColumns} cells={[]} />
-    );
+    render(<MatrixHeatmap rows={mockRows} columns={mockColumns} cells={[]} />);
     const cell = screen.getByTestId("matrix-cell-AAPL-1D");
     expect(cell.textContent).toBe("+0.00%");
     // Should get neutral color

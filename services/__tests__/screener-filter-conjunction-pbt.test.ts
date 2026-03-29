@@ -19,7 +19,7 @@ import type { ScreenerFilter, ScreenerResult, ValuationContext } from "@/types";
 const valuationArb: fc.Arbitrary<ValuationContext> = fc.constantFrom(
   "overpriced",
   "underpriced",
-  "fair",
+  "fair"
 );
 
 const sectorArb = fc.constantFrom(
@@ -27,7 +27,7 @@ const sectorArb = fc.constantFrom(
   "Healthcare",
   "Energy",
   "Financial",
-  "Consumer Discretionary",
+  "Consumer Discretionary"
 );
 
 const resultArb: fc.Arbitrary<ScreenerResult> = fc
@@ -42,15 +42,9 @@ const resultArb: fc.Arbitrary<ScreenerResult> = fc
     peRatio: fc.option(fc.double({ min: 0, max: 200, noNaN: true })),
     pbRatio: fc.option(fc.double({ min: 0, max: 50, noNaN: true })),
     pegRatio: fc.option(fc.double({ min: 0, max: 10, noNaN: true })),
-    dividendYield: fc.option(
-      fc.double({ min: 0, max: 20, noNaN: true }),
-    ),
-    revenueGrowth: fc.option(
-      fc.double({ min: -100, max: 500, noNaN: true }),
-    ),
-    earningsGrowth: fc.option(
-      fc.double({ min: -100, max: 500, noNaN: true }),
-    ),
+    dividendYield: fc.option(fc.double({ min: 0, max: 20, noNaN: true })),
+    revenueGrowth: fc.option(fc.double({ min: -100, max: 500, noNaN: true })),
+    earningsGrowth: fc.option(fc.double({ min: -100, max: 500, noNaN: true })),
     valuationContext: valuationArb,
     matchScore: fc.integer({ min: 0, max: 100 }),
   })
@@ -69,7 +63,7 @@ const numericFieldArb = fc.constantFrom(
   "price",
   "changePercent",
   "volume",
-  "marketCap",
+  "marketCap"
 );
 
 const numericFilterArb: fc.Arbitrary<ScreenerFilter> = fc.oneof(
@@ -82,7 +76,7 @@ const numericFilterArb: fc.Arbitrary<ScreenerFilter> = fc.oneof(
         "lt" as const,
         "gte" as const,
         "lte" as const,
-        "eq" as const,
+        "eq" as const
       ),
       value: fc.double({ min: -1000, max: 100000, noNaN: true }),
     })
@@ -103,7 +97,7 @@ const numericFilterArb: fc.Arbitrary<ScreenerFilter> = fc.oneof(
         value: [min, max] as [number, number],
         label: `${f.field} between ${min}-${max}`,
       };
-    }),
+    })
 );
 
 const sectorFilterArb: fc.Arbitrary<ScreenerFilter> = fc.oneof(
@@ -124,19 +118,19 @@ const sectorFilterArb: fc.Arbitrary<ScreenerFilter> = fc.oneof(
         "Financial",
         "Consumer Discretionary",
       ],
-      { minLength: 1 },
+      { minLength: 1 }
     )
     .map((sectors) => ({
       field: "sector",
       operator: "in" as const,
       value: sectors,
       label: `sector in [${sectors.join(",")}]`,
-    })),
+    }))
 );
 
 const filterArb: fc.Arbitrary<ScreenerFilter> = fc.oneof(
   { weight: 3, arbitrary: numericFilterArb },
-  { weight: 1, arbitrary: sectorFilterArb },
+  { weight: 1, arbitrary: sectorFilterArb }
 );
 
 // ---------------------------------------------------------------------------
@@ -156,9 +150,9 @@ describe("Property 17: Screener Filter Conjunction", () => {
           for (const r of filtered) {
             expect(screenerService.matchesAllFilters(r, filters)).toBe(true);
           }
-        },
+        }
       ),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
@@ -171,12 +165,11 @@ describe("Property 17: Screener Filter Conjunction", () => {
         (results, filters) => {
           const filtered = screenerService.filterResults(results, filters);
           const filteredSymbols = new Set(
-            filtered.map((r, i) => `${r.symbol}-${i}`),
+            filtered.map((r, i) => `${r.symbol}-${i}`)
           );
 
           const excluded = results.filter(
-            (_, i) =>
-              !filteredSymbols.has(`${results[i].symbol}-${i}`),
+            (_, i) => !filteredSymbols.has(`${results[i].symbol}-${i}`)
           );
 
           // Rebuild excluded set properly via index
@@ -192,13 +185,13 @@ describe("Property 17: Screener Filter Conjunction", () => {
           for (let i = 0; i < results.length; i++) {
             if (!filteredIndices.has(i)) {
               expect(
-                screenerService.matchesAllFilters(results[i], filters),
+                screenerService.matchesAllFilters(results[i], filters)
               ).toBe(false);
             }
           }
-        },
+        }
       ),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
@@ -211,13 +204,13 @@ describe("Property 17: Screener Filter Conjunction", () => {
         (results, filters) => {
           const filtered = screenerService.filterResults(results, filters);
           const manualCount = results.filter((r) =>
-            screenerService.matchesAllFilters(r, filters),
+            screenerService.matchesAllFilters(r, filters)
           ).length;
 
           expect(filtered.length).toBe(manualCount);
-        },
+        }
       ),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
@@ -229,9 +222,9 @@ describe("Property 17: Screener Filter Conjunction", () => {
         (results) => {
           const filtered = screenerService.filterResults(results, []);
           expect(filtered.length).toBe(results.length);
-        },
+        }
       ),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
@@ -245,7 +238,7 @@ describe("Property 17: Screener Filter Conjunction", () => {
         (results, baseFilters, extraFilter) => {
           const baseCount = screenerService.filterResults(
             results,
-            baseFilters,
+            baseFilters
           ).length;
           const stricterCount = screenerService.filterResults(results, [
             ...baseFilters,
@@ -253,9 +246,9 @@ describe("Property 17: Screener Filter Conjunction", () => {
           ]).length;
 
           expect(stricterCount).toBeLessThanOrEqual(baseCount);
-        },
+        }
       ),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
@@ -269,16 +262,16 @@ describe("Property 17: Screener Filter Conjunction", () => {
           const forward = screenerService.filterResults(results, filters);
           const reversed = screenerService.filterResults(
             results,
-            [...filters].reverse(),
+            [...filters].reverse()
           );
 
           expect(forward.length).toBe(reversed.length);
           expect(forward.map((r) => r.symbol)).toEqual(
-            reversed.map((r) => r.symbol),
+            reversed.map((r) => r.symbol)
           );
-        },
+        }
       ),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
@@ -294,9 +287,9 @@ describe("Property 17: Screener Filter Conjunction", () => {
           for (const fr of filtered) {
             expect(results).toContain(fr);
           }
-        },
+        }
       ),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 });

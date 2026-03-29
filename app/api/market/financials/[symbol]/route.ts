@@ -37,7 +37,8 @@ export async function GET(
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Failed to fetch financials",
+        error:
+          error instanceof Error ? error.message : "Failed to fetch financials",
         timestamp: new Date(),
       },
       { status: 500 }

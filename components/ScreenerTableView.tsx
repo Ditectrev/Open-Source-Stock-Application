@@ -70,7 +70,7 @@ function compareValues(
   a: ScreenerResult,
   b: ScreenerResult,
   field: SortField,
-  direction: SortDirection,
+  direction: SortDirection
 ): number {
   const aVal = a[field];
   const bVal = b[field];
@@ -120,24 +120,21 @@ export function ScreenerTableView({
   });
   const [page, setPage] = useState(0);
 
-  const handleSort = useCallback(
-    (field: SortField) => {
-      setSort((prev) => ({
-        field,
-        direction:
-          prev.field === field && prev.direction === "asc" ? "desc" : "asc",
-      }));
-      setPage(0);
-    },
-    [],
-  );
+  const handleSort = useCallback((field: SortField) => {
+    setSort((prev) => ({
+      field,
+      direction:
+        prev.field === field && prev.direction === "asc" ? "desc" : "asc",
+    }));
+    setPage(0);
+  }, []);
 
   const sorted = useMemo(
     () =>
       [...results].sort((a, b) =>
-        compareValues(a, b, sort.field, sort.direction),
+        compareValues(a, b, sort.field, sort.direction)
       ),
-    [results, sort],
+    [results, sort]
   );
 
   const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
@@ -159,7 +156,10 @@ export function ScreenerTableView({
   return (
     <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden">
       <div className="overflow-x-auto -mx-0">
-        <table className="w-full text-sm md:text-sm lg:text-base" aria-label="Screener results">
+        <table
+          className="w-full text-sm md:text-sm lg:text-base"
+          aria-label="Screener results"
+        >
           <thead>
             <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
               {COLUMNS.map((col) => (

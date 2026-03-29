@@ -75,7 +75,10 @@ export class YahooFinanceService {
 
       return { crumb, cookie };
     } catch (error) {
-      logger.warn("Failed to obtain Yahoo Finance crumb, will try without auth", { error });
+      logger.warn(
+        "Failed to obtain Yahoo Finance crumb, will try without auth",
+        { error }
+      );
       return { crumb: "", cookie: "" };
     }
   }
@@ -83,7 +86,10 @@ export class YahooFinanceService {
   /**
    * Fetch from quoteSummary with crumb authentication
    */
-  private async fetchQuoteSummary(symbol: string, modules: string): Promise<any> {
+  private async fetchQuoteSummary(
+    symbol: string,
+    modules: string
+  ): Promise<any> {
     const { crumb, cookie } = await getCrumbSafe(this);
 
     const url = crumb
@@ -91,7 +97,7 @@ export class YahooFinanceService {
       : `${this.baseUrl}/v10/finance/quoteSummary/${symbol}?modules=${modules}`;
 
     const headers: Record<string, string> = {
-      "Accept": "application/json",
+      Accept: "application/json",
       "User-Agent": "Mozilla/5.0",
     };
     if (cookie) {
@@ -101,7 +107,9 @@ export class YahooFinanceService {
     const response = await fetch(url, { headers });
 
     if (!response.ok) {
-      throw new Error(`Yahoo Finance API error: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Yahoo Finance API error: ${response.status} ${response.statusText}`
+      );
     }
 
     const data = await response.json();
@@ -117,178 +125,176 @@ export class YahooFinanceService {
    * Fetch symbol quote data
    */
   async getSymbolQuote(symbol: string): Promise<SymbolData> {
-    return retryWithBackoff(
-      async () => {
-        try {
-          const response = await fetch(
-            `${this.baseUrl}/v8/finance/quote?symbols=${symbol}`,
-            {
-              headers: {
-                "Accept": "application/json",
-                "User-Agent": "Mozilla/5.0",
-              },
-            }
+    return retryWithBackoff(async () => {
+      try {
+        const response = await fetch(
+          `${this.baseUrl}/v8/finance/quote?symbols=${symbol}`,
+          {
+            headers: {
+              Accept: "application/json",
+              "User-Agent": "Mozilla/5.0",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            `Yahoo Finance API error: ${response.status} ${response.statusText}`
           );
-
-          if (!response.ok) {
-            throw new Error(`Yahoo Finance API error: ${response.status} ${response.statusText}`);
-          }
-
-          const data = await response.json();
-          
-          if (!data.quoteResponse?.result?.[0]) {
-            throw new Error(`Symbol not found: ${symbol}`);
-          }
-
-          return this.parseQuoteResponse(data.quoteResponse.result[0]);
-        } catch (error) {
-          logger.error("Failed to fetch symbol quote", error as Error, {
-            symbol,
-            baseUrl: this.baseUrl,
-          });
-          throw error;
         }
-      },
-      `YahooFinance:Quote:${symbol}`
-    );
+
+        const data = await response.json();
+
+        if (!data.quoteResponse?.result?.[0]) {
+          throw new Error(`Symbol not found: ${symbol}`);
+        }
+
+        return this.parseQuoteResponse(data.quoteResponse.result[0]);
+      } catch (error) {
+        logger.error("Failed to fetch symbol quote", error as Error, {
+          symbol,
+          baseUrl: this.baseUrl,
+        });
+        throw error;
+      }
+    }, `YahooFinance:Quote:${symbol}`);
   }
 
   /**
    * Fetch historical price data
    */
-  async getHistoricalData(symbol: string, range: TimeRange): Promise<PriceData[]> {
-    return retryWithBackoff(
-      async () => {
-        try {
-          const { interval, period } = this.getTimeRangeParams(range);
-          
-          const response = await fetch(
-            `${this.baseUrl}/v8/finance/chart/${symbol}?interval=${interval}&range=${period}`,
-            {
-              headers: {
-                "Accept": "application/json",
-                "User-Agent": "Mozilla/5.0",
-              },
-            }
+  async getHistoricalData(
+    symbol: string,
+    range: TimeRange
+  ): Promise<PriceData[]> {
+    return retryWithBackoff(async () => {
+      try {
+        const { interval, period } = this.getTimeRangeParams(range);
+
+        const response = await fetch(
+          `${this.baseUrl}/v8/finance/chart/${symbol}?interval=${interval}&range=${period}`,
+          {
+            headers: {
+              Accept: "application/json",
+              "User-Agent": "Mozilla/5.0",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            `Yahoo Finance API error: ${response.status} ${response.statusText}`
           );
-
-          if (!response.ok) {
-            throw new Error(`Yahoo Finance API error: ${response.status} ${response.statusText}`);
-          }
-
-          const data = await response.json();
-          
-          if (!data.chart?.result?.[0]) {
-            throw new Error(`No historical data found for symbol: ${symbol}`);
-          }
-
-          return this.parseHistoricalResponse(data.chart.result[0]);
-        } catch (error) {
-          logger.error("Failed to fetch historical data", error as Error, {
-            symbol,
-            range,
-            baseUrl: this.baseUrl,
-          });
-          throw error;
         }
-      },
-      `YahooFinance:Historical:${symbol}`
-    );
+
+        const data = await response.json();
+
+        if (!data.chart?.result?.[0]) {
+          throw new Error(`No historical data found for symbol: ${symbol}`);
+        }
+
+        return this.parseHistoricalResponse(data.chart.result[0]);
+      } catch (error) {
+        logger.error("Failed to fetch historical data", error as Error, {
+          symbol,
+          range,
+          baseUrl: this.baseUrl,
+        });
+        throw error;
+      }
+    }, `YahooFinance:Historical:${symbol}`);
   }
 
   /**
    * Search for symbols by query string
    */
-  async searchSymbols(query: string): Promise<Array<{ symbol: string; name: string; type: string; exchange: string }>> {
-    return retryWithBackoff(
-      async () => {
-        try {
-          const response = await fetch(
-            `${this.baseUrl}/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=10&newsCount=0`,
-            {
-              headers: {
-                "Accept": "application/json",
-                "User-Agent": "Mozilla/5.0",
-              },
-            }
+  async searchSymbols(
+    query: string
+  ): Promise<
+    Array<{ symbol: string; name: string; type: string; exchange: string }>
+  > {
+    return retryWithBackoff(async () => {
+      try {
+        const response = await fetch(
+          `${this.baseUrl}/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=10&newsCount=0`,
+          {
+            headers: {
+              Accept: "application/json",
+              "User-Agent": "Mozilla/5.0",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            `Yahoo Finance API error: ${response.status} ${response.statusText}`
           );
-
-          if (!response.ok) {
-            throw new Error(`Yahoo Finance API error: ${response.status} ${response.statusText}`);
-          }
-
-          const data = await response.json();
-          
-          if (!data.quotes) {
-            return [];
-          }
-
-          return data.quotes
-            .filter((quote: any) => quote.symbol && quote.shortname)
-            .map((quote: any) => ({
-              symbol: quote.symbol,
-              name: quote.shortname || quote.longname || quote.symbol,
-              type: quote.quoteType || "EQUITY",
-              exchange: quote.exchange || "",
-            }));
-        } catch (error) {
-          logger.error("Failed to search symbols", error as Error, {
-            query,
-            baseUrl: this.baseUrl,
-          });
-          throw error;
         }
-      },
-      `YahooFinance:Search:${query}`
-    );
+
+        const data = await response.json();
+
+        if (!data.quotes) {
+          return [];
+        }
+
+        return data.quotes
+          .filter((quote: any) => quote.symbol && quote.shortname)
+          .map((quote: any) => ({
+            symbol: quote.symbol,
+            name: quote.shortname || quote.longname || quote.symbol,
+            type: quote.quoteType || "EQUITY",
+            exchange: quote.exchange || "",
+          }));
+      } catch (error) {
+        logger.error("Failed to search symbols", error as Error, {
+          query,
+          baseUrl: this.baseUrl,
+        });
+        throw error;
+      }
+    }, `YahooFinance:Search:${query}`);
   }
 
   /**
    * Fetch forecast/analyst data
    */
   async getForecastData(symbol: string): Promise<ForecastData> {
-    return retryWithBackoff(
-      async () => {
-        try {
-          const summary = await this.fetchQuoteSummary(
-            symbol,
-            "financialData,earningsTrend,recommendationTrend,earningsHistory"
-          );
-          return this.parseForecastResponse(summary);
-        } catch (error) {
-          logger.error("Failed to fetch forecast data", error as Error, {
-            symbol,
-            baseUrl: this.baseUrl,
-          });
-          throw error;
-        }
-      },
-      `YahooFinance:Forecast:${symbol}`
-    );
+    return retryWithBackoff(async () => {
+      try {
+        const summary = await this.fetchQuoteSummary(
+          symbol,
+          "financialData,earningsTrend,recommendationTrend,earningsHistory"
+        );
+        return this.parseForecastResponse(summary);
+      } catch (error) {
+        logger.error("Failed to fetch forecast data", error as Error, {
+          symbol,
+          baseUrl: this.baseUrl,
+        });
+        throw error;
+      }
+    }, `YahooFinance:Forecast:${symbol}`);
   }
 
   /**
    * Fetch financial statements
    */
   async getFinancials(symbol: string): Promise<FinancialData> {
-    return retryWithBackoff(
-      async () => {
-        try {
-          const summary = await this.fetchQuoteSummary(
-            symbol,
-            "financialData,defaultKeyStatistics,summaryDetail"
-          );
-          return this.parseFinancialsResponse(summary);
-        } catch (error) {
-          logger.error("Failed to fetch financials", error as Error, {
-            symbol,
-            baseUrl: this.baseUrl,
-          });
-          throw error;
-        }
-      },
-      `YahooFinance:Financials:${symbol}`
-    );
+    return retryWithBackoff(async () => {
+      try {
+        const summary = await this.fetchQuoteSummary(
+          symbol,
+          "financialData,defaultKeyStatistics,summaryDetail"
+        );
+        return this.parseFinancialsResponse(summary);
+      } catch (error) {
+        logger.error("Failed to fetch financials", error as Error, {
+          symbol,
+          baseUrl: this.baseUrl,
+        });
+        throw error;
+      }
+    }, `YahooFinance:Financials:${symbol}`);
   }
 
   /**
@@ -296,414 +302,609 @@ export class YahooFinanceService {
    * Used as a fallback when CNN dataviz is unavailable.
    */
   /**
-     * Fetch world market indices via Yahoo Finance quoteSummary endpoint.
-     * Used as a fallback when CNN dataviz is unavailable.
-     */
-    async getWorldMarkets(): Promise<MarketIndex[]> {
-      const indices: { symbol: string; name: string; region: MarketIndex["region"] }[] = [
-        { symbol: "^GSPC", name: "S&P 500", region: "Americas" },
-        { symbol: "^DJI", name: "Dow Jones", region: "Americas" },
-        { symbol: "^IXIC", name: "NASDAQ", region: "Americas" },
-        { symbol: "^N225", name: "Nikkei 225", region: "Asia-Pacific" },
-        { symbol: "^HSI", name: "Hang Seng", region: "Asia-Pacific" },
-        { symbol: "000001.SS", name: "Shanghai Composite", region: "Asia-Pacific" },
-        { symbol: "^FTSE", name: "FTSE 100", region: "Europe" },
-        { symbol: "^GDAXI", name: "DAX", region: "Europe" },
-        { symbol: "^FCHI", name: "CAC 40", region: "Europe" },
-      ];
+   * Fetch world market indices via Yahoo Finance quoteSummary endpoint.
+   * Used as a fallback when CNN dataviz is unavailable.
+   */
+  async getWorldMarkets(): Promise<MarketIndex[]> {
+    const indices: {
+      symbol: string;
+      name: string;
+      region: MarketIndex["region"];
+    }[] = [
+      { symbol: "^GSPC", name: "S&P 500", region: "Americas" },
+      { symbol: "^DJI", name: "Dow Jones", region: "Americas" },
+      { symbol: "^IXIC", name: "NASDAQ", region: "Americas" },
+      { symbol: "^N225", name: "Nikkei 225", region: "Asia-Pacific" },
+      { symbol: "^HSI", name: "Hang Seng", region: "Asia-Pacific" },
+      {
+        symbol: "000001.SS",
+        name: "Shanghai Composite",
+        region: "Asia-Pacific",
+      },
+      { symbol: "^FTSE", name: "FTSE 100", region: "Europe" },
+      { symbol: "^GDAXI", name: "DAX", region: "Europe" },
+      { symbol: "^FCHI", name: "CAC 40", region: "Europe" },
+    ];
 
-      const results: MarketIndex[] = [];
+    const results: MarketIndex[] = [];
 
-      // Fetch each index using the authenticated quoteSummary endpoint
-      const fetches = indices.map(async (idx) => {
-        try {
-          const summary = await this.fetchQuoteSummary(idx.symbol, "price");
-          const price = summary.price || {};
-          return {
-            name: idx.name,
-            symbol: idx.symbol,
-            value: price.regularMarketPrice?.raw || 0,
-            change: price.regularMarketChange?.raw || 0,
-            changePercent: price.regularMarketChangePercent?.raw || 0,
-            region: idx.region,
-          };
-        } catch (error) {
-          logger.warn(`Failed to fetch index ${idx.symbol}, skipping`, {
-            error: (error as Error).message,
-          });
-          return null;
-        }
-      });
-
-      const settled = await Promise.all(fetches);
-      for (const item of settled) {
-        if (item) results.push(item);
+    // Fetch each index using the authenticated quoteSummary endpoint
+    const fetches = indices.map(async (idx) => {
+      try {
+        const summary = await this.fetchQuoteSummary(idx.symbol, "price");
+        const price = summary.price || {};
+        return {
+          name: idx.name,
+          symbol: idx.symbol,
+          value: price.regularMarketPrice?.raw || 0,
+          change: price.regularMarketChange?.raw || 0,
+          changePercent: price.regularMarketChangePercent?.raw || 0,
+          region: idx.region,
+        };
+      } catch (error) {
+        logger.warn(`Failed to fetch index ${idx.symbol}, skipping`, {
+          error: (error as Error).message,
+        });
+        return null;
       }
+    });
 
-      if (results.length === 0) {
-        throw new Error("Failed to fetch any world market indices from Yahoo Finance");
-      }
-
-      return results;
+    const settled = await Promise.all(fetches);
+    for (const item of settled) {
+      if (item) results.push(item);
     }
 
-    /**
-     * Fetch sector performance data via SPDR sector ETFs.
-     */
-    /**
-       * Fetch sector performance data via SPDR sector ETFs.
-       * @param period Yahoo Finance range string (1d, 5d, 1mo, 3mo, 1y, ytd). Defaults to 1d.
-       */
-      async getSectorPerformance(period: string = "1d"): Promise<SectorData[]> {
-        const sectorETFs: { symbol: string; sector: string }[] = [
-          { symbol: "XLK", sector: "Technology" },
-          { symbol: "XLF", sector: "Financial" },
-          { symbol: "XLY", sector: "Consumer Discretionary" },
-          { symbol: "XLC", sector: "Communication" },
-          { symbol: "XLV", sector: "Healthcare" },
-          { symbol: "XLI", sector: "Industrials" },
-          { symbol: "XLP", sector: "Consumer Staples" },
-          { symbol: "XLE", sector: "Energy" },
-          { symbol: "XLB", sector: "Materials" },
-          { symbol: "XLRE", sector: "Real Estate" },
-          { symbol: "XLU", sector: "Utilities" },
-        ];
+    if (results.length === 0) {
+      throw new Error(
+        "Failed to fetch any world market indices from Yahoo Finance"
+      );
+    }
 
-        const results: SectorData[] = [];
+    return results;
+  }
 
-        const fetches = sectorETFs.map(async (etf) => {
-          try {
-            // For 1d, use the live quote change
-            if (period === "1d") {
-              const summary = await this.fetchQuoteSummary(etf.symbol, "price");
-              const price = summary.price || {};
-              return {
-                sector: etf.sector,
-                performance: price.regularMarketPrice?.raw || 0,
-                changePercent: (price.regularMarketChangePercent?.raw || 0) * 100,
-                constituents: 0,
-              };
-            }
+  /**
+   * Fetch sector performance data via SPDR sector ETFs.
+   */
+  /**
+   * Fetch sector performance data via SPDR sector ETFs.
+   * @param period Yahoo Finance range string (1d, 5d, 1mo, 3mo, 1y, ytd). Defaults to 1d.
+   */
+  async getSectorPerformance(period: string = "1d"): Promise<SectorData[]> {
+    const sectorETFs: { symbol: string; sector: string }[] = [
+      { symbol: "XLK", sector: "Technology" },
+      { symbol: "XLF", sector: "Financial" },
+      { symbol: "XLY", sector: "Consumer Discretionary" },
+      { symbol: "XLC", sector: "Communication" },
+      { symbol: "XLV", sector: "Healthcare" },
+      { symbol: "XLI", sector: "Industrials" },
+      { symbol: "XLP", sector: "Consumer Staples" },
+      { symbol: "XLE", sector: "Energy" },
+      { symbol: "XLB", sector: "Materials" },
+      { symbol: "XLRE", sector: "Real Estate" },
+      { symbol: "XLU", sector: "Utilities" },
+    ];
 
-            // For other periods, compute change from historical data
-            const interval = period === "5d" ? "1d" : "1d";
-            const url = `${this.baseUrl}/v8/finance/chart/${etf.symbol}?range=${period}&interval=${interval}`;
-            const { crumb, cookie } = await getCrumbSafe(this);
+    const results: SectorData[] = [];
 
-            const headers: Record<string, string> = {
-              Accept: "application/json",
-              "User-Agent": "Mozilla/5.0",
-            };
-            if (cookie) headers["Cookie"] = cookie;
+    const fetches = sectorETFs.map(async (etf) => {
+      try {
+        // For 1d, use the live quote change
+        if (period === "1d") {
+          const summary = await this.fetchQuoteSummary(etf.symbol, "price");
+          const price = summary.price || {};
+          return {
+            sector: etf.sector,
+            performance: price.regularMarketPrice?.raw || 0,
+            changePercent: (price.regularMarketChangePercent?.raw || 0) * 100,
+            constituents: 0,
+          };
+        }
 
-            const finalUrl = crumb ? `${url}&crumb=${encodeURIComponent(crumb)}` : url;
-            const response = await fetch(finalUrl, { headers });
+        // For other periods, compute change from historical data
+        const interval = period === "5d" ? "1d" : "1d";
+        const url = `${this.baseUrl}/v8/finance/chart/${etf.symbol}?range=${period}&interval=${interval}`;
+        const { crumb, cookie } = await getCrumbSafe(this);
 
-            if (!response.ok) {
-              throw new Error(`Yahoo Finance API error: ${response.status}`);
-            }
+        const headers: Record<string, string> = {
+          Accept: "application/json",
+          "User-Agent": "Mozilla/5.0",
+        };
+        if (cookie) headers["Cookie"] = cookie;
 
-            const data = await response.json();
-            const closes: number[] = data.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
-            const validCloses = closes.filter((c: number | null) => c != null);
+        const finalUrl = crumb
+          ? `${url}&crumb=${encodeURIComponent(crumb)}`
+          : url;
+        const response = await fetch(finalUrl, { headers });
 
-            if (validCloses.length < 2) {
-              throw new Error("Not enough data points");
-            }
+        if (!response.ok) {
+          throw new Error(`Yahoo Finance API error: ${response.status}`);
+        }
 
-            const startPrice = validCloses[0];
-            const endPrice = validCloses[validCloses.length - 1];
-            const changePct = ((endPrice - startPrice) / startPrice) * 100;
+        const data = await response.json();
+        const closes: number[] =
+          data.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
+        const validCloses = closes.filter((c: number | null) => c != null);
 
-            return {
-              sector: etf.sector,
-              performance: endPrice,
-              changePercent: changePct,
-              constituents: 0,
-            };
-          } catch (error) {
-            logger.warn(`Failed to fetch sector ETF ${etf.symbol} for period ${period}, skipping`, {
-              error: (error as Error).message,
-            });
-            return null;
+        if (validCloses.length < 2) {
+          throw new Error("Not enough data points");
+        }
+
+        const startPrice = validCloses[0];
+        const endPrice = validCloses[validCloses.length - 1];
+        const changePct = ((endPrice - startPrice) / startPrice) * 100;
+
+        return {
+          sector: etf.sector,
+          performance: endPrice,
+          changePercent: changePct,
+          constituents: 0,
+        };
+      } catch (error) {
+        logger.warn(
+          `Failed to fetch sector ETF ${etf.symbol} for period ${period}, skipping`,
+          {
+            error: (error as Error).message,
           }
-        });
-
-        const settled = await Promise.all(fetches);
-        for (const item of settled) {
-          if (item) results.push(item);
-        }
-
-        if (results.length === 0) {
-          throw new Error("Failed to fetch any sector performance data");
-        }
-
-        return results;
+        );
+        return null;
       }
+    });
 
+    const settled = await Promise.all(fetches);
+    for (const item of settled) {
+      if (item) results.push(item);
+    }
+
+    if (results.length === 0) {
+      throw new Error("Failed to fetch any sector performance data");
+    }
+
+    return results;
+  }
 
   /**
    * Fetch earnings calendar data for a date range.
    * Uses Yahoo Finance trending tickers + calendarEvents module to build an earnings calendar.
    */
-  async getEarningsCalendar(startDate?: string, endDate?: string): Promise<EarningsEvent[]> {
-      return retryWithBackoff(
-        async () => {
-          try {
-            const rangeStart = startDate ? new Date(startDate) : new Date();
-            const rangeEnd = endDate
-              ? new Date(endDate)
-              : new Date(rangeStart.getTime() + 30 * 24 * 60 * 60 * 1000);
+  async getEarningsCalendar(
+    startDate?: string,
+    endDate?: string
+  ): Promise<EarningsEvent[]> {
+    return retryWithBackoff(async () => {
+      try {
+        const rangeStart = startDate ? new Date(startDate) : new Date();
+        const rangeEnd = endDate
+          ? new Date(endDate)
+          : new Date(rangeStart.getTime() + 30 * 24 * 60 * 60 * 1000);
 
-            // Scan a broad set of well-known symbols for upcoming earnings
-            const symbols = [
-              // Mega-cap tech
-              "AAPL","MSFT","GOOGL","AMZN","META","NVDA","TSLA","AVGO","ORCL","CRM",
-              "ADBE","AMD","INTC","CSCO","QCOM","TXN","IBM","NOW","UBER","SHOP",
-              // Finance
-              "JPM","BAC","WFC","GS","MS","C","BLK","SCHW","AXP","USB",
-              "PNC","TFC","COF","BK","CME","ICE","MCO","SPGI","MMC","AON",
-              // Healthcare
-              "UNH","JNJ","LLY","PFE","ABBV","MRK","TMO","ABT","DHR","BMY",
-              "AMGN","GILD","ISRG","MDT","SYK","REGN","VRTX","ZTS","BDX","EW",
-              // Consumer
-              "WMT","PG","KO","PEP","COST","MCD","NKE","SBUX","TGT","LOW",
-              "HD","TJX","BKNG","MAR","HLT","CMG","YUM","DG","DLTR","ROST",
-              // Industrial / Energy / Materials
-              "CAT","DE","HON","UNP","RTX","BA","LMT","GE","MMM","EMR",
-              "XOM","CVX","COP","SLB","EOG","PSX","VLO","MPC","OXY","HAL",
-              // Comm / Media / Other
-              "DIS","NFLX","CMCSA","T","VZ","TMUS","CHTR","EA","TTWO","WBD",
-              "V","MA","PYPL","SQ","FIS","FISV","GPN","INTU","ADP","PAYX",
-              // Additional coverage
-              "LIN","APD","ECL","DD","NEM","FCX","ASML","JEF","QS","PLTR",
-              "SNOW","CRWD","DDOG","ZS","NET","MDB","PANW","FTNT","OKTA","BILL",
-            ];
+        // Scan a broad set of well-known symbols for upcoming earnings
+        const symbols = [
+          // Mega-cap tech
+          "AAPL",
+          "MSFT",
+          "GOOGL",
+          "AMZN",
+          "META",
+          "NVDA",
+          "TSLA",
+          "AVGO",
+          "ORCL",
+          "CRM",
+          "ADBE",
+          "AMD",
+          "INTC",
+          "CSCO",
+          "QCOM",
+          "TXN",
+          "IBM",
+          "NOW",
+          "UBER",
+          "SHOP",
+          // Finance
+          "JPM",
+          "BAC",
+          "WFC",
+          "GS",
+          "MS",
+          "C",
+          "BLK",
+          "SCHW",
+          "AXP",
+          "USB",
+          "PNC",
+          "TFC",
+          "COF",
+          "BK",
+          "CME",
+          "ICE",
+          "MCO",
+          "SPGI",
+          "MMC",
+          "AON",
+          // Healthcare
+          "UNH",
+          "JNJ",
+          "LLY",
+          "PFE",
+          "ABBV",
+          "MRK",
+          "TMO",
+          "ABT",
+          "DHR",
+          "BMY",
+          "AMGN",
+          "GILD",
+          "ISRG",
+          "MDT",
+          "SYK",
+          "REGN",
+          "VRTX",
+          "ZTS",
+          "BDX",
+          "EW",
+          // Consumer
+          "WMT",
+          "PG",
+          "KO",
+          "PEP",
+          "COST",
+          "MCD",
+          "NKE",
+          "SBUX",
+          "TGT",
+          "LOW",
+          "HD",
+          "TJX",
+          "BKNG",
+          "MAR",
+          "HLT",
+          "CMG",
+          "YUM",
+          "DG",
+          "DLTR",
+          "ROST",
+          // Industrial / Energy / Materials
+          "CAT",
+          "DE",
+          "HON",
+          "UNP",
+          "RTX",
+          "BA",
+          "LMT",
+          "GE",
+          "MMM",
+          "EMR",
+          "XOM",
+          "CVX",
+          "COP",
+          "SLB",
+          "EOG",
+          "PSX",
+          "VLO",
+          "MPC",
+          "OXY",
+          "HAL",
+          // Comm / Media / Other
+          "DIS",
+          "NFLX",
+          "CMCSA",
+          "T",
+          "VZ",
+          "TMUS",
+          "CHTR",
+          "EA",
+          "TTWO",
+          "WBD",
+          "V",
+          "MA",
+          "PYPL",
+          "SQ",
+          "FIS",
+          "FISV",
+          "GPN",
+          "INTU",
+          "ADP",
+          "PAYX",
+          // Additional coverage
+          "LIN",
+          "APD",
+          "ECL",
+          "DD",
+          "NEM",
+          "FCX",
+          "ASML",
+          "JEF",
+          "QS",
+          "PLTR",
+          "SNOW",
+          "CRWD",
+          "DDOG",
+          "ZS",
+          "NET",
+          "MDB",
+          "PANW",
+          "FTNT",
+          "OKTA",
+          "BILL",
+        ];
 
-            // Batch fetch using quote endpoint for speed (up to 100 symbols per call)
-            const earningsEvents: EarningsEvent[] = [];
-            const batchSize = 15;
+        // Batch fetch using quote endpoint for speed (up to 100 symbols per call)
+        const earningsEvents: EarningsEvent[] = [];
+        const batchSize = 15;
 
-            for (let i = 0; i < symbols.length; i += batchSize) {
-              const batch = symbols.slice(i, i + batchSize);
+        for (let i = 0; i < symbols.length; i += batchSize) {
+          const batch = symbols.slice(i, i + batchSize);
 
-              const fetches = batch.map(async (symbol) => {
-                try {
-                  const summary = await this.fetchQuoteSummary(symbol, "calendarEvents,price");
-                  const calendarEvents = summary.calendarEvents || {};
-                  const earnings = calendarEvents.earnings || {};
-                  const price = summary.price || {};
+          const fetches = batch.map(async (symbol) => {
+            try {
+              const summary = await this.fetchQuoteSummary(
+                symbol,
+                "calendarEvents,price"
+              );
+              const calendarEvents = summary.calendarEvents || {};
+              const earnings = calendarEvents.earnings || {};
+              const price = summary.price || {};
 
-                  const earningsDate = earnings.earningsDate?.[0]?.raw
-                    ? new Date(earnings.earningsDate[0].raw * 1000)
-                    : null;
+              const earningsDate = earnings.earningsDate?.[0]?.raw
+                ? new Date(earnings.earningsDate[0].raw * 1000)
+                : null;
 
-                  if (!earningsDate) return null;
-                  if (earningsDate < rangeStart || earningsDate > rangeEnd) return null;
+              if (!earningsDate) return null;
+              if (earningsDate < rangeStart || earningsDate > rangeEnd)
+                return null;
 
-                  return {
-                    id: `earnings-${symbol}-${earningsDate.toISOString().split("T")[0]}`,
-                    symbol,
-                    companyName: price.longName || price.shortName || symbol,
-                    date: earningsDate,
-                    time: earnings.earningsDate?.length > 1 ? "BMO" : undefined,
-                    epsEstimate: earnings.earningsAverage?.raw ?? undefined,
-                    revenueEstimate: earnings.revenueAverage?.raw ?? undefined,
-                  } as EarningsEvent;
-                } catch {
-                  return null;
-                }
-              });
-
-              const results = await Promise.all(fetches);
-              for (const item of results) {
-                if (item) earningsEvents.push(item);
-              }
+              return {
+                id: `earnings-${symbol}-${earningsDate.toISOString().split("T")[0]}`,
+                symbol,
+                companyName: price.longName || price.shortName || symbol,
+                date: earningsDate,
+                time: earnings.earningsDate?.length > 1 ? "BMO" : undefined,
+                epsEstimate: earnings.earningsAverage?.raw ?? undefined,
+                revenueEstimate: earnings.revenueAverage?.raw ?? undefined,
+              } as EarningsEvent;
+            } catch {
+              return null;
             }
+          });
 
-            earningsEvents.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
-            return earningsEvents;
-          } catch (error) {
-            logger.error("Failed to fetch earnings calendar", error as Error, {
-              startDate,
-              endDate,
-              baseUrl: this.baseUrl,
-            });
-            throw error;
+          const results = await Promise.all(fetches);
+          for (const item of results) {
+            if (item) earningsEvents.push(item);
           }
-        },
-        `YahooFinance:EarningsCalendar`
-      );
-    }
+        }
+
+        earningsEvents.sort(
+          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+        );
+
+        return earningsEvents;
+      } catch (error) {
+        logger.error("Failed to fetch earnings calendar", error as Error, {
+          startDate,
+          endDate,
+          baseUrl: this.baseUrl,
+        });
+        throw error;
+      }
+    }, `YahooFinance:EarningsCalendar`);
+  }
 
   /**
    * Fetch dividend calendar data.
    * Scans well-known dividend-paying symbols via quoteSummary to build a dividend calendar.
    */
   async getDividendCalendar(): Promise<DividendEvent[]> {
-    return retryWithBackoff(
-      async () => {
-        try {
-          // Dividend-heavy symbols across sectors
-          const symbols = [
-            // Dividend aristocrats / kings
-            "JNJ", "PG", "KO", "PEP", "MCD", "MMM", "ABT", "ABBV",
-            "T", "VZ", "XOM", "CVX", "CL", "GPC", "SWK", "EMR",
-            "ITW", "ADP", "BDX", "SHW", "CTAS", "AFL", "CB", "ED",
-            // High-yield / popular dividend stocks
-            "O", "MAIN", "STAG", "AGNC", "NLY", "EPD", "MO", "PM",
-            "IBM", "INTC", "CSCO", "TXN", "AVGO", "QCOM", "HD", "LOW",
-            // Financials
-            "JPM", "BAC", "WFC", "GS", "MS", "USB", "PNC", "BLK",
-            // Utilities / REITs
-            "DUK", "SO", "NEE", "D", "AEP", "WEC", "ES", "SPG",
-            "AMT", "PLD", "CCI", "WELL", "DLR", "PSA", "EQR", "AVB",
-          ];
+    return retryWithBackoff(async () => {
+      try {
+        // Dividend-heavy symbols across sectors
+        const symbols = [
+          // Dividend aristocrats / kings
+          "JNJ",
+          "PG",
+          "KO",
+          "PEP",
+          "MCD",
+          "MMM",
+          "ABT",
+          "ABBV",
+          "T",
+          "VZ",
+          "XOM",
+          "CVX",
+          "CL",
+          "GPC",
+          "SWK",
+          "EMR",
+          "ITW",
+          "ADP",
+          "BDX",
+          "SHW",
+          "CTAS",
+          "AFL",
+          "CB",
+          "ED",
+          // High-yield / popular dividend stocks
+          "O",
+          "MAIN",
+          "STAG",
+          "AGNC",
+          "NLY",
+          "EPD",
+          "MO",
+          "PM",
+          "IBM",
+          "INTC",
+          "CSCO",
+          "TXN",
+          "AVGO",
+          "QCOM",
+          "HD",
+          "LOW",
+          // Financials
+          "JPM",
+          "BAC",
+          "WFC",
+          "GS",
+          "MS",
+          "USB",
+          "PNC",
+          "BLK",
+          // Utilities / REITs
+          "DUK",
+          "SO",
+          "NEE",
+          "D",
+          "AEP",
+          "WEC",
+          "ES",
+          "SPG",
+          "AMT",
+          "PLD",
+          "CCI",
+          "WELL",
+          "DLR",
+          "PSA",
+          "EQR",
+          "AVB",
+        ];
 
-          const dividendEvents: DividendEvent[] = [];
-          const batchSize = 15;
+        const dividendEvents: DividendEvent[] = [];
+        const batchSize = 15;
 
-          for (let i = 0; i < symbols.length; i += batchSize) {
-            const batch = symbols.slice(i, i + batchSize);
+        for (let i = 0; i < symbols.length; i += batchSize) {
+          const batch = symbols.slice(i, i + batchSize);
 
-            const fetches = batch.map(async (symbol) => {
-              try {
-                const summary = await this.fetchQuoteSummary(
-                  symbol,
-                  "calendarEvents,summaryDetail,price"
-                );
-                const calendar = summary.calendarEvents || {};
-                const summaryDetail = summary.summaryDetail || {};
-                const price = summary.price || {};
+          const fetches = batch.map(async (symbol) => {
+            try {
+              const summary = await this.fetchQuoteSummary(
+                symbol,
+                "calendarEvents,summaryDetail,price"
+              );
+              const calendar = summary.calendarEvents || {};
+              const summaryDetail = summary.summaryDetail || {};
+              const price = summary.price || {};
 
-                const exDivRaw = calendar.exDividendDate?.raw;
-                const divDateRaw = calendar.dividendDate?.raw;
+              const exDivRaw = calendar.exDividendDate?.raw;
+              const divDateRaw = calendar.dividendDate?.raw;
 
-                if (!exDivRaw) return null;
+              if (!exDivRaw) return null;
 
-                const exDividendDate = new Date(exDivRaw * 1000);
-                const paymentDate = divDateRaw
-                  ? new Date(divDateRaw * 1000)
-                  : exDividendDate;
+              const exDividendDate = new Date(exDivRaw * 1000);
+              const paymentDate = divDateRaw
+                ? new Date(divDateRaw * 1000)
+                : exDividendDate;
 
-                const amount =
-                  summaryDetail.dividendRate?.raw ?? 0;
-                const yieldVal =
-                  summaryDetail.dividendYield?.raw ?? 0;
+              const amount = summaryDetail.dividendRate?.raw ?? 0;
+              const yieldVal = summaryDetail.dividendYield?.raw ?? 0;
 
-                // Infer frequency from ex-dividend date patterns
-                const frequency = this.inferDividendFrequency(
-                  summaryDetail.trailingAnnualDividendRate?.raw,
-                  amount
-                );
+              // Infer frequency from ex-dividend date patterns
+              const frequency = this.inferDividendFrequency(
+                summaryDetail.trailingAnnualDividendRate?.raw,
+                amount
+              );
 
-                return {
-                  id: `div-${symbol}-${exDividendDate.toISOString().split("T")[0]}`,
-                  symbol,
-                  companyName:
-                    price.longName || price.shortName || symbol,
-                  amount,
-                  exDividendDate,
-                  paymentDate,
-                  yield: yieldVal * 100,
-                  frequency,
-                } as DividendEvent;
-              } catch {
-                return null;
-              }
-            });
-
-            const results = await Promise.all(fetches);
-            for (const item of results) {
-              if (item && item.amount > 0) dividendEvents.push(item);
+              return {
+                id: `div-${symbol}-${exDividendDate.toISOString().split("T")[0]}`,
+                symbol,
+                companyName: price.longName || price.shortName || symbol,
+                amount,
+                exDividendDate,
+                paymentDate,
+                yield: yieldVal * 100,
+                frequency,
+              } as DividendEvent;
+            } catch {
+              return null;
             }
+          });
+
+          const results = await Promise.all(fetches);
+          for (const item of results) {
+            if (item && item.amount > 0) dividendEvents.push(item);
           }
-
-          dividendEvents.sort(
-            (a, b) =>
-              new Date(a.exDividendDate).getTime() -
-              new Date(b.exDividendDate).getTime()
-          );
-
-          return dividendEvents;
-        } catch (error) {
-          logger.error(
-            "Failed to fetch dividend calendar",
-            error as Error,
-            { baseUrl: this.baseUrl }
-          );
-          throw error;
         }
-      },
-      `YahooFinance:DividendCalendar`
-    );
+
+        dividendEvents.sort(
+          (a, b) =>
+            new Date(a.exDividendDate).getTime() -
+            new Date(b.exDividendDate).getTime()
+        );
+
+        return dividendEvents;
+      } catch (error) {
+        logger.error("Failed to fetch dividend calendar", error as Error, {
+          baseUrl: this.baseUrl,
+        });
+        throw error;
+      }
+    }, `YahooFinance:DividendCalendar`);
   }
 
   /**
    * Fetch IPO calendar data.
    * Uses Yahoo Finance screener to find recently listed / upcoming IPOs.
    */
-  async getIPOCalendar(startDate?: string, endDate?: string): Promise<IPOEvent[]> {
-    return retryWithBackoff(
-      async () => {
+  async getIPOCalendar(
+    startDate?: string,
+    endDate?: string
+  ): Promise<IPOEvent[]> {
+    return retryWithBackoff(async () => {
+      try {
+        const rangeStart = startDate ? new Date(startDate) : new Date();
+        const rangeEnd = endDate
+          ? new Date(endDate)
+          : new Date(rangeStart.getTime() + 90 * 24 * 60 * 60 * 1000);
+
+        const { crumb, cookie } = await this.getCrumb();
+
+        // Use Yahoo Finance screener to find recent IPOs
+        const url = `${this.baseUrl}/v1/finance/screener/predefined/saved?formatted=false&lang=en-US&region=US&scrIds=most_actives_penny_stocks&count=100&corsDomain=finance.yahoo.com&crumb=${encodeURIComponent(crumb)}`;
+
+        // Alternatively, use the IPO endpoint
+        const ipoUrl = `${this.baseUrl}/v1/finance/ipos?lang=en-US&region=US&crumb=${encodeURIComponent(crumb)}`;
+
+        let ipoEvents: IPOEvent[] = [];
+
         try {
-          const rangeStart = startDate ? new Date(startDate) : new Date();
-          const rangeEnd = endDate
-            ? new Date(endDate)
-            : new Date(rangeStart.getTime() + 90 * 24 * 60 * 60 * 1000);
-
-          const { crumb, cookie } = await this.getCrumb();
-
-          // Use Yahoo Finance screener to find recent IPOs
-          const url = `${this.baseUrl}/v1/finance/screener/predefined/saved?formatted=false&lang=en-US&region=US&scrIds=most_actives_penny_stocks&count=100&corsDomain=finance.yahoo.com&crumb=${encodeURIComponent(crumb)}`;
-
-          // Alternatively, use the IPO endpoint
-          const ipoUrl = `${this.baseUrl}/v1/finance/ipos?lang=en-US&region=US&crumb=${encodeURIComponent(crumb)}`;
-
-          let ipoEvents: IPOEvent[] = [];
-
-          try {
-            const response = await fetch(ipoUrl, {
-              headers: {
-                Accept: "application/json",
-                "User-Agent":
-                  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
-                Cookie: cookie,
-              },
-            });
-
-            if (response.ok) {
-              const data = await response.json();
-              ipoEvents = this.parseIPOResponse(data, rangeStart, rangeEnd);
-            }
-          } catch {
-            // IPO endpoint may not be available; fall through to fallback
-          }
-
-          // Fallback: return curated mock data for known upcoming IPOs
-          if (ipoEvents.length === 0) {
-            ipoEvents = this.getFallbackIPOData(rangeStart, rangeEnd);
-          }
-
-          ipoEvents.sort(
-            (a, b) =>
-              new Date(a.expectedDate).getTime() -
-              new Date(b.expectedDate).getTime()
-          );
-
-          return ipoEvents;
-        } catch (error) {
-          logger.error("Failed to fetch IPO calendar", error as Error, {
-            startDate,
-            endDate,
-            baseUrl: this.baseUrl,
+          const response = await fetch(ipoUrl, {
+            headers: {
+              Accept: "application/json",
+              "User-Agent":
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+              Cookie: cookie,
+            },
           });
-          throw error;
+
+          if (response.ok) {
+            const data = await response.json();
+            ipoEvents = this.parseIPOResponse(data, rangeStart, rangeEnd);
+          }
+        } catch {
+          // IPO endpoint may not be available; fall through to fallback
         }
-      },
-      "YahooFinance:IPOCalendar"
-    );
+
+        // Fallback: return curated mock data for known upcoming IPOs
+        if (ipoEvents.length === 0) {
+          ipoEvents = this.getFallbackIPOData(rangeStart, rangeEnd);
+        }
+
+        ipoEvents.sort(
+          (a, b) =>
+            new Date(a.expectedDate).getTime() -
+            new Date(b.expectedDate).getTime()
+        );
+
+        return ipoEvents;
+      } catch (error) {
+        logger.error("Failed to fetch IPO calendar", error as Error, {
+          startDate,
+          endDate,
+          baseUrl: this.baseUrl,
+        });
+        throw error;
+      }
+    }, "YahooFinance:IPOCalendar");
   }
 
   /**
@@ -715,8 +916,7 @@ export class YahooFinanceService {
     rangeEnd: Date
   ): IPOEvent[] {
     const events: IPOEvent[] = [];
-    const ipos =
-      data?.ipoEventStore?.upcoming || data?.finance?.result || [];
+    const ipos = data?.ipoEventStore?.upcoming || data?.finance?.result || [];
 
     const items = Array.isArray(ipos) ? ipos : [];
 
@@ -750,71 +950,68 @@ export class YahooFinanceService {
    * Fallback IPO data when the Yahoo Finance IPO endpoint is unavailable.
    * Returns an empty array — the API route will handle this gracefully.
    */
-  private getFallbackIPOData(
-      rangeStart: Date,
-      rangeEnd: Date
-    ): IPOEvent[] {
-      const now = new Date();
-      const day = 24 * 60 * 60 * 1000;
+  private getFallbackIPOData(rangeStart: Date, rangeEnd: Date): IPOEvent[] {
+    const now = new Date();
+    const day = 24 * 60 * 60 * 1000;
 
-      const fallbackIPOs: IPOEvent[] = [
-        {
-          id: "ipo-klarna-2026",
-          companyName: "Klarna Group plc",
-          symbol: "KLAR",
-          expectedDate: new Date(now.getTime() + 5 * day),
-          priceRangeLow: 60.0,
-          priceRangeHigh: 72.0,
-          sharesOffered: 40_000_000,
-          exchange: "NYSE",
-        },
-        {
-          id: "ipo-stubhub-2026",
-          companyName: "StubHub Holdings",
-          symbol: "STUB",
-          expectedDate: new Date(now.getTime() + 10 * day),
-          priceRangeLow: 28.0,
-          priceRangeHigh: 33.0,
-          sharesOffered: 25_000_000,
-          exchange: "NASDAQ",
-        },
-        {
-          id: "ipo-cerebras-2026",
-          companyName: "Cerebras Systems",
-          symbol: "CBRS",
-          expectedDate: new Date(now.getTime() + 14 * day),
-          priceRangeLow: 34.0,
-          priceRangeHigh: 40.0,
-          sharesOffered: 20_000_000,
-          exchange: "NASDAQ",
-        },
-        {
-          id: "ipo-medline-2026",
-          companyName: "Medline Industries",
-          symbol: "MDLN",
-          expectedDate: new Date(now.getTime() + 21 * day),
-          priceRangeLow: 42.0,
-          priceRangeHigh: 48.0,
-          sharesOffered: 35_000_000,
-          exchange: "NYSE",
-        },
-        {
-          id: "ipo-chime-2026",
-          companyName: "Chime Financial",
-          symbol: "CHME",
-          expectedDate: new Date(now.getTime() + 30 * day),
-          priceRangeLow: 22.0,
-          priceRangeHigh: 26.0,
-          sharesOffered: 30_000_000,
-          exchange: "NYSE",
-        },
-      ];
+    const fallbackIPOs: IPOEvent[] = [
+      {
+        id: "ipo-klarna-2026",
+        companyName: "Klarna Group plc",
+        symbol: "KLAR",
+        expectedDate: new Date(now.getTime() + 5 * day),
+        priceRangeLow: 60.0,
+        priceRangeHigh: 72.0,
+        sharesOffered: 40_000_000,
+        exchange: "NYSE",
+      },
+      {
+        id: "ipo-stubhub-2026",
+        companyName: "StubHub Holdings",
+        symbol: "STUB",
+        expectedDate: new Date(now.getTime() + 10 * day),
+        priceRangeLow: 28.0,
+        priceRangeHigh: 33.0,
+        sharesOffered: 25_000_000,
+        exchange: "NASDAQ",
+      },
+      {
+        id: "ipo-cerebras-2026",
+        companyName: "Cerebras Systems",
+        symbol: "CBRS",
+        expectedDate: new Date(now.getTime() + 14 * day),
+        priceRangeLow: 34.0,
+        priceRangeHigh: 40.0,
+        sharesOffered: 20_000_000,
+        exchange: "NASDAQ",
+      },
+      {
+        id: "ipo-medline-2026",
+        companyName: "Medline Industries",
+        symbol: "MDLN",
+        expectedDate: new Date(now.getTime() + 21 * day),
+        priceRangeLow: 42.0,
+        priceRangeHigh: 48.0,
+        sharesOffered: 35_000_000,
+        exchange: "NYSE",
+      },
+      {
+        id: "ipo-chime-2026",
+        companyName: "Chime Financial",
+        symbol: "CHME",
+        expectedDate: new Date(now.getTime() + 30 * day),
+        priceRangeLow: 22.0,
+        priceRangeHigh: 26.0,
+        sharesOffered: 30_000_000,
+        exchange: "NYSE",
+      },
+    ];
 
-      return fallbackIPOs.filter((ipo) => {
-        const d = new Date(ipo.expectedDate);
-        return d >= rangeStart && d <= rangeEnd;
-      });
-    }
+    return fallbackIPOs.filter((ipo) => {
+      const d = new Date(ipo.expectedDate);
+      return d >= rangeStart && d <= rangeEnd;
+    });
+  }
 
   /**
    * Fetch ETF performance data grouped by category.
@@ -835,17 +1032,33 @@ export class YahooFinanceService {
       { symbol: "XLE", name: "Energy Select", category: "Sector" },
       { symbol: "XLI", name: "Industrial Select", category: "Sector" },
       // Fixed Income
-      { symbol: "TLT", name: "iShares 20+ Year Treasury", category: "Fixed Income" },
+      {
+        symbol: "TLT",
+        name: "iShares 20+ Year Treasury",
+        category: "Fixed Income",
+      },
       { symbol: "BND", name: "Vanguard Total Bond", category: "Fixed Income" },
-      { symbol: "HYG", name: "iShares High Yield Corp", category: "Fixed Income" },
+      {
+        symbol: "HYG",
+        name: "iShares High Yield Corp",
+        category: "Fixed Income",
+      },
       // Commodity
       { symbol: "GLD", name: "SPDR Gold Shares", category: "Commodity" },
       { symbol: "SLV", name: "iShares Silver Trust", category: "Commodity" },
       { symbol: "USO", name: "United States Oil Fund", category: "Commodity" },
       // International
       { symbol: "EFA", name: "iShares MSCI EAFE", category: "International" },
-      { symbol: "EEM", name: "iShares MSCI Emerging", category: "International" },
-      { symbol: "VEA", name: "Vanguard FTSE Developed", category: "International" },
+      {
+        symbol: "EEM",
+        name: "iShares MSCI Emerging",
+        category: "International",
+      },
+      {
+        symbol: "VEA",
+        name: "Vanguard FTSE Developed",
+        category: "International",
+      },
     ];
 
     const fetches = etfList.map(async (etf) => {
@@ -857,8 +1070,7 @@ export class YahooFinanceService {
             symbol: etf.symbol,
             name: etf.name,
             price: price.regularMarketPrice?.raw || 0,
-            changePercent:
-              (price.regularMarketChangePercent?.raw || 0) * 100,
+            changePercent: (price.regularMarketChangePercent?.raw || 0) * 100,
             category: etf.category,
             marketCap: price.marketCap?.raw,
           };
@@ -885,9 +1097,7 @@ export class YahooFinanceService {
         const data = await response.json();
         const closes: number[] =
           data.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
-        const validCloses = closes.filter(
-          (c: number | null) => c != null
-        );
+        const validCloses = closes.filter((c: number | null) => c != null);
 
         if (validCloses.length < 2) {
           throw new Error("Not enough data points");
@@ -895,8 +1105,7 @@ export class YahooFinanceService {
 
         const startPrice = validCloses[0];
         const endPrice = validCloses[validCloses.length - 1];
-        const changePct =
-          ((endPrice - startPrice) / startPrice) * 100;
+        const changePct = ((endPrice - startPrice) / startPrice) * 100;
 
         return {
           symbol: etf.symbol,
@@ -966,8 +1175,7 @@ export class YahooFinanceService {
             symbol: crypto.symbol,
             name: crypto.name,
             price: price.regularMarketPrice?.raw || 0,
-            changePercent:
-              (price.regularMarketChangePercent?.raw || 0) * 100,
+            changePercent: (price.regularMarketChangePercent?.raw || 0) * 100,
             category: crypto.category,
             marketCap: price.marketCap?.raw,
           } as CryptoData;
@@ -1022,9 +1230,7 @@ export class YahooFinanceService {
     });
 
     const settled = await Promise.all(fetches);
-    const results = settled.filter(
-      (item): item is CryptoData => item !== null
-    );
+    const results = settled.filter((item): item is CryptoData => item !== null);
 
     if (results.length === 0) {
       throw new Error("Failed to fetch any crypto performance data");
@@ -1089,7 +1295,7 @@ export class YahooFinanceService {
         if (period === "1d") {
           const summary = await this.fetchQuoteSummary(
             stock.symbol,
-            "price,summaryDetail,defaultKeyStatistics,financialData",
+            "price,summaryDetail,defaultKeyStatistics,financialData"
           );
           const price = summary.price || {};
           const detail = summary.summaryDetail || {};
@@ -1099,23 +1305,25 @@ export class YahooFinanceService {
             symbol: stock.symbol,
             name: stock.name,
             price: price.regularMarketPrice?.raw || 0,
-            changePercent:
-              (price.regularMarketChangePercent?.raw || 0) * 100,
+            changePercent: (price.regularMarketChangePercent?.raw || 0) * 100,
             sector: stock.sector,
             marketCap: price.marketCap?.raw,
             volume: price.regularMarketVolume?.raw,
             peRatio: detail.trailingPE?.raw,
             pbRatio: keyStats.priceToBook?.raw,
             pegRatio: keyStats.pegRatio?.raw,
-            dividendYield: detail.dividendYield?.raw != null
-              ? detail.dividendYield.raw * 100
-              : undefined,
-            revenueGrowth: finData.revenueGrowth?.raw != null
-              ? finData.revenueGrowth.raw * 100
-              : undefined,
-            earningsGrowth: finData.earningsGrowth?.raw != null
-              ? finData.earningsGrowth.raw * 100
-              : undefined,
+            dividendYield:
+              detail.dividendYield?.raw != null
+                ? detail.dividendYield.raw * 100
+                : undefined,
+            revenueGrowth:
+              finData.revenueGrowth?.raw != null
+                ? finData.revenueGrowth.raw * 100
+                : undefined,
+            earningsGrowth:
+              finData.earningsGrowth?.raw != null
+                ? finData.earningsGrowth.raw * 100
+                : undefined,
           } as StockData;
         }
 
@@ -1140,9 +1348,7 @@ export class YahooFinanceService {
         const data = await response.json();
         const closes: number[] =
           data.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
-        const validCloses = closes.filter(
-          (c: number | null) => c != null,
-        );
+        const validCloses = closes.filter((c: number | null) => c != null);
 
         if (validCloses.length < 2) {
           throw new Error("Not enough data points");
@@ -1150,8 +1356,7 @@ export class YahooFinanceService {
 
         const startPrice = validCloses[0];
         const endPrice = validCloses[validCloses.length - 1];
-        const changePct =
-          ((endPrice - startPrice) / startPrice) * 100;
+        const changePct = ((endPrice - startPrice) / startPrice) * 100;
 
         return {
           symbol: stock.symbol,
@@ -1163,16 +1368,14 @@ export class YahooFinanceService {
       } catch (error) {
         logger.warn(
           `Failed to fetch stock ${stock.symbol} for period ${period}, skipping`,
-          { error: (error as Error).message },
+          { error: (error as Error).message }
         );
         return null;
       }
     });
 
     const settled = await Promise.all(fetches);
-    const results = settled.filter(
-      (item): item is StockData => item !== null,
-    );
+    const results = settled.filter((item): item is StockData => item !== null);
 
     if (results.length === 0) {
       throw new Error("Failed to fetch any stock performance data");
@@ -1198,7 +1401,6 @@ export class YahooFinanceService {
     return "annual";
   }
 
-
   /**
    * Parse quote response
    */
@@ -1223,7 +1425,7 @@ export class YahooFinanceService {
   private parseHistoricalResponse(chart: any): PriceData[] {
     const timestamps = chart.timestamp || [];
     const quotes = chart.indicators?.quote?.[0] || {};
-    
+
     const open = quotes.open || [];
     const high = quotes.high || [];
     const low = quotes.low || [];
@@ -1275,9 +1477,10 @@ export class YahooFinanceService {
       const estimate = entry.epsEstimate?.raw;
       const actual = entry.epsActual?.raw;
       const surprise = entry.epsDifference?.raw;
-      const surprisePercent = entry.surprisePercent?.raw != null
-        ? entry.surprisePercent.raw * 100
-        : undefined;
+      const surprisePercent =
+        entry.surprisePercent?.raw != null
+          ? entry.surprisePercent.raw * 100
+          : undefined;
 
       epsForecasts.push({
         quarter,
@@ -1348,7 +1551,10 @@ export class YahooFinanceService {
   /**
    * Get time range parameters for Yahoo Finance API
    */
-  private getTimeRangeParams(range: TimeRange): { interval: string; period: string } {
+  private getTimeRangeParams(range: TimeRange): {
+    interval: string;
+    period: string;
+  } {
     switch (range) {
       case "1D":
         return { interval: "5m", period: "1d" };
@@ -1373,7 +1579,9 @@ export class YahooFinanceService {
 }
 
 // Helper to access private getCrumb from fetchQuoteSummary
-async function getCrumbSafe(service: YahooFinanceService): Promise<{ crumb: string; cookie: string }> {
+async function getCrumbSafe(
+  service: YahooFinanceService
+): Promise<{ crumb: string; cookie: string }> {
   return (service as any).getCrumb();
 }
 

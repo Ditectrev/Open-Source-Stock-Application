@@ -31,12 +31,12 @@ const COUNTRY_NAME_TO_CODE: Record<string, string> = {
   "United States": "US",
   "United Kingdom": "UK",
   "European Union": "EU",
-  "Japan": "JP",
-  "China": "CN",
-  "Canada": "CA",
-  "Australia": "AU",
+  Japan: "JP",
+  China: "CN",
+  Canada: "CA",
+  Australia: "AU",
   "New Zealand": "NZ",
-  "Switzerland": "CH",
+  Switzerland: "CH",
 };
 
 const COUNTRY_CODE_TO_NAME: Record<string, string> = Object.fromEntries(
@@ -60,7 +60,8 @@ type ImportanceLevel = (typeof IMPORTANCE_LEVELS)[number];
 
 const IMPORTANCE_STYLES: Record<ImportanceLevel, string> = {
   high: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
-  medium: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
+  medium:
+    "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
   low: "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300",
 };
 
@@ -90,19 +91,23 @@ const todayStr = toDateString(today);
 const defaultStart = todayStr;
 const defaultEnd = "";
 
-export function EconomicCalendar({ data: externalData }: EconomicCalendarProps) {
+export function EconomicCalendar({
+  data: externalData,
+}: EconomicCalendarProps) {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
-  const [data, setData] = useState<EconomicEvent[] | null>(externalData ?? null);
+  const [data, setData] = useState<EconomicEvent[] | null>(
+    externalData ?? null
+  );
   const [loading, setLoading] = useState(!externalData);
   const [error, setError] = useState<string | null>(null);
   const [countryFilter, setCountryFilter] = useState<string>("All");
   const [startDate, setStartDate] = useState<string>(defaultStart);
   const [endDate, setEndDate] = useState<string>(defaultEnd);
-  const [importanceFilter, setImportanceFilter] = useState<Set<ImportanceLevel>>(
-    new Set(IMPORTANCE_LEVELS)
-  );
+  const [importanceFilter, setImportanceFilter] = useState<
+    Set<ImportanceLevel>
+  >(new Set(IMPORTANCE_LEVELS));
 
   const fetchData = useCallback(async () => {
     setError(null);
@@ -140,26 +145,34 @@ export function EconomicCalendar({ data: externalData }: EconomicCalendarProps) 
     });
   };
 
-  const filteredEvents = useMemo(() => data
-    ? data.filter((event) => {
-        if (countryFilter !== "All") {
-          const code = COUNTRY_NAME_TO_CODE[countryFilter] || countryFilter;
-          if (event.country !== code) return false;
-        }
-        if (!importanceFilter.has(event.importance)) return false;
-        const eventDate = typeof event.date === "string" ? new Date(event.date) : event.date;
-        const eventDateStr = toDateString(eventDate);
-        if (startDate && eventDateStr < startDate) return false;
-        if (endDate && eventDateStr > endDate) return false;
-        return true;
-      })
-    : [], [data, countryFilter, importanceFilter, startDate, endDate]);
+  const filteredEvents = useMemo(
+    () =>
+      data
+        ? data.filter((event) => {
+            if (countryFilter !== "All") {
+              const code = COUNTRY_NAME_TO_CODE[countryFilter] || countryFilter;
+              if (event.country !== code) return false;
+            }
+            if (!importanceFilter.has(event.importance)) return false;
+            const eventDate =
+              typeof event.date === "string"
+                ? new Date(event.date)
+                : event.date;
+            const eventDateStr = toDateString(eventDate);
+            if (startDate && eventDateStr < startDate) return false;
+            if (endDate && eventDateStr > endDate) return false;
+            return true;
+          })
+        : [],
+    [data, countryFilter, importanceFilter, startDate, endDate]
+  );
 
   // Group events by date
   const groupedEvents = useMemo(() => {
     const groups: Record<string, EconomicEvent[]> = {};
     for (const event of filteredEvents) {
-      const eventDate = typeof event.date === "string" ? new Date(event.date) : event.date;
+      const eventDate =
+        typeof event.date === "string" ? new Date(event.date) : event.date;
       const key = toDateString(eventDate);
       if (!groups[key]) groups[key] = [];
       groups[key].push(event);
@@ -186,7 +199,14 @@ export function EconomicCalendar({ data: externalData }: EconomicCalendarProps) 
         className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
         data-testid="economic-calendar-error"
       >
-        <ErrorMessage type="api" message={error} onRetry={() => { setLoading(true); fetchData(); }} />
+        <ErrorMessage
+          type="api"
+          message={error}
+          onRetry={() => {
+            setLoading(true);
+            fetchData();
+          }}
+        />
       </div>
     );
   }
@@ -198,12 +218,17 @@ export function EconomicCalendar({ data: externalData }: EconomicCalendarProps) 
       role="region"
       aria-label="Economic Calendar"
     >
-      <h3 className={`text-lg font-semibold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}>
+      <h3
+        className={`text-lg font-semibold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}
+      >
         Economic Calendar
       </h3>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-4" data-testid="filters">
+      <div
+        className="flex flex-col sm:flex-row gap-3 mb-4"
+        data-testid="filters"
+      >
         <div className="flex items-center gap-2">
           <label
             htmlFor="country-filter"
@@ -224,14 +249,18 @@ export function EconomicCalendar({ data: externalData }: EconomicCalendarProps) 
           >
             {COUNTRIES.map((c) => (
               <option key={c} value={c}>
-                {c === "All" ? "🌍 All" : `${COUNTRY_FLAG[COUNTRY_NAME_TO_CODE[c]] || ""} ${c}`}
+                {c === "All"
+                  ? "🌍 All"
+                  : `${COUNTRY_FLAG[COUNTRY_NAME_TO_CODE[c]] || ""} ${c}`}
               </option>
             ))}
           </select>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}>
+          <span
+            className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}
+          >
             Importance:
           </span>
           {IMPORTANCE_LEVELS.map((level) => (
@@ -271,7 +300,8 @@ export function EconomicCalendar({ data: externalData }: EconomicCalendarProps) 
           No events match the selected filters.
           {!externalData && (
             <span className="block mt-1 text-xs">
-              The data source may be temporarily unavailable. Try again in a few minutes.
+              The data source may be temporarily unavailable. Try again in a few
+              minutes.
             </span>
           )}
         </p>
@@ -296,19 +326,27 @@ export function EconomicCalendar({ data: externalData }: EconomicCalendarProps) 
                 >
                   {formatDayHeader(dateKey)}
                   {isToday && (
-                    <span className={`ml-2 text-xs font-normal px-1.5 py-0.5 rounded ${
-                      isDark ? "bg-blue-800 text-blue-200" : "bg-blue-200 text-blue-700"
-                    }`}>
+                    <span
+                      className={`ml-2 text-xs font-normal px-1.5 py-0.5 rounded ${
+                        isDark
+                          ? "bg-blue-800 text-blue-200"
+                          : "bg-blue-200 text-blue-700"
+                      }`}
+                    >
                       Today
                     </span>
                   )}
-                  <span className={`ml-2 text-xs font-normal ${isDark ? "text-gray-300" : "text-gray-500"}`}>
+                  <span
+                    className={`ml-2 text-xs font-normal ${isDark ? "text-gray-300" : "text-gray-500"}`}
+                  >
                     ({events.length} event{events.length !== 1 ? "s" : ""})
                   </span>
                 </div>
 
                 {/* Events table for this day */}
-                <div className={`divide-y ${isDark ? "divide-gray-700" : "divide-gray-100"}`}>
+                <div
+                  className={`divide-y ${isDark ? "divide-gray-700" : "divide-gray-100"}`}
+                >
                   {events.map((event) => (
                     <div
                       key={event.id}
@@ -318,14 +356,22 @@ export function EconomicCalendar({ data: externalData }: EconomicCalendarProps) 
                       data-testid={`event-${event.id}`}
                     >
                       {/* Time */}
-                      <span className={`text-xs w-12 shrink-0 pt-0.5 font-mono ${
-                        isDark ? "text-gray-300" : "text-gray-500"
-                      }`}>
+                      <span
+                        className={`text-xs w-12 shrink-0 pt-0.5 font-mono ${
+                          isDark ? "text-gray-300" : "text-gray-500"
+                        }`}
+                      >
                         {event.time || "—"}
                       </span>
 
                       {/* Flag + Country */}
-                      <span className="text-base w-6 shrink-0" aria-hidden="true" title={COUNTRY_CODE_TO_NAME[event.country] || event.country}>
+                      <span
+                        className="text-base w-6 shrink-0"
+                        aria-hidden="true"
+                        title={
+                          COUNTRY_CODE_TO_NAME[event.country] || event.country
+                        }
+                      >
                         {COUNTRY_FLAG[event.country] || "🏳️"}
                       </span>
 
@@ -338,24 +384,41 @@ export function EconomicCalendar({ data: externalData }: EconomicCalendarProps) 
                           >
                             {event.importance}
                           </span>
-                          <span className={`text-sm font-medium truncate ${isDark ? "text-gray-200" : "text-gray-900"}`}>
+                          <span
+                            className={`text-sm font-medium truncate ${isDark ? "text-gray-200" : "text-gray-900"}`}
+                          >
                             {event.name}
                           </span>
                         </div>
-                        {event.description && event.description !== event.name && (
-                          <p className={`text-xs mt-0.5 ${isDark ? "text-gray-300" : "text-gray-500"}`}>
-                            {event.description}
-                          </p>
-                        )}
+                        {event.description &&
+                          event.description !== event.name && (
+                            <p
+                              className={`text-xs mt-0.5 ${isDark ? "text-gray-300" : "text-gray-500"}`}
+                            >
+                              {event.description}
+                            </p>
+                          )}
                       </div>
 
                       {/* Values: Prev / Forecast / Actual */}
                       {(event.previous || event.forecast || event.actual) && (
-                        <div className={`flex gap-3 text-xs shrink-0 pt-0.5 ${isDark ? "text-gray-300" : "text-gray-500"}`}>
-                          {event.previous && <span>Prev: {event.previous}</span>}
-                          {event.forecast && <span>Fcst: {event.forecast}</span>}
+                        <div
+                          className={`flex gap-3 text-xs shrink-0 pt-0.5 ${isDark ? "text-gray-300" : "text-gray-500"}`}
+                        >
+                          {event.previous && (
+                            <span>Prev: {event.previous}</span>
+                          )}
+                          {event.forecast && (
+                            <span>Fcst: {event.forecast}</span>
+                          )}
                           {event.actual && (
-                            <span className={isDark ? "text-green-400 font-medium" : "text-green-700 font-medium"}>
+                            <span
+                              className={
+                                isDark
+                                  ? "text-green-400 font-medium"
+                                  : "text-green-700 font-medium"
+                              }
+                            >
                               Act: {event.actual}
                             </span>
                           )}

@@ -22,7 +22,10 @@ const DEFAULT_OPTIONS: Required<RetryOptions> = {
 /**
  * Calculate delay with exponential backoff
  */
-function calculateDelay(attempt: number, options: Required<RetryOptions>): number {
+function calculateDelay(
+  attempt: number,
+  options: Required<RetryOptions>
+): number {
   // Exponential backoff: 1s, 2s, 4s, 8s
   const exponentialDelay = options.baseDelayMs * Math.pow(2, attempt);
   const cappedDelay = Math.min(exponentialDelay, options.maxDelayMs);
@@ -53,17 +56,21 @@ export async function retryWithBackoff<T>(
 
   for (let attempt = 0; attempt < opts.maxAttempts; attempt++) {
     try {
-      logger.debug("Retry attempt", { context, attempt: attempt + 1, maxAttempts: opts.maxAttempts });
+      logger.debug("Retry attempt", {
+        context,
+        attempt: attempt + 1,
+        maxAttempts: opts.maxAttempts,
+      });
       const result = await fn();
-      
+
       if (attempt > 0) {
         logger.info("Retry succeeded", { context, attempt: attempt + 1 });
       }
-      
+
       return result;
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
-      
+
       // Don't retry on last attempt
       if (attempt === opts.maxAttempts - 1) {
         logger.error("All retry attempts failed", lastError, {

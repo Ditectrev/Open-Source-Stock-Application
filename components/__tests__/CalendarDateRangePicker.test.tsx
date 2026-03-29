@@ -53,10 +53,7 @@ describe("CalendarDateRangePicker", () => {
   it("calls onStartDateChange when start date input changes", () => {
     const onStart = vi.fn();
     render(
-      <CalendarDateRangePicker
-        {...defaultProps}
-        onStartDateChange={onStart}
-      />
+      <CalendarDateRangePicker {...defaultProps} onStartDateChange={onStart} />
     );
     fireEvent.change(screen.getByTestId("start-date"), {
       target: { value: "2025-06-01" },
@@ -67,10 +64,7 @@ describe("CalendarDateRangePicker", () => {
   it("calls onEndDateChange when end date input changes", () => {
     const onEnd = vi.fn();
     render(
-      <CalendarDateRangePicker
-        {...defaultProps}
-        onEndDateChange={onEnd}
-      />
+      <CalendarDateRangePicker {...defaultProps} onEndDateChange={onEnd} />
     );
     fireEvent.change(screen.getByTestId("end-date"), {
       target: { value: "2025-12-31" },

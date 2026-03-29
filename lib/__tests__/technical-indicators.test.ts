@@ -122,7 +122,10 @@ describe("calculateRSI", () => {
   });
 
   it("returns value between 0 and 100", () => {
-    const data = [100, 102, 99, 105, 103, 108, 106, 110, 107, 112, 109, 115, 111, 118, 114, 120];
+    const data = [
+      100, 102, 99, 105, 103, 108, 106, 110, 107, 112, 109, 115, 111, 118, 114,
+      120,
+    ];
     const rsi = calculateRSI(data, 14);
     expect(rsi).toBeGreaterThanOrEqual(0);
     expect(rsi).toBeLessThanOrEqual(100);
@@ -290,12 +293,22 @@ describe("getBollingerSignal", () => {
 
 describe("getOverallSentiment", () => {
   it("returns overpriced when majority overpriced", () => {
-    const signals: Signal[] = ["overpriced", "overpriced", "fair", "underpriced"];
+    const signals: Signal[] = [
+      "overpriced",
+      "overpriced",
+      "fair",
+      "underpriced",
+    ];
     expect(getOverallSentiment(signals)).toBe("overpriced");
   });
 
   it("returns underpriced when majority underpriced", () => {
-    const signals: Signal[] = ["underpriced", "underpriced", "underpriced", "fair"];
+    const signals: Signal[] = [
+      "underpriced",
+      "underpriced",
+      "underpriced",
+      "fair",
+    ];
     expect(getOverallSentiment(signals)).toBe("underpriced");
   });
 
@@ -310,7 +323,12 @@ describe("getOverallSentiment", () => {
   });
 
   it("returns fair when overpriced and underpriced are tied", () => {
-    const signals: Signal[] = ["overpriced", "underpriced", "overpriced", "underpriced"];
+    const signals: Signal[] = [
+      "overpriced",
+      "underpriced",
+      "overpriced",
+      "underpriced",
+    ];
     // Both have 2, fair has 0 — neither > the other AND neither > fair(0)
     // overpriced(2) > underpriced(2) is false, so falls through to fair
     expect(getOverallSentiment(signals)).toBe("fair");

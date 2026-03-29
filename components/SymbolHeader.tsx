@@ -3,7 +3,7 @@
 /**
  * SymbolHeader Component
  * Displays symbol name and current price with change indicators
- * 
+ *
  * Requirements: 2.4, 4.3
  */
 
@@ -50,7 +50,11 @@ export function SymbolHeader({ symbolData }: SymbolHeaderProps) {
         </div>
 
         {/* Price and Change */}
-        <div className="text-left sm:text-right" aria-live="polite" aria-atomic="true">
+        <div
+          className="text-left sm:text-right"
+          aria-live="polite"
+          aria-atomic="true"
+        >
           <div
             className={`text-2xl sm:text-3xl font-bold ${
               isDark ? "text-white" : "text-gray-900"
@@ -59,15 +63,16 @@ export function SymbolHeader({ symbolData }: SymbolHeaderProps) {
           >
             ${symbolData.price.toFixed(2)}
           </div>
-          <div className={`text-base sm:text-lg font-semibold ${changeColor}`} aria-label={`Change: ${isPositive ? "+" : ""}${symbolData.change.toFixed(2)} (${isPositive ? "+" : ""}${symbolData.changePercent.toFixed(2)}%)`}>
+          <div
+            className={`text-base sm:text-lg font-semibold ${changeColor}`}
+            aria-label={`Change: ${isPositive ? "+" : ""}${symbolData.change.toFixed(2)} (${isPositive ? "+" : ""}${symbolData.changePercent.toFixed(2)}%)`}
+          >
             {isPositive ? "+" : ""}
             {symbolData.change.toFixed(2)} ({isPositive ? "+" : ""}
             {symbolData.changePercent.toFixed(2)}%)
           </div>
           <div
-            className={`text-sm ${
-              isDark ? "text-gray-300" : "text-gray-500"
-            }`}
+            className={`text-sm ${isDark ? "text-gray-300" : "text-gray-500"}`}
           >
             Last updated: {new Date(symbolData.lastUpdated).toLocaleString()}
           </div>

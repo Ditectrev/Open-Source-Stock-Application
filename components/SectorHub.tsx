@@ -19,13 +19,20 @@ type SortField = "sector" | "changePercent";
 type SortDirection = "asc" | "desc";
 
 const SECTOR_DESCRIPTIONS: Record<string, string> = {
-  Technology: "Companies in software, hardware, semiconductors, and IT services.",
-  Financial: "Banks, insurance companies, asset managers, and financial exchanges.",
-  "Consumer Discretionary": "Non-essential goods and services: retail, automotive, apparel, and entertainment.",
-  Communication: "Telecom providers, media companies, and interactive entertainment.",
-  Healthcare: "Pharmaceuticals, biotech, medical devices, and healthcare providers.",
-  Industrials: "Aerospace, defense, construction, machinery, and transportation.",
-  "Consumer Staples": "Essential products: food, beverages, household goods, and personal care.",
+  Technology:
+    "Companies in software, hardware, semiconductors, and IT services.",
+  Financial:
+    "Banks, insurance companies, asset managers, and financial exchanges.",
+  "Consumer Discretionary":
+    "Non-essential goods and services: retail, automotive, apparel, and entertainment.",
+  Communication:
+    "Telecom providers, media companies, and interactive entertainment.",
+  Healthcare:
+    "Pharmaceuticals, biotech, medical devices, and healthcare providers.",
+  Industrials:
+    "Aerospace, defense, construction, machinery, and transportation.",
+  "Consumer Staples":
+    "Essential products: food, beverages, household goods, and personal care.",
   Energy: "Oil, gas, coal, and renewable energy companies.",
   Materials: "Chemicals, metals, mining, paper, and construction materials.",
   "Real Estate": "REITs, property developers, and real estate services.",
@@ -114,19 +121,24 @@ export function SectorHub({
   const sortedData = data
     ? [...data].sort((a, b) => {
         const mul = sortDirection === "asc" ? 1 : -1;
-        if (sortField === "sector") return mul * a.sector.localeCompare(b.sector);
+        if (sortField === "sector")
+          return mul * a.sector.localeCompare(b.sector);
         return mul * (a.changePercent - b.changePercent);
       })
     : [];
 
-  const comparisonData = selectedSectors.length > 0
-    ? sortedData.filter((s) => selectedSectors.includes(s.sector))
-    : null;
+  const comparisonData =
+    selectedSectors.length > 0
+      ? sortedData.filter((s) => selectedSectors.includes(s.sector))
+      : null;
 
   // --- Loading ---
   if (loading) {
     return (
-      <div className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`} data-testid="sector-hub-loading">
+      <div
+        className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
+        data-testid="sector-hub-loading"
+      >
         <LoadingSpinner className="py-8" />
       </div>
     );
@@ -135,21 +147,41 @@ export function SectorHub({
   // --- Error ---
   if (error) {
     return (
-      <div className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`} data-testid="sector-hub-error">
-        <ErrorMessage type="api" message={error} onRetry={() => { setLoading(true); fetchData(); }} />
+      <div
+        className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
+        data-testid="sector-hub-error"
+      >
+        <ErrorMessage
+          type="api"
+          message={error}
+          onRetry={() => {
+            setLoading(true);
+            fetchData();
+          }}
+        />
       </div>
     );
   }
 
   if (!data || data.length === 0) return null;
 
-  const maxAbsChange = Math.max(...data.map((s) => Math.abs(s.changePercent)), 0.01);
+  const maxAbsChange = Math.max(
+    ...data.map((s) => Math.abs(s.changePercent)),
+    0.01
+  );
 
   return (
-    <div className={`p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`} data-testid="sector-hub" role="region" aria-label="Sectors Hub">
+    <div
+      className={`p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
+      data-testid="sector-hub"
+      role="region"
+      aria-label="Sectors Hub"
+    >
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 gap-3">
-        <h3 className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
+        <h3
+          className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}
+        >
           Sectors Hub
         </h3>
         <div className="flex items-center gap-2">
@@ -159,38 +191,59 @@ export function SectorHub({
             className={`text-xs px-3 py-2 rounded min-h-[36px] ${
               sortField === "changePercent"
                 ? "bg-blue-600 text-white"
-                : isDark ? "bg-gray-700 text-gray-300" : "bg-gray-100 text-gray-600"
+                : isDark
+                  ? "bg-gray-700 text-gray-300"
+                  : "bg-gray-100 text-gray-600"
             }`}
             data-testid="sort-performance"
             aria-label={`Sort by performance ${sortDirection === "asc" ? "ascending" : "descending"}`}
           >
-            Performance {sortField === "changePercent" ? (sortDirection === "asc" ? "↑" : "↓") : ""}
+            Performance{" "}
+            {sortField === "changePercent"
+              ? sortDirection === "asc"
+                ? "↑"
+                : "↓"
+              : ""}
           </button>
           <button
             onClick={() => handleSort("sector")}
             className={`text-xs px-3 py-2 rounded min-h-[36px] ${
               sortField === "sector"
                 ? "bg-blue-600 text-white"
-                : isDark ? "bg-gray-700 text-gray-300" : "bg-gray-100 text-gray-600"
+                : isDark
+                  ? "bg-gray-700 text-gray-300"
+                  : "bg-gray-100 text-gray-600"
             }`}
             data-testid="sort-name"
             aria-label={`Sort by name ${sortDirection === "asc" ? "ascending" : "descending"}`}
           >
-            Name {sortField === "sector" ? (sortDirection === "asc" ? "↑" : "↓") : ""}
+            Name{" "}
+            {sortField === "sector"
+              ? sortDirection === "asc"
+                ? "↑"
+                : "↓"
+              : ""}
           </button>
         </div>
       </div>
 
       {/* Time period selector */}
-      <div className="flex gap-1 mb-3 sm:mb-4 flex-wrap" data-testid="time-period-selector">
-        {(["1D", "1W", "1M", "3M", "1Y", "5Y", "YTD", "Max"] as TimePeriod[]).map((period) => (
+      <div
+        className="flex gap-1 mb-3 sm:mb-4 flex-wrap"
+        data-testid="time-period-selector"
+      >
+        {(
+          ["1D", "1W", "1M", "3M", "1Y", "5Y", "YTD", "Max"] as TimePeriod[]
+        ).map((period) => (
           <button
             key={period}
             onClick={() => setTimePeriod(period)}
             className={`text-xs px-2.5 py-2 rounded min-h-[36px] min-w-[36px] flex items-center justify-center ${
               timePeriod === period
                 ? "bg-blue-600 text-white"
-                : isDark ? "bg-gray-700 text-gray-300 hover:bg-gray-600" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                : isDark
+                  ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
             data-testid={`period-${period}`}
           >
@@ -200,11 +253,17 @@ export function SectorHub({
       </div>
 
       {/* Sector grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4" data-testid="sector-grid">
+      <div
+        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4"
+        data-testid="sector-grid"
+      >
         {sortedData.map((sector) => {
           const isPositive = sector.changePercent >= 0;
           const colorClass = isPositive ? "text-green-500" : "text-red-500";
-          const barWidth = Math.min(Math.abs(sector.changePercent) / maxAbsChange * 100, 100);
+          const barWidth = Math.min(
+            (Math.abs(sector.changePercent) / maxAbsChange) * 100,
+            100
+          );
           const barColor = isPositive ? "bg-green-500/20" : "bg-red-500/20";
           const isSelected = selectedSectors.includes(sector.sector);
           const isHovered = hoveredSector === sector.sector;
@@ -214,8 +273,12 @@ export function SectorHub({
               key={sector.sector}
               className={`relative p-3 sm:p-3 rounded-lg cursor-pointer transition-all min-h-[44px] ${
                 isSelected
-                  ? isDark ? "ring-2 ring-blue-500 bg-gray-700" : "ring-2 ring-blue-500 bg-blue-50"
-                  : isDark ? "bg-gray-700/50 hover:bg-gray-700" : "bg-gray-50 hover:bg-gray-100"
+                  ? isDark
+                    ? "ring-2 ring-blue-500 bg-gray-700"
+                    : "ring-2 ring-blue-500 bg-blue-50"
+                  : isDark
+                    ? "bg-gray-700/50 hover:bg-gray-700"
+                    : "bg-gray-50 hover:bg-gray-100"
               }`}
               data-testid={`sector-${sector.sector.replace(/\s+/g, "-")}`}
               onClick={() => toggleSectorComparison(sector.sector)}
@@ -223,7 +286,10 @@ export function SectorHub({
               onMouseLeave={() => setHoveredSector(null)}
               role="button"
               tabIndex={0}
-              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") toggleSectorComparison(sector.sector); }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ")
+                  toggleSectorComparison(sector.sector);
+              }}
               aria-pressed={isSelected}
               aria-label={`${sector.sector}: ${formatPercent(sector.changePercent)}`}
             >
@@ -235,10 +301,15 @@ export function SectorHub({
               />
 
               <div className="flex items-center justify-between">
-                <p className={`text-sm font-medium ${isDark ? "text-gray-200" : "text-gray-900"}`}>
+                <p
+                  className={`text-sm font-medium ${isDark ? "text-gray-200" : "text-gray-900"}`}
+                >
                   {sector.sector}
                 </p>
-                <p className={`text-sm font-semibold ${colorClass}`} data-testid={`change-${sector.sector.replace(/\s+/g, "-")}`}>
+                <p
+                  className={`text-sm font-semibold ${colorClass}`}
+                  data-testid={`change-${sector.sector.replace(/\s+/g, "-")}`}
+                >
                   {formatPercent(sector.changePercent)}
                 </p>
               </div>
@@ -262,7 +333,9 @@ export function SectorHub({
       {comparisonData && comparisonData.length > 0 && (
         <div className="mt-6" data-testid="comparison-view">
           <div className="flex items-center justify-between mb-3">
-            <h4 className={`text-sm font-semibold ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+            <h4
+              className={`text-sm font-semibold ${isDark ? "text-gray-300" : "text-gray-700"}`}
+            >
               Sector Comparison
             </h4>
             <button
@@ -276,19 +349,28 @@ export function SectorHub({
           <div className="space-y-2">
             {comparisonData.map((sector) => {
               const isPositive = sector.changePercent >= 0;
-              const barWidth = Math.min(Math.abs(sector.changePercent) / maxAbsChange * 100, 100);
+              const barWidth = Math.min(
+                (Math.abs(sector.changePercent) / maxAbsChange) * 100,
+                100
+              );
               return (
                 <div key={sector.sector} className="flex items-center gap-3">
-                  <span className={`text-xs w-40 truncate ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+                  <span
+                    className={`text-xs w-40 truncate ${isDark ? "text-gray-300" : "text-gray-700"}`}
+                  >
                     {sector.sector}
                   </span>
-                  <div className={`flex-1 h-4 rounded ${isDark ? "bg-gray-700" : "bg-gray-100"}`}>
+                  <div
+                    className={`flex-1 h-4 rounded ${isDark ? "bg-gray-700" : "bg-gray-100"}`}
+                  >
                     <div
                       className={`h-full rounded ${isPositive ? "bg-green-500" : "bg-red-500"}`}
                       style={{ width: `${barWidth}%` }}
                     />
                   </div>
-                  <span className={`text-xs font-medium w-16 text-right ${isPositive ? "text-green-500" : "text-red-500"}`}>
+                  <span
+                    className={`text-xs font-medium w-16 text-right ${isPositive ? "text-green-500" : "text-red-500"}`}
+                  >
                     {formatPercent(sector.changePercent)}
                   </span>
                 </div>

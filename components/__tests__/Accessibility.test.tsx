@@ -9,7 +9,11 @@ import { render, screen } from "@testing-library/react";
 
 // Mock theme context
 vi.mock("@/lib/theme-context", () => ({
-  useTheme: () => ({ theme: "light", setTheme: vi.fn(), resolvedTheme: "light" }),
+  useTheme: () => ({
+    theme: "light",
+    setTheme: vi.fn(),
+    resolvedTheme: "light",
+  }),
 }));
 
 // Mock lightweight-charts
@@ -32,7 +36,7 @@ global.fetch = vi.fn(() =>
   Promise.resolve({
     ok: true,
     json: () => Promise.resolve({ success: true, data: [] }),
-  } as Response),
+  } as Response)
 );
 
 import { LoadingSpinner } from "../LoadingSpinner";
@@ -72,7 +76,9 @@ describe("Accessibility - LoadingSpinner (Req 18.5)", () => {
 
   it("should have sr-only text for screen readers", () => {
     render(<LoadingSpinner message="Loading data..." />);
-    expect(screen.getAllByText("Loading data...").length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText("Loading data...").length
+    ).toBeGreaterThanOrEqual(1);
   });
 });
 

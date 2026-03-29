@@ -55,7 +55,7 @@ export function ScreenerHeatmapView({
     (item: HeatmapData) => {
       onSymbolClick?.(item.symbol);
     },
-    [onSymbolClick],
+    [onSymbolClick]
   );
 
   if (results.length === 0) {
@@ -70,7 +70,11 @@ export function ScreenerHeatmapView({
   }
 
   return (
-    <div data-testid="screener-heatmap-view" role="region" aria-label="Screener heatmap results">
+    <div
+      data-testid="screener-heatmap-view"
+      role="region"
+      aria-label="Screener heatmap results"
+    >
       {/* Placeholder: mini charts per asset will be added when historical data is available in screener results */}
       <HeatmapComponent data={heatmapData} onTileClick={handleTileClick} />
     </div>

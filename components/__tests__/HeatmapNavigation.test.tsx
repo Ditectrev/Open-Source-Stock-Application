@@ -1,9 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import {
-  HeatmapNavigation,
-  HeatmapType,
-} from "@/components/HeatmapNavigation";
+import { HeatmapNavigation, HeatmapType } from "@/components/HeatmapNavigation";
 
 vi.mock("@/lib/theme-context", () => ({
   useTheme: () => ({ resolvedTheme: "light" }),
@@ -24,15 +21,18 @@ describe("HeatmapNavigation", () => {
 
   it("marks the active tab with aria-selected", () => {
     render(<HeatmapNavigation {...defaultProps} />);
-    expect(
-      screen.getByTestId("heatmap-tab-etf")
-    ).toHaveAttribute("aria-selected", "true");
-    expect(
-      screen.getByTestId("heatmap-tab-crypto")
-    ).toHaveAttribute("aria-selected", "false");
-    expect(
-      screen.getByTestId("heatmap-tab-stock")
-    ).toHaveAttribute("aria-selected", "false");
+    expect(screen.getByTestId("heatmap-tab-etf")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    );
+    expect(screen.getByTestId("heatmap-tab-crypto")).toHaveAttribute(
+      "aria-selected",
+      "false"
+    );
+    expect(screen.getByTestId("heatmap-tab-stock")).toHaveAttribute(
+      "aria-selected",
+      "false"
+    );
   });
 
   it("calls onHeatmapChange when a tab is clicked", () => {
@@ -51,9 +51,10 @@ describe("HeatmapNavigation", () => {
 
   it("switches active styling when activeHeatmap changes", () => {
     const { rerender } = render(<HeatmapNavigation {...defaultProps} />);
-    expect(
-      screen.getByTestId("heatmap-tab-etf")
-    ).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByTestId("heatmap-tab-etf")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    );
 
     rerender(
       <HeatmapNavigation
@@ -61,11 +62,13 @@ describe("HeatmapNavigation", () => {
         onHeatmapChange={defaultProps.onHeatmapChange}
       />
     );
-    expect(
-      screen.getByTestId("heatmap-tab-etf")
-    ).toHaveAttribute("aria-selected", "false");
-    expect(
-      screen.getByTestId("heatmap-tab-stock")
-    ).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByTestId("heatmap-tab-etf")).toHaveAttribute(
+      "aria-selected",
+      "false"
+    );
+    expect(screen.getByTestId("heatmap-tab-stock")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    );
   });
 });

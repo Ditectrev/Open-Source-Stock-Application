@@ -47,9 +47,11 @@ bunx playwright test --headed
 ## Test Coverage
 
 ### Task 6.4: ChartComponent Unit Tests
+
 **Requirements: 4.2, 11.2, 11.4**
 
 Tests for the ChartComponent including:
+
 - Chart type switching (Line, Area, Candlestick)
 - Time range changes (1D, 1W, 1M, 3M, 1Y, 5Y, Max)
 - Responsive behavior
@@ -60,9 +62,11 @@ Tests for the ChartComponent including:
 Location: `components/__tests__/ChartComponent.test.tsx`
 
 ### Task 5.13: API Routes Unit Tests
+
 **Requirements: 3.5, 14.2**
 
 Tests for Market Data API routes including:
+
 - Successful data retrieval
 - Caching behavior
 - Rate limiting
@@ -73,6 +77,7 @@ Location: `app/api/market/__tests__/symbol.test.ts`
 ### Playwright E2E Tests
 
 Comprehensive end-to-end tests for chart functionality:
+
 - Chart loading and rendering
 - User interactions (clicking buttons, switching views)
 - Theme toggling
@@ -84,6 +89,7 @@ Location: `e2e/chart.spec.ts`
 ## Test Implementation Status
 
 ✅ **Completed:**
+
 - Vitest setup and configuration
 - Playwright setup and configuration
 - ChartComponent unit test structure
@@ -115,17 +121,18 @@ describe('MyComponent', () => {
 ### E2E Test Example
 
 ```typescript
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-test('should navigate to page', async ({ page }) => {
-  await page.goto('/my-page');
-  await expect(page.locator('h1')).toContainText('My Page');
+test("should navigate to page", async ({ page }) => {
+  await page.goto("/my-page");
+  await expect(page.locator("h1")).toContainText("My Page");
 });
 ```
 
 ## CI/CD Integration
 
 The tests are configured to run in CI environments:
+
 - Vitest runs with `--run` flag (no watch mode)
 - Playwright runs with retries and single worker in CI
 - Test reports are generated in HTML format
@@ -133,11 +140,13 @@ The tests are configured to run in CI environments:
 ## Troubleshooting
 
 ### Vitest Issues
+
 - Ensure jsdom is installed: `bun add -d jsdom`
 - Check vitest.config.ts for proper environment setup
 - Verify test files are in `__tests__` directories
 
 ### Playwright Issues
+
 - Install browsers: `bunx playwright install`
 - Ensure dev server is running for E2E tests
 - Check playwright.config.ts for correct baseURL

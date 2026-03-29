@@ -4,7 +4,7 @@
  * TechnicalIndicatorOverlay Component
  * Provides toggleable technical indicator overlays for charts
  * Supports Moving Averages, RSI, MACD, and Bollinger Bands
- * 
+ *
  * Requirements: 5.1, 5.2
  */
 
@@ -138,9 +138,11 @@ export function TechnicalIndicatorOverlay({
   const activeCount = indicators.filter((i) => i.visible).length;
 
   return (
-    <div className={`technical-indicator-overlay border rounded-lg shadow-sm ${
-      isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
-    }`}>
+    <div
+      className={`technical-indicator-overlay border rounded-lg shadow-sm ${
+        isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
+      }`}
+    >
       {/* Header */}
       <div
         className={`flex items-center justify-between p-3 cursor-pointer transition-colors ${
@@ -149,13 +151,19 @@ export function TechnicalIndicatorOverlay({
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center gap-2">
-          <span className={`font-semibold ${isDark ? "text-gray-100" : "text-gray-800"}`}>
+          <span
+            className={`font-semibold ${isDark ? "text-gray-100" : "text-gray-800"}`}
+          >
             Technical Indicators
           </span>
           {activeCount > 0 && (
-            <span className={`px-2 py-0.5 text-xs rounded-full ${
-              isDark ? "bg-blue-900 text-blue-200" : "bg-blue-100 text-blue-700"
-            }`}>
+            <span
+              className={`px-2 py-0.5 text-xs rounded-full ${
+                isDark
+                  ? "bg-blue-900 text-blue-200"
+                  : "bg-blue-100 text-blue-700"
+              }`}
+            >
               {activeCount} active
             </span>
           )}
@@ -179,13 +187,12 @@ export function TechnicalIndicatorOverlay({
 
       {/* Indicator List */}
       {isExpanded && (
-        <div className={`border-t ${isDark ? "border-gray-700" : "border-gray-200"}`}>
+        <div
+          className={`border-t ${isDark ? "border-gray-700" : "border-gray-200"}`}
+        >
           <div className="p-3 space-y-3">
             {indicators.map((indicator, index) => (
-              <div
-                key={index}
-                className="flex items-start gap-3"
-              >
+              <div key={index} className="flex items-start gap-3">
                 {/* Toggle Checkbox */}
                 <label className="flex items-start gap-2 flex-1 cursor-pointer group">
                   <input
@@ -198,8 +205,8 @@ export function TechnicalIndicatorOverlay({
                     <div className="flex items-center gap-2">
                       <span
                         className={`font-medium transition-colors ${
-                          isDark 
-                            ? "text-gray-200 group-hover:text-blue-400" 
+                          isDark
+                            ? "text-gray-200 group-hover:text-blue-400"
                             : "text-gray-800 group-hover:text-blue-600"
                         }`}
                       >
@@ -213,9 +220,11 @@ export function TechnicalIndicatorOverlay({
                         style={{ backgroundColor: indicator.color }}
                       />
                     </div>
-                    <p className={`text-xs mt-0.5 ${
-                      isDark ? "text-gray-300" : "text-gray-500"
-                    }`}>
+                    <p
+                      className={`text-xs mt-0.5 ${
+                        isDark ? "text-gray-300" : "text-gray-500"
+                      }`}
+                    >
                       {getIndicatorDescription(indicator)}
                     </p>
                   </div>
@@ -243,19 +252,33 @@ export function TechnicalIndicatorOverlay({
           </div>
 
           {/* Info Footer */}
-          <div className={`px-3 py-2 border-t text-xs ${
-            isDark 
-              ? "bg-gray-900 border-gray-700 text-gray-300" 
-              : "bg-gray-50 border-gray-200 text-gray-600"
-          }`}>
+          <div
+            className={`px-3 py-2 border-t text-xs ${
+              isDark
+                ? "bg-gray-900 border-gray-700 text-gray-300"
+                : "bg-gray-50 border-gray-200 text-gray-600"
+            }`}
+          >
             <p className="mb-2">
               💡 <strong>Quick Guide:</strong>
             </p>
             <ul className="space-y-1 ml-4 list-disc">
-              <li><strong>MA/EMA:</strong> Lines on chart show average price trends</li>
-              <li><strong>RSI:</strong> Bottom panel (0-100). &gt;70 = overbought, &lt;30 = oversold</li>
-              <li><strong>MACD:</strong> Bottom panel. Line crossovers signal momentum shifts</li>
-              <li><strong>Bollinger Bands:</strong> 3 lines on chart. Price touching bands = potential reversal</li>
+              <li>
+                <strong>MA/EMA:</strong> Lines on chart show average price
+                trends
+              </li>
+              <li>
+                <strong>RSI:</strong> Bottom panel (0-100). &gt;70 = overbought,
+                &lt;30 = oversold
+              </li>
+              <li>
+                <strong>MACD:</strong> Bottom panel. Line crossovers signal
+                momentum shifts
+              </li>
+              <li>
+                <strong>Bollinger Bands:</strong> 3 lines on chart. Price
+                touching bands = potential reversal
+              </li>
             </ul>
           </div>
         </div>
@@ -358,9 +381,7 @@ export function calculateRSI(
 /**
  * Calculate MACD (Moving Average Convergence Divergence)
  */
-export function calculateMACD(
-  data: PriceData[]
-): Array<{
+export function calculateMACD(data: PriceData[]): Array<{
   timestamp: Date;
   macd: number;
   signal: number;
@@ -387,8 +408,7 @@ export function calculateMACD(
 
   // Calculate signal line (9-period EMA of MACD)
   const signalMultiplier = 2 / (9 + 1);
-  let signal =
-    macdLine.slice(0, 9).reduce((sum, d) => sum + d.value, 0) / 9;
+  let signal = macdLine.slice(0, 9).reduce((sum, d) => sum + d.value, 0) / 9;
 
   for (let i = 8; i < macdLine.length; i++) {
     if (i === 8) {

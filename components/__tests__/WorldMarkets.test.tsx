@@ -12,7 +12,11 @@ import { MarketIndex } from "@/types";
 
 // Mock useTheme
 vi.mock("@/lib/theme-context", () => ({
-  useTheme: () => ({ theme: "light", resolvedTheme: "light", setTheme: vi.fn() }),
+  useTheme: () => ({
+    theme: "light",
+    resolvedTheme: "light",
+    setTheme: vi.fn(),
+  }),
 }));
 
 // Mock fetch

@@ -4,7 +4,7 @@
  * ChartWithIndicators Component
  * Combines ChartComponent with TechnicalIndicatorOverlay
  * Provides a complete charting solution with toggleable indicators
- * 
+ *
  * Requirements: 4.2, 5.1, 5.2, 11.2, 11.3, 11.4, 11.5
  */
 
@@ -37,9 +37,12 @@ export function ChartWithIndicators({
   const [hoveredPoint, setHoveredPoint] = useState<PriceData | null>(null);
 
   // Handle indicator changes from overlay
-  const handleIndicatorsChange = useCallback((newIndicators: ChartIndicator[]) => {
-    setIndicators(newIndicators);
-  }, []);
+  const handleIndicatorsChange = useCallback(
+    (newIndicators: ChartIndicator[]) => {
+      setIndicators(newIndicators);
+    },
+    []
+  );
 
   // Handle data point hover
   const handleDataPointHover = useCallback((point: PriceData | null) => {
@@ -47,11 +50,13 @@ export function ChartWithIndicators({
   }, []);
 
   return (
-    <div className="chart-with-indicators space-y-4" role="region" aria-label="Price chart with technical indicators">
+    <div
+      className="chart-with-indicators space-y-4"
+      role="region"
+      aria-label="Price chart with technical indicators"
+    >
       {/* Technical Indicator Controls */}
-      <TechnicalIndicatorOverlay
-        onIndicatorsChange={handleIndicatorsChange}
-      />
+      <TechnicalIndicatorOverlay onIndicatorsChange={handleIndicatorsChange} />
 
       {/* Chart */}
       <ChartComponent

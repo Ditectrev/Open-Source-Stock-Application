@@ -20,10 +20,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (query.trim().length === 0) {
-      return NextResponse.json(
-        { success: true, data: [] },
-        { status: 200 }
-      );
+      return NextResponse.json({ success: true, data: [] }, { status: 200 });
     }
 
     const results = await marketDataService.searchSymbols(query);
@@ -44,7 +41,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Failed to search symbols",
+        error:
+          error instanceof Error ? error.message : "Failed to search symbols",
         timestamp: new Date(),
       },
       { status: 500 }

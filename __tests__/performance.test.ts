@@ -17,7 +17,14 @@ describe("Bundle size limits (Req 15.5)", () => {
       fs.readFileSync(path.resolve(__dirname, "../package.json"), "utf-8")
     );
     const deps = Object.keys(pkg.dependencies);
-    const heavyLibs = ["lodash", "moment", "moment-timezone", "jquery", "underscore", "rxjs"];
+    const heavyLibs = [
+      "lodash",
+      "moment",
+      "moment-timezone",
+      "jquery",
+      "underscore",
+      "rxjs",
+    ];
     const found = deps.filter((d) => heavyLibs.includes(d));
     expect(found).toEqual([]);
   });
@@ -76,9 +83,7 @@ describe("Lazy loading behavior (Req 15.2)", () => {
 
   for (const component of dynamicComponents) {
     it(`should lazy-load ${component} via dynamic()`, () => {
-      const pattern = new RegExp(
-        `const\\s+${component}\\s*=\\s*dynamic\\(`
-      );
+      const pattern = new RegExp(`const\\s+${component}\\s*=\\s*dynamic\\(`);
       expect(pageSource).toMatch(pattern);
     });
   }
@@ -94,9 +99,7 @@ describe("Lazy loading behavior (Req 15.2)", () => {
     // All dynamic components except Footer should have a loading fallback
     const loadingCount = (pageSource.match(/loading:\s*\(\)\s*=>/g) || [])
       .length;
-    const dynamicCount = (
-      pageSource.match(/=\s*dynamic\(/g) || []
-    ).length;
+    const dynamicCount = (pageSource.match(/=\s*dynamic\(/g) || []).length;
     // Footer is lightweight and doesn't need a loading fallback
     expect(loadingCount).toBeGreaterThanOrEqual(dynamicCount - 1);
   });
@@ -128,9 +131,7 @@ describe("Lazy loading behavior (Req 15.2)", () => {
     ];
 
     for (const imp of staticImports!) {
-      const componentMatch = imp.match(
-        /from\s+"@\/components\/(\w+)"/
-      );
+      const componentMatch = imp.match(/from\s+"@\/components\/(\w+)"/);
       if (componentMatch) {
         expect(allowedStatic).toContain(componentMatch[1]);
       }

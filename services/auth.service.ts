@@ -71,10 +71,7 @@ export class AuthenticationService {
    */
   async signInWithEmail(email: string): Promise<void> {
     try {
-      await this.account.createEmailToken(
-        "unique()",
-        email
-      );
+      await this.account.createEmailToken("unique()", email);
     } catch (error) {
       throw new Error(
         `Email OTP failed: ${error instanceof Error ? error.message : "Unknown error"}`
@@ -85,10 +82,7 @@ export class AuthenticationService {
   /**
    * Verify email OTP token
    */
-  async verifyEmailOTP(
-    userId: string,
-    secret: string
-  ): Promise<AuthResult> {
+  async verifyEmailOTP(userId: string, secret: string): Promise<AuthResult> {
     try {
       const session = await this.account.createSession(userId, secret);
       const user = await this.account.get();

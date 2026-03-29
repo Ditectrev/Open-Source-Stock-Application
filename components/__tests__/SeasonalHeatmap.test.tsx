@@ -46,7 +46,20 @@ describe("SeasonalHeatmap", () => {
 
     it("should render month column headers", () => {
       renderWithTheme(mockSeasonalData);
-      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const months = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
       for (const m of months) {
         expect(screen.getByText(m)).toBeInTheDocument();
       }
@@ -93,7 +106,9 @@ describe("SeasonalHeatmap", () => {
 
     it("should show empty message when heatmap array is empty", () => {
       renderWithTheme({ heatmap: [], averageByMonth: {} });
-      expect(screen.getByText("No seasonal data available.")).toBeInTheDocument();
+      expect(
+        screen.getByText("No seasonal data available.")
+      ).toBeInTheDocument();
     });
   });
 
@@ -216,7 +231,9 @@ describe("SeasonalHeatmap", () => {
     it("should display the past performance disclaimer", () => {
       renderWithTheme(mockSeasonalData);
       expect(
-        screen.getByText("Past seasonality does not guarantee future performance")
+        screen.getByText(
+          "Past seasonality does not guarantee future performance"
+        )
       ).toBeInTheDocument();
     });
 
@@ -231,7 +248,9 @@ describe("SeasonalHeatmap", () => {
     it("should not display disclaimer when no data", () => {
       renderWithTheme(null);
       expect(
-        screen.queryByText("Past seasonality does not guarantee future performance")
+        screen.queryByText(
+          "Past seasonality does not guarantee future performance"
+        )
       ).not.toBeInTheDocument();
     });
   });

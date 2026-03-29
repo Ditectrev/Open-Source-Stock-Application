@@ -8,20 +8,16 @@ test.describe("Dividend Calendar", () => {
   test("should display the Dividend Calendar section on the home page", async ({
     page,
   }) => {
-    const calendar = page.getByTestId("dividend-calendar").or(
-      page.getByTestId("dividend-calendar-loading")
-    );
+    const calendar = page
+      .getByTestId("dividend-calendar")
+      .or(page.getByTestId("dividend-calendar-loading"));
     await expect(calendar).toBeVisible({ timeout: 15000 });
   });
 
-  test("should display the Dividend Calendar heading", async ({
-    page,
-  }) => {
+  test("should display the Dividend Calendar heading", async ({ page }) => {
     const calendar = page.getByTestId("dividend-calendar");
     await expect(calendar).toBeVisible({ timeout: 15000 });
-    await expect(
-      calendar.getByText("Dividend Calendar")
-    ).toBeVisible();
+    await expect(calendar.getByText("Dividend Calendar")).toBeVisible();
   });
 
   test("should display date range filters", async ({ page }) => {
@@ -32,9 +28,7 @@ test.describe("Dividend Calendar", () => {
     await expect(calendar.getByTestId("end-date")).toBeVisible();
   });
 
-  test("should show loading state before data arrives", async ({
-    page,
-  }) => {
+  test("should show loading state before data arrives", async ({ page }) => {
     await page.route("**/api/calendar/dividends", async (route) => {
       await new Promise((r) => setTimeout(r, 3000));
       await route.continue();
@@ -48,9 +42,9 @@ test.describe("Dividend Calendar", () => {
   test("should hide Dividend Calendar when a symbol is selected", async ({
     page,
   }) => {
-    const calendar = page.getByTestId("dividend-calendar").or(
-      page.getByTestId("dividend-calendar-loading")
-    );
+    const calendar = page
+      .getByTestId("dividend-calendar")
+      .or(page.getByTestId("dividend-calendar-loading"));
     await expect(calendar).toBeVisible({ timeout: 15000 });
 
     const searchInput = page.getByPlaceholder(/search stocks/i);
@@ -60,9 +54,7 @@ test.describe("Dividend Calendar", () => {
     await expect(calendar).not.toBeVisible({ timeout: 5000 });
   });
 
-  test("should filter events when date range is changed", async ({
-    page,
-  }) => {
+  test("should filter events when date range is changed", async ({ page }) => {
     const calendar = page.getByTestId("dividend-calendar");
     await expect(calendar).toBeVisible({ timeout: 15000 });
 

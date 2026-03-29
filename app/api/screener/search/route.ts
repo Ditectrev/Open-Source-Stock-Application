@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
         data: results,
         timestamp: new Date(),
       },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error) {
     logger.error("Screener search failed", error as Error);
@@ -44,12 +44,10 @@ export async function POST(request: NextRequest) {
       {
         success: false,
         error:
-          error instanceof Error
-            ? error.message
-            : "Failed to search screener",
+          error instanceof Error ? error.message : "Failed to search screener",
         timestamp: new Date(),
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

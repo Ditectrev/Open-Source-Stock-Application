@@ -18,7 +18,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover"
+        />
         {/* Preconnect to external API domains for faster data fetching */}
         <link rel="preconnect" href="https://production.dataviz.cnn.io" />
         <link rel="preconnect" href="https://query1.finance.yahoo.com" />

@@ -127,7 +127,14 @@ export function WorldMarkets({
         className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
         data-testid="world-markets-error"
       >
-        <ErrorMessage type="api" message={error} onRetry={() => { setLoading(true); fetchData(); }} />
+        <ErrorMessage
+          type="api"
+          message={error}
+          onRetry={() => {
+            setLoading(true);
+            fetchData();
+          }}
+        />
       </div>
     );
   }
@@ -153,7 +160,12 @@ export function WorldMarkets({
           if (indices.length === 0) return null;
 
           return (
-            <div key={region} data-testid={`region-${region}`} role="region" aria-label={`${region} markets`}>
+            <div
+              key={region}
+              data-testid={`region-${region}`}
+              role="region"
+              aria-label={`${region} markets`}
+            >
               <h4
                 className={`text-sm font-semibold mb-3 pb-1 border-b ${
                   isDark
@@ -209,7 +221,8 @@ export function WorldMarkets({
                           className={`text-xs font-medium ${colorClass}`}
                           data-testid={`change-${idx.symbol}`}
                         >
-                          {formatChange(idx.change)} ({formatPercent(idx.changePercent)})
+                          {formatChange(idx.change)} (
+                          {formatPercent(idx.changePercent)})
                         </p>
                       </div>
                     </li>

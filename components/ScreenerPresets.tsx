@@ -52,9 +52,7 @@ export function ScreenerPresets({
         const json = await res.json();
         setPresets(json.data ?? []);
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to load presets",
-        );
+        setError(err instanceof Error ? err.message : "Failed to load presets");
       } finally {
         setLoading(false);
       }
@@ -67,7 +65,7 @@ export function ScreenerPresets({
       setSelectedPresetId(preset.id);
       onPresetSelect(preset);
     },
-    [onPresetSelect],
+    [onPresetSelect]
   );
 
   const handleSave = useCallback(async () => {
@@ -96,9 +94,7 @@ export function ScreenerPresets({
       setSaveName("");
       setSaveDescription("");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to save preset",
-      );
+      setError(err instanceof Error ? err.message : "Failed to save preset");
     } finally {
       setSaving(false);
     }

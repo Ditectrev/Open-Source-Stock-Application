@@ -9,7 +9,12 @@
 import { describe, it, expect } from "vitest";
 import fc from "fast-check";
 import { screenerService } from "@/services/screener.service";
-import type { ScreenerFilter, ScreenerPreset, ScreenerResult, ValuationContext } from "@/types";
+import type {
+  ScreenerFilter,
+  ScreenerPreset,
+  ScreenerResult,
+  ValuationContext,
+} from "@/types";
 
 // ---------------------------------------------------------------------------
 // Arbitraries
@@ -20,7 +25,7 @@ const operatorArb = fc.constantFrom(
   "lt" as const,
   "gte" as const,
   "lte" as const,
-  "eq" as const,
+  "eq" as const
 );
 
 const numericFieldArb = fc.constantFrom(
@@ -33,7 +38,7 @@ const numericFieldArb = fc.constantFrom(
   "pegRatio",
   "dividendYield",
   "revenueGrowth",
-  "earningsGrowth",
+  "earningsGrowth"
 );
 
 const numericFilterArb: fc.Arbitrary<ScreenerFilter> = fc
@@ -72,7 +77,7 @@ const sectorArb = fc.constantFrom(
   "Materials",
   "Real Estate",
   "Utilities",
-  "Communication",
+  "Communication"
 );
 
 const sectorFilterArb: fc.Arbitrary<ScreenerFilter> = fc
@@ -86,7 +91,7 @@ const sectorFilterArb: fc.Arbitrary<ScreenerFilter> = fc
       "Industrials",
       "Consumer Staples",
     ],
-    { minLength: 1 },
+    { minLength: 1 }
   )
   .map((sectors) => ({
     field: "sector",
@@ -98,7 +103,7 @@ const sectorFilterArb: fc.Arbitrary<ScreenerFilter> = fc
 const filterArb: fc.Arbitrary<ScreenerFilter> = fc.oneof(
   { weight: 3, arbitrary: numericFilterArb },
   { weight: 1, arbitrary: betweenFilterArb },
-  { weight: 1, arbitrary: sectorFilterArb },
+  { weight: 1, arbitrary: sectorFilterArb }
 );
 
 /** Arbitrary for a non-empty preset name (alphanumeric + spaces). */
@@ -113,7 +118,7 @@ const filtersArb = fc.array(filterArb, { minLength: 1, maxLength: 8 });
 const valuationArb: fc.Arbitrary<ValuationContext> = fc.constantFrom(
   "overpriced",
   "underpriced",
-  "fair",
+  "fair"
 );
 
 const resultArb: fc.Arbitrary<ScreenerResult> = fc
@@ -155,7 +160,7 @@ const resultArb: fc.Arbitrary<ScreenerResult> = fc
 function savePreset(
   name: string,
   description: string,
-  filters: ScreenerFilter[],
+  filters: ScreenerFilter[]
 ): ScreenerPreset {
   return {
     id: `custom-${name.toLowerCase().replace(/\s+/g, "-")}`,
@@ -194,9 +199,9 @@ describe("Property 20: Custom Preset Round Trip", () => {
           // Filter combination must be exactly preserved
           expect(retrieved.filters).toEqual(filters);
           expect(retrieved.filters.length).toBe(filters.length);
-        },
+        }
       ),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
@@ -217,9 +222,9 @@ describe("Property 20: Custom Preset Round Trip", () => {
             expect(retrieved.filters[i].value).toEqual(filters[i].value);
             expect(retrieved.filters[i].label).toBe(filters[i].label);
           }
-        },
+        }
       ),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
@@ -238,11 +243,11 @@ describe("Property 20: Custom Preset Round Trip", () => {
           expect(retrieved.description).toBe(description);
           expect(retrieved.isDefault).toBe(false);
           expect(retrieved.id).toBe(
-            `custom-${name.toLowerCase().replace(/\s+/g, "-")}`,
+            `custom-${name.toLowerCase().replace(/\s+/g, "-")}`
           );
-        },
+        }
       ),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
@@ -260,17 +265,17 @@ describe("Property 20: Custom Preset Round Trip", () => {
 
           const originalResults = screenerService.filterResults(
             results,
-            filters,
+            filters
           );
           const roundTrippedResults = screenerService.filterResults(
             results,
-            retrieved.filters,
+            retrieved.filters
           );
 
           expect(roundTrippedResults).toEqual(originalResults);
-        },
+        }
       ),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
@@ -291,11 +296,11 @@ describe("Property 20: Custom Preset Round Trip", () => {
 
           expect(firstRest).toEqual(secondRest);
           expect(retrievePreset(first).filters).toEqual(
-            retrievePreset(second).filters,
+            retrievePreset(second).filters
           );
-        },
+        }
       ),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
@@ -314,9 +319,9 @@ describe("Property 20: Custom Preset Round Trip", () => {
           retrieved.filters.forEach((f, i) => {
             expect(f).toEqual(filters[i]);
           });
-        },
+        }
       ),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 });

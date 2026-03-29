@@ -52,11 +52,16 @@ const todayStr = toDateString(today);
 const defaultStart = todayStr;
 const defaultEnd = "";
 
-export function EarningsCalendar({ data: externalData, onSymbolClick }: EarningsCalendarProps) {
+export function EarningsCalendar({
+  data: externalData,
+  onSymbolClick,
+}: EarningsCalendarProps) {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
-  const [data, setData] = useState<EarningsEvent[] | null>(externalData ?? null);
+  const [data, setData] = useState<EarningsEvent[] | null>(
+    externalData ?? null
+  );
   const [loading, setLoading] = useState(!externalData);
   const [error, setError] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<string>(defaultStart);
@@ -86,20 +91,28 @@ export function EarningsCalendar({ data: externalData, onSymbolClick }: Earnings
     fetchData();
   }, [externalData, fetchData]);
 
-  const filteredEvents = useMemo(() => data
-    ? data.filter((event) => {
-        const eventDate = typeof event.date === "string" ? new Date(event.date) : event.date;
-        const eventDateStr = toDateString(eventDate);
-        if (startDate && eventDateStr < startDate) return false;
-        if (endDate && eventDateStr > endDate) return false;
-        return true;
-      })
-    : [], [data, startDate, endDate]);
+  const filteredEvents = useMemo(
+    () =>
+      data
+        ? data.filter((event) => {
+            const eventDate =
+              typeof event.date === "string"
+                ? new Date(event.date)
+                : event.date;
+            const eventDateStr = toDateString(eventDate);
+            if (startDate && eventDateStr < startDate) return false;
+            if (endDate && eventDateStr > endDate) return false;
+            return true;
+          })
+        : [],
+    [data, startDate, endDate]
+  );
 
   const groupedEvents = useMemo(() => {
     const groups: Record<string, EarningsEvent[]> = {};
     for (const event of filteredEvents) {
-      const eventDate = typeof event.date === "string" ? new Date(event.date) : event.date;
+      const eventDate =
+        typeof event.date === "string" ? new Date(event.date) : event.date;
       const key = toDateString(eventDate);
       if (!groups[key]) groups[key] = [];
       groups[key].push(event);
@@ -126,7 +139,14 @@ export function EarningsCalendar({ data: externalData, onSymbolClick }: Earnings
         className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
         data-testid="earnings-calendar-error"
       >
-        <ErrorMessage type="api" message={error} onRetry={() => { setLoading(true); fetchData(); }} />
+        <ErrorMessage
+          type="api"
+          message={error}
+          onRetry={() => {
+            setLoading(true);
+            fetchData();
+          }}
+        />
       </div>
     );
   }
@@ -138,12 +158,17 @@ export function EarningsCalendar({ data: externalData, onSymbolClick }: Earnings
       role="region"
       aria-label="Earnings Calendar"
     >
-      <h3 className={`text-lg font-semibold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}>
+      <h3
+        className={`text-lg font-semibold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}
+      >
         Earnings Calendar
       </h3>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-4" data-testid="filters">
+      <div
+        className="flex flex-col sm:flex-row gap-3 mb-4"
+        data-testid="filters"
+      >
         <CalendarDateRangePicker
           startDate={startDate}
           endDate={endDate}
@@ -162,7 +187,8 @@ export function EarningsCalendar({ data: externalData, onSymbolClick }: Earnings
           No earnings events match the selected filters.
           {!externalData && (
             <span className="block mt-1 text-xs">
-              The data source may be temporarily unavailable. Try again in a few minutes.
+              The data source may be temporarily unavailable. Try again in a few
+              minutes.
             </span>
           )}
         </p>
@@ -187,21 +213,31 @@ export function EarningsCalendar({ data: externalData, onSymbolClick }: Earnings
                 >
                   {formatDayHeader(dateKey)}
                   {isToday && (
-                    <span className={`ml-2 text-xs font-normal px-1.5 py-0.5 rounded ${
-                      isDark ? "bg-blue-800 text-blue-200" : "bg-blue-200 text-blue-700"
-                    }`}>
+                    <span
+                      className={`ml-2 text-xs font-normal px-1.5 py-0.5 rounded ${
+                        isDark
+                          ? "bg-blue-800 text-blue-200"
+                          : "bg-blue-200 text-blue-700"
+                      }`}
+                    >
                       Today
                     </span>
                   )}
-                  <span className={`ml-2 text-xs font-normal ${isDark ? "text-gray-300" : "text-gray-500"}`}>
+                  <span
+                    className={`ml-2 text-xs font-normal ${isDark ? "text-gray-300" : "text-gray-500"}`}
+                  >
                     ({events.length} event{events.length !== 1 ? "s" : ""})
                   </span>
                 </div>
 
                 {/* Events for this day */}
-                <div className={`divide-y ${isDark ? "divide-gray-700" : "divide-gray-100"}`}>
+                <div
+                  className={`divide-y ${isDark ? "divide-gray-700" : "divide-gray-100"}`}
+                >
                   {events.map((event) => {
-                    const hasSurprise = event.epsSurprise !== undefined && event.epsSurprise !== null;
+                    const hasSurprise =
+                      event.epsSurprise !== undefined &&
+                      event.epsSurprise !== null;
                     const isBeat = hasSurprise && event.epsSurprise! > 0;
                     const isMiss = hasSurprise && event.epsSurprise! < 0;
 
@@ -236,13 +272,17 @@ export function EarningsCalendar({ data: externalData, onSymbolClick }: Earnings
                         {/* Company details */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className={`text-sm font-medium truncate ${isDark ? "text-gray-200" : "text-gray-900"}`}>
+                            <span
+                              className={`text-sm font-medium truncate ${isDark ? "text-gray-200" : "text-gray-900"}`}
+                            >
                               {event.companyName}
                             </span>
                             {event.time && (
                               <span
                                 className={`text-xs px-1.5 py-0.5 rounded ${
-                                  isDark ? "bg-gray-700 text-gray-400" : "bg-gray-100 text-gray-500"
+                                  isDark
+                                    ? "bg-gray-700 text-gray-400"
+                                    : "bg-gray-100 text-gray-500"
                                 }`}
                                 data-testid={`time-${event.id}`}
                               >
@@ -252,22 +292,28 @@ export function EarningsCalendar({ data: externalData, onSymbolClick }: Earnings
                           </div>
 
                           {/* EPS row */}
-                          <div className={`flex flex-wrap gap-3 mt-1 text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}>
+                          <div
+                            className={`flex flex-wrap gap-3 mt-1 text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}
+                          >
                             <span data-testid={`eps-estimate-${event.id}`}>
                               Est: {formatEps(event.epsEstimate)}
                             </span>
-                            {event.epsActual !== undefined && event.epsActual !== null && (
-                              <span data-testid={`eps-actual-${event.id}`}>
-                                Act: {formatEps(event.epsActual)}
-                              </span>
-                            )}
+                            {event.epsActual !== undefined &&
+                              event.epsActual !== null && (
+                                <span data-testid={`eps-actual-${event.id}`}>
+                                  Act: {formatEps(event.epsActual)}
+                                </span>
+                              )}
                             {hasSurprise && (
                               <span
                                 className={surpriseColorClass}
                                 data-testid={`eps-surprise-${event.id}`}
                               >
-                                Surprise: {formatEps(event.epsSurprise)}{" "}
-                                ({formatSurprisePercent(event.epsSurprisePercent)})
+                                Surprise: {formatEps(event.epsSurprise)} (
+                                {formatSurprisePercent(
+                                  event.epsSurprisePercent
+                                )}
+                                )
                               </span>
                             )}
                           </div>

@@ -18,10 +18,7 @@ export async function GET() {
       timestamp: new Date(),
     });
   } catch (error) {
-    logger.error(
-      "Failed to fetch dividend events",
-      error as Error
-    );
+    logger.error("Failed to fetch dividend events", error as Error);
 
     return NextResponse.json(
       {

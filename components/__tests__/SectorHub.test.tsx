@@ -11,23 +11,77 @@ import { SectorHub } from "../SectorHub";
 import { SectorData } from "@/types";
 
 vi.mock("@/lib/theme-context", () => ({
-  useTheme: () => ({ theme: "light", resolvedTheme: "light", setTheme: vi.fn() }),
+  useTheme: () => ({
+    theme: "light",
+    resolvedTheme: "light",
+    setTheme: vi.fn(),
+  }),
 }));
 
 global.fetch = vi.fn();
 
 const mockData: SectorData[] = [
-  { sector: "Technology", performance: 180.5, changePercent: 1.25, constituents: 0 },
-  { sector: "Financial", performance: 42.3, changePercent: -0.45, constituents: 0 },
-  { sector: "Healthcare", performance: 140.1, changePercent: 0.78, constituents: 0 },
+  {
+    sector: "Technology",
+    performance: 180.5,
+    changePercent: 1.25,
+    constituents: 0,
+  },
+  {
+    sector: "Financial",
+    performance: 42.3,
+    changePercent: -0.45,
+    constituents: 0,
+  },
+  {
+    sector: "Healthcare",
+    performance: 140.1,
+    changePercent: 0.78,
+    constituents: 0,
+  },
   { sector: "Energy", performance: 88.9, changePercent: -1.1, constituents: 0 },
-  { sector: "Consumer Discretionary", performance: 195.2, changePercent: 0.32, constituents: 0 },
-  { sector: "Communication", performance: 82.4, changePercent: 0.55, constituents: 0 },
-  { sector: "Industrials", performance: 120.7, changePercent: 0.15, constituents: 0 },
-  { sector: "Consumer Staples", performance: 78.3, changePercent: -0.22, constituents: 0 },
-  { sector: "Materials", performance: 85.6, changePercent: 0.68, constituents: 0 },
-  { sector: "Real Estate", performance: 40.1, changePercent: -0.9, constituents: 0 },
-  { sector: "Utilities", performance: 70.2, changePercent: 0.1, constituents: 0 },
+  {
+    sector: "Consumer Discretionary",
+    performance: 195.2,
+    changePercent: 0.32,
+    constituents: 0,
+  },
+  {
+    sector: "Communication",
+    performance: 82.4,
+    changePercent: 0.55,
+    constituents: 0,
+  },
+  {
+    sector: "Industrials",
+    performance: 120.7,
+    changePercent: 0.15,
+    constituents: 0,
+  },
+  {
+    sector: "Consumer Staples",
+    performance: 78.3,
+    changePercent: -0.22,
+    constituents: 0,
+  },
+  {
+    sector: "Materials",
+    performance: 85.6,
+    changePercent: 0.68,
+    constituents: 0,
+  },
+  {
+    sector: "Real Estate",
+    performance: 40.1,
+    changePercent: -0.9,
+    constituents: 0,
+  },
+  {
+    sector: "Utilities",
+    performance: 70.2,
+    changePercent: 0.1,
+    constituents: 0,
+  },
 ];
 
 describe("SectorHub", () => {
@@ -182,7 +236,9 @@ describe("SectorHub", () => {
     render(<SectorHub />);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith("/api/market/sectors?period=1D");
+      expect(global.fetch).toHaveBeenCalledWith(
+        "/api/market/sectors?period=1D"
+      );
       expect(screen.getByTestId("sector-hub")).toBeDefined();
     });
   });

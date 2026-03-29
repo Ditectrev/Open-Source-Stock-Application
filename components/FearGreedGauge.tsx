@@ -47,9 +47,16 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
   const [loading, setLoading] = useState(!externalData);
   const [error, setError] = useState<string | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
-  const [historyRange, setHistoryRange] = useState<"1W" | "1M" | "3M" | "1Y" | "5Y" | "YTD" | "Max">("1M");
+  const [historyRange, setHistoryRange] = useState<
+    "1W" | "1M" | "3M" | "1Y" | "5Y" | "YTD" | "Max"
+  >("1M");
 
-  const [hoveredPoint, setHoveredPoint] = useState<{ x: number; y: number; value: number; date: Date } | null>(null);
+  const [hoveredPoint, setHoveredPoint] = useState<{
+    x: number;
+    y: number;
+    value: number;
+    date: Date;
+  } | null>(null);
 
   const fetchData = useCallback(async (limit: number = 30) => {
     setLoading(true);
@@ -73,10 +80,23 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
       setLoading(false);
       return;
     }
-    const limits: Record<string, number> = { "1W": 7, "1M": 30, "3M": 90, "1Y": 365, "5Y": 1825, "YTD": -1, "Max": 0 };
-    fetchData(historyRange === "YTD"
-      ? Math.ceil((Date.now() - new Date(new Date().getFullYear(), 0, 1).getTime()) / 86400000)
-      : limits[historyRange]);
+    const limits: Record<string, number> = {
+      "1W": 7,
+      "1M": 30,
+      "3M": 90,
+      "1Y": 365,
+      "5Y": 1825,
+      YTD: -1,
+      Max: 0,
+    };
+    fetchData(
+      historyRange === "YTD"
+        ? Math.ceil(
+            (Date.now() - new Date(new Date().getFullYear(), 0, 1).getTime()) /
+              86400000
+          )
+        : limits[historyRange]
+    );
   }, [externalData, fetchData, historyRange]);
 
   // --- Loading state ---
@@ -170,9 +190,7 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
             <div
               role="tooltip"
               className={`absolute right-0 top-8 z-10 w-64 p-3 rounded-lg shadow-lg text-sm ${
-                isDark
-                  ? "bg-gray-700 text-gray-200"
-                  : "bg-gray-900 text-white"
+                isDark ? "bg-gray-700 text-gray-200" : "bg-gray-900 text-white"
               }`}
             >
               {TOOLTIP_TEXT}
@@ -304,22 +322,27 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
               Historical Timeline
             </h4>
             {!externalData && (
-              <div className="flex gap-1 flex-wrap" data-testid="fear-greed-range-selector">
-                {(["1W", "1M", "3M", "1Y", "5Y", "YTD", "Max"] as const).map((range) => (
-                  <button
-                    key={range}
-                    onClick={() => setHistoryRange(range)}
-                    className={`px-2.5 py-1.5 text-xs rounded transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center ${
-                      historyRange === range
-                        ? "bg-blue-600 text-white"
-                        : isDark
-                          ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                          : "bg-gray-200 text-gray-600 hover:bg-gray-300"
-                    }`}
-                  >
-                    {range}
-                  </button>
-                ))}
+              <div
+                className="flex gap-1 flex-wrap"
+                data-testid="fear-greed-range-selector"
+              >
+                {(["1W", "1M", "3M", "1Y", "5Y", "YTD", "Max"] as const).map(
+                  (range) => (
+                    <button
+                      key={range}
+                      onClick={() => setHistoryRange(range)}
+                      className={`px-2.5 py-1.5 text-xs rounded transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center ${
+                        historyRange === range
+                          ? "bg-blue-600 text-white"
+                          : isDark
+                            ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                            : "bg-gray-200 text-gray-600 hover:bg-gray-300"
+                      }`}
+                    >
+                      {range}
+                    </button>
+                  )
+                )}
               </div>
             )}
           </div>
@@ -336,11 +359,16 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
                 const rect = svg.getBoundingClientRect();
                 const relX = (e.clientX - rect.left) / rect.width;
                 const idx = Math.round(relX * (data.history.length - 1));
-                const clamped = Math.max(0, Math.min(data.history.length - 1, idx));
+                const clamped = Math.max(
+                  0,
+                  Math.min(data.history.length - 1, idx)
+                );
                 const point = data.history[clamped];
                 if (point) {
                   // Snap X to the data point's position
-                  const snapX = (clamped / Math.max(data.history.length - 1, 1)) * rect.width;
+                  const snapX =
+                    (clamped / Math.max(data.history.length - 1, 1)) *
+                    rect.width;
                   // Snap Y to the data value (0 at bottom, 100 at top)
                   const snapY = ((100 - point.value) / 100) * rect.height;
                   setHoveredPoint({
@@ -399,7 +427,9 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
             {hoveredPoint && (
               <div
                 className={`absolute z-10 px-2 py-1 rounded text-xs shadow-lg pointer-events-none whitespace-nowrap ${
-                  isDark ? "bg-gray-700 text-gray-100" : "bg-gray-900 text-white"
+                  isDark
+                    ? "bg-gray-700 text-gray-100"
+                    : "bg-gray-900 text-white"
                 }`}
                 style={{
                   left: Math.min(hoveredPoint.x, 200),
@@ -407,7 +437,11 @@ export function FearGreedGauge({ data: externalData }: FearGreedGaugeProps) {
                 }}
                 data-testid="fear-greed-chart-tooltip"
               >
-                {hoveredPoint.date.toLocaleDateString()} — <span style={{ color: getColor(hoveredPoint.value) }}>{hoveredPoint.value}</span> ({getLabel(hoveredPoint.value)})
+                {hoveredPoint.date.toLocaleDateString()} —{" "}
+                <span style={{ color: getColor(hoveredPoint.value) }}>
+                  {hoveredPoint.value}
+                </span>{" "}
+                ({getLabel(hoveredPoint.value)})
               </div>
             )}
 

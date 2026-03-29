@@ -124,7 +124,12 @@ describe("Retry Functionality (Req 14.5)", () => {
       json: async () => ({
         success: true,
         data: [
-          { sector: "Technology", performance: 100, changePercent: 1.5, constituents: 0 },
+          {
+            sector: "Technology",
+            performance: 100,
+            changePercent: 1.5,
+            constituents: 0,
+          },
         ],
       }),
     });
@@ -239,8 +244,18 @@ describe("Retry Functionality (Req 14.5)", () => {
   it("SectorHub: preserves user context (time period, sort) during retry", async () => {
     // First render with data to set user context
     const mockData = [
-      { sector: "Technology", performance: 100, changePercent: 1.5, constituents: 0 },
-      { sector: "Financial", performance: 50, changePercent: -0.5, constituents: 0 },
+      {
+        sector: "Technology",
+        performance: 100,
+        changePercent: 1.5,
+        constituents: 0,
+      },
+      {
+        sector: "Financial",
+        performance: 50,
+        changePercent: -0.5,
+        constituents: 0,
+      },
     ];
 
     (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({

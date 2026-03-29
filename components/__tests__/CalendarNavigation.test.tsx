@@ -25,12 +25,14 @@ describe("CalendarNavigation", () => {
 
   it("marks the active tab with aria-selected", () => {
     render(<CalendarNavigation {...defaultProps} />);
-    expect(
-      screen.getByTestId("calendar-tab-economic")
-    ).toHaveAttribute("aria-selected", "true");
-    expect(
-      screen.getByTestId("calendar-tab-earnings")
-    ).toHaveAttribute("aria-selected", "false");
+    expect(screen.getByTestId("calendar-tab-economic")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    );
+    expect(screen.getByTestId("calendar-tab-earnings")).toHaveAttribute(
+      "aria-selected",
+      "false"
+    );
   });
 
   it("calls onCalendarChange when a tab is clicked", () => {
@@ -52,9 +54,10 @@ describe("CalendarNavigation", () => {
 
   it("switches active styling when activeCalendar changes", () => {
     const { rerender } = render(<CalendarNavigation {...defaultProps} />);
-    expect(
-      screen.getByTestId("calendar-tab-economic")
-    ).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByTestId("calendar-tab-economic")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    );
 
     rerender(
       <CalendarNavigation
@@ -62,11 +65,13 @@ describe("CalendarNavigation", () => {
         onCalendarChange={defaultProps.onCalendarChange}
       />
     );
-    expect(
-      screen.getByTestId("calendar-tab-economic")
-    ).toHaveAttribute("aria-selected", "false");
-    expect(
-      screen.getByTestId("calendar-tab-ipos")
-    ).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByTestId("calendar-tab-economic")).toHaveAttribute(
+      "aria-selected",
+      "false"
+    );
+    expect(screen.getByTestId("calendar-tab-ipos")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    );
   });
 });

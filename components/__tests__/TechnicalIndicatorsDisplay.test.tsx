@@ -15,9 +15,19 @@ vi.mock("@/lib/theme-context", () => ({
 
 const mockIndicators: TechnicalIndicators = {
   rsi: { value: 72.5, signal: "overpriced" },
-  macd: { value: 1.2345, signal: 0.9876, histogram: 0.2469, trend: "underpriced" },
+  macd: {
+    value: 1.2345,
+    signal: 0.9876,
+    histogram: 0.2469,
+    trend: "underpriced",
+  },
   movingAverages: { ma50: 155.0, ma200: 140.0, signal: "fair" },
-  bollingerBands: { upper: 170.0, middle: 150.0, lower: 130.0, signal: "overpriced" },
+  bollingerBands: {
+    upper: 170.0,
+    middle: 150.0,
+    lower: 130.0,
+    signal: "overpriced",
+  },
   overallSentiment: "overpriced",
 };
 
@@ -25,7 +35,9 @@ describe("TechnicalIndicatorsDisplay", () => {
   it("should render all four indicator cards", () => {
     render(<TechnicalIndicatorsDisplay indicators={mockIndicators} />);
 
-    expect(screen.getByText("RSI (Relative Strength Index)")).toBeInTheDocument();
+    expect(
+      screen.getByText("RSI (Relative Strength Index)")
+    ).toBeInTheDocument();
     expect(screen.getAllByText("MACD").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("Moving Averages")).toBeInTheDocument();
     expect(screen.getByText("Bollinger Bands")).toBeInTheDocument();
@@ -86,7 +98,9 @@ describe("TechnicalIndicatorsDisplay", () => {
   it("should show tooltip on hover over indicator name", () => {
     render(<TechnicalIndicatorsDisplay indicators={mockIndicators} />);
 
-    const rsiButton = screen.getByLabelText("More info about RSI (Relative Strength Index)");
+    const rsiButton = screen.getByLabelText(
+      "More info about RSI (Relative Strength Index)"
+    );
     fireEvent.mouseEnter(rsiButton);
 
     expect(
@@ -97,12 +111,18 @@ describe("TechnicalIndicatorsDisplay", () => {
   it("should hide tooltip on mouse leave", () => {
     render(<TechnicalIndicatorsDisplay indicators={mockIndicators} />);
 
-    const rsiButton = screen.getByLabelText("More info about RSI (Relative Strength Index)");
+    const rsiButton = screen.getByLabelText(
+      "More info about RSI (Relative Strength Index)"
+    );
     fireEvent.mouseEnter(rsiButton);
-    expect(screen.getByText(/RSI measures the speed and magnitude/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/RSI measures the speed and magnitude/)
+    ).toBeInTheDocument();
 
     fireEvent.mouseLeave(rsiButton);
-    expect(screen.queryByText(/RSI measures the speed and magnitude/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/RSI measures the speed and magnitude/)
+    ).not.toBeInTheDocument();
   });
 
   it("should NOT contain Buy or Sell language", () => {
@@ -137,7 +157,9 @@ describe("TechnicalIndicatorsDisplay", () => {
       overallSentiment: "underpriced",
     };
     render(<TechnicalIndicatorsDisplay indicators={underpriced} />);
-    expect(screen.getByText("Overall: Appears Underpriced")).toBeInTheDocument();
+    expect(
+      screen.getByText("Overall: Appears Underpriced")
+    ).toBeInTheDocument();
   });
 
   it("should display sentiment for fair overall", () => {
@@ -146,7 +168,9 @@ describe("TechnicalIndicatorsDisplay", () => {
       overallSentiment: "fair",
     };
     render(<TechnicalIndicatorsDisplay indicators={fair} />);
-    expect(screen.getByText("Overall: Appears Fairly Priced")).toBeInTheDocument();
+    expect(
+      screen.getByText("Overall: Appears Fairly Priced")
+    ).toBeInTheDocument();
   });
 
   it("should show tooltip on hover over MACD indicator name", () => {
@@ -160,7 +184,9 @@ describe("TechnicalIndicatorsDisplay", () => {
 
   it("should show tooltip on hover over Moving Averages indicator name", () => {
     render(<TechnicalIndicatorsDisplay indicators={mockIndicators} />);
-    const hoverTarget = screen.getByLabelText("More info about Moving Averages");
+    const hoverTarget = screen.getByLabelText(
+      "More info about Moving Averages"
+    );
     fireEvent.mouseEnter(hoverTarget);
     expect(
       screen.getByText(/Moving averages smooth out price data/)
@@ -169,7 +195,9 @@ describe("TechnicalIndicatorsDisplay", () => {
 
   it("should show tooltip on hover over Bollinger Bands indicator name", () => {
     render(<TechnicalIndicatorsDisplay indicators={mockIndicators} />);
-    const hoverTarget = screen.getByLabelText("More info about Bollinger Bands");
+    const hoverTarget = screen.getByLabelText(
+      "More info about Bollinger Bands"
+    );
     fireEvent.mouseEnter(hoverTarget);
     expect(
       screen.getByText(/Bollinger Bands consist of a middle band/)
@@ -179,9 +207,19 @@ describe("TechnicalIndicatorsDisplay", () => {
   it("should show all badges as Underpriced when all indicators are underpriced", () => {
     const allUnderpriced: TechnicalIndicators = {
       rsi: { value: 25.0, signal: "underpriced" },
-      macd: { value: -0.5, signal: -0.3, histogram: -0.2, trend: "underpriced" },
+      macd: {
+        value: -0.5,
+        signal: -0.3,
+        histogram: -0.2,
+        trend: "underpriced",
+      },
       movingAverages: { ma50: 140.0, ma200: 155.0, signal: "underpriced" },
-      bollingerBands: { upper: 170.0, middle: 150.0, lower: 130.0, signal: "underpriced" },
+      bollingerBands: {
+        upper: 170.0,
+        middle: 150.0,
+        lower: 130.0,
+        signal: "underpriced",
+      },
       overallSentiment: "underpriced",
     };
     render(<TechnicalIndicatorsDisplay indicators={allUnderpriced} />);
@@ -195,7 +233,12 @@ describe("TechnicalIndicatorsDisplay", () => {
       rsi: { value: 50.0, signal: "fair" },
       macd: { value: 0.0, signal: 0.0, histogram: 0.0, trend: "fair" },
       movingAverages: { ma50: 150.0, ma200: 150.0, signal: "fair" },
-      bollingerBands: { upper: 170.0, middle: 150.0, lower: 130.0, signal: "fair" },
+      bollingerBands: {
+        upper: 170.0,
+        middle: 150.0,
+        lower: 130.0,
+        signal: "fair",
+      },
       overallSentiment: "fair",
     };
     render(<TechnicalIndicatorsDisplay indicators={allFair} />);
@@ -209,7 +252,12 @@ describe("TechnicalIndicatorsDisplay", () => {
       rsi: { value: 85.0, signal: "overpriced" },
       macd: { value: 2.0, signal: 1.5, histogram: 0.5, trend: "overpriced" },
       movingAverages: { ma50: 170.0, ma200: 140.0, signal: "overpriced" },
-      bollingerBands: { upper: 170.0, middle: 150.0, lower: 130.0, signal: "overpriced" },
+      bollingerBands: {
+        upper: 170.0,
+        middle: 150.0,
+        lower: 130.0,
+        signal: "overpriced",
+      },
       overallSentiment: "overpriced",
     };
     render(<TechnicalIndicatorsDisplay indicators={allOverpriced} />);
@@ -238,9 +286,19 @@ describe("TechnicalIndicatorsDisplay", () => {
   it("should render correctly with negative values", () => {
     const negativeIndicators: TechnicalIndicators = {
       rsi: { value: 15.5, signal: "underpriced" },
-      macd: { value: -2.5678, signal: -1.2345, histogram: -1.3333, trend: "underpriced" },
+      macd: {
+        value: -2.5678,
+        signal: -1.2345,
+        histogram: -1.3333,
+        trend: "underpriced",
+      },
       movingAverages: { ma50: 100.0, ma200: 120.0, signal: "underpriced" },
-      bollingerBands: { upper: 130.0, middle: 110.0, lower: 90.0, signal: "underpriced" },
+      bollingerBands: {
+        upper: 130.0,
+        middle: 110.0,
+        lower: 90.0,
+        signal: "underpriced",
+      },
       overallSentiment: "underpriced",
     };
     render(<TechnicalIndicatorsDisplay indicators={negativeIndicators} />);

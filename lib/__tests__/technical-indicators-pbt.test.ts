@@ -52,12 +52,9 @@ describe("Property 16: Technical Indicator Color Coding", () => {
     it("should return 'underpriced' for any RSI < 30", () => {
       // Feature: stock-exchange-application, Property 16: Technical Indicator Color Coding
       fc.assert(
-        fc.property(
-          fc.double({ min: 0, max: 29.9999, noNaN: true }),
-          (rsi) => {
-            expect(getRSISignal(rsi)).toBe("underpriced");
-          }
-        ),
+        fc.property(fc.double({ min: 0, max: 29.9999, noNaN: true }), (rsi) => {
+          expect(getRSISignal(rsi)).toBe("underpriced");
+        }),
         { numRuns: 100 }
       );
     });

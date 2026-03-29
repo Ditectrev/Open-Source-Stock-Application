@@ -15,9 +15,7 @@ import type { ScreenerResult, ValuationContext } from "@/types";
 // Helpers
 // ---------------------------------------------------------------------------
 
-function makeResult(
-  overrides: Partial<ScreenerResult> = {},
-): ScreenerResult {
+function makeResult(overrides: Partial<ScreenerResult> = {}): ScreenerResult {
   return {
     symbol: "AAPL",
     name: "Apple Inc.",
@@ -48,7 +46,7 @@ function makeManyResults(count: number): ScreenerResult[] {
         ["fair", "overpriced", "underpriced"] as ValuationContext[]
       )[i % 3],
       matchScore: 50 + i,
-    }),
+    })
   );
 }
 
@@ -116,18 +114,14 @@ describe("ScreenerTableView", () => {
 
   it("should show dash for missing P/E ratio", () => {
     render(
-      <ScreenerTableView
-        results={[makeResult({ peRatio: undefined })]}
-      />,
+      <ScreenerTableView results={[makeResult({ peRatio: undefined })]} />
     );
     expect(screen.getByText("—")).toBeDefined();
   });
 
   it("should format negative change percent with minus sign", () => {
     render(
-      <ScreenerTableView
-        results={[makeResult({ changePercent: -3.14 })]}
-      />,
+      <ScreenerTableView results={[makeResult({ changePercent: -3.14 })]} />
     );
     expect(screen.getByText("-3.14%")).toBeDefined();
   });
@@ -178,9 +172,9 @@ describe("ScreenerTableView", () => {
     expect(priceHeader.textContent).toContain("▲");
 
     // Symbol header should no longer have arrow
-    expect(
-      screen.getByText("Symbol").closest("th")!.textContent,
-    ).not.toContain("▲");
+    expect(screen.getByText("Symbol").closest("th")!.textContent).not.toContain(
+      "▲"
+    );
   });
 
   it("should set aria-sort on the active column header", () => {
@@ -199,7 +193,7 @@ describe("ScreenerTableView", () => {
     render(
       <ScreenerTableView
         results={[makeResult({ valuationContext: "overpriced" })]}
-      />,
+      />
     );
     const row = screen.getByTestId("row-AAPL");
     expect(row.className).toContain("bg-red-50");
@@ -209,7 +203,7 @@ describe("ScreenerTableView", () => {
     render(
       <ScreenerTableView
         results={[makeResult({ valuationContext: "underpriced" })]}
-      />,
+      />
     );
     const row = screen.getByTestId("row-AAPL");
     expect(row.className).toContain("bg-green-50");
@@ -217,9 +211,7 @@ describe("ScreenerTableView", () => {
 
   it("should not apply tint to fair rows", () => {
     render(
-      <ScreenerTableView
-        results={[makeResult({ valuationContext: "fair" })]}
-      />,
+      <ScreenerTableView results={[makeResult({ valuationContext: "fair" })]} />
     );
     const row = screen.getByTestId("row-AAPL");
     expect(row.className).not.toContain("bg-red-50");
@@ -252,7 +244,7 @@ describe("ScreenerTableView", () => {
       <ScreenerTableView
         results={[makeResult({ symbol: "TSLA" })]}
         onSymbolClick={onClick}
-      />,
+      />
     );
 
     fireEvent.click(screen.getByTestId("row-TSLA"));
@@ -260,9 +252,7 @@ describe("ScreenerTableView", () => {
   });
 
   it("should not throw when row clicked without onSymbolClick", () => {
-    render(
-      <ScreenerTableView results={[makeResult({ symbol: "TSLA" })]} />,
-    );
+    render(<ScreenerTableView results={[makeResult({ symbol: "TSLA" })]} />);
     expect(() => {
       fireEvent.click(screen.getByTestId("row-TSLA"));
     }).not.toThrow();

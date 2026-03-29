@@ -95,7 +95,9 @@ describe("IPOCalendar", () => {
   it("should display expected listing date via day group headers (Req 24.19)", () => {
     render(<IPOCalendar data={mockEvents} />);
     const eventsList = screen.getByTestId("events-list");
-    const dayGroups = eventsList.querySelectorAll("[data-testid^='day-group-']");
+    const dayGroups = eventsList.querySelectorAll(
+      "[data-testid^='day-group-']"
+    );
     // 3 distinct days: daysFromNow(1), daysFromNow(5), daysFromNow(10)
     expect(dayGroups.length).toBe(3);
   });
@@ -103,7 +105,8 @@ describe("IPOCalendar", () => {
   it("should group events by day with correct counts", () => {
     render(<IPOCalendar data={mockEvents} />);
     // daysFromNow(1) has 2 events
-    const firstDayHeader = screen.getByTestId("events-list")
+    const firstDayHeader = screen
+      .getByTestId("events-list")
       .querySelector("[data-testid^='day-header-']");
     expect(firstDayHeader?.textContent).toContain("2 IPOs");
   });

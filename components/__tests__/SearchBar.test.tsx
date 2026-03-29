@@ -21,7 +21,7 @@ describe("SearchBar", () => {
 
   it("should render search input with placeholder", () => {
     render(<SearchBar placeholder="Search stocks..." />);
-    
+
     const input = screen.getByPlaceholderText("Search stocks...");
     expect(input).toBeDefined();
   });

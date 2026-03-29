@@ -51,7 +51,7 @@ global.fetch = vi.fn(() =>
   Promise.resolve({
     ok: true,
     json: () => Promise.resolve({ success: true, data: [] }),
-  } as Response),
+  } as Response)
 );
 
 import { LoadingSpinner } from "../LoadingSpinner";
@@ -63,10 +63,7 @@ import { Footer } from "../Footer";
 // on bg-gray-800 or bg-gray-900 backgrounds.
 // ---------------------------------------------------------------------------
 
-const LOW_CONTRAST_DARK_CLASSES = [
-  "dark:text-gray-400",
-  "dark:text-gray-500",
-];
+const LOW_CONTRAST_DARK_CLASSES = ["dark:text-gray-400", "dark:text-gray-500"];
 
 /**
  * Helper: renders a component and returns the full HTML string so we can
@@ -89,7 +86,7 @@ describe("Color Contrast Compliance (Req 18.3)", () => {
   describe("LoadingSpinner", () => {
     it("uses text-gray-300 (not text-gray-400) for message text in dark mode", () => {
       const { container } = render(
-        <LoadingSpinner message="Loading data..." />,
+        <LoadingSpinner message="Loading data..." />
       );
       const messageEl = container.querySelector("p");
       expect(messageEl).not.toBeNull();

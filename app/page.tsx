@@ -4,7 +4,15 @@ import dynamic from "next/dynamic";
 import { SearchBar } from "@/components/SearchBar";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useState, useEffect, useRef } from "react";
-import { SymbolData, PriceData, TechnicalIndicators, ForecastData, SeasonalData, FinancialData, TimeRange } from "@/types";
+import {
+  SymbolData,
+  PriceData,
+  TechnicalIndicators,
+  ForecastData,
+  SeasonalData,
+  FinancialData,
+  TimeRange,
+} from "@/types";
 import { SymbolHeader } from "@/components/SymbolHeader";
 import { TabNavigation } from "@/components/TabNavigation";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
@@ -15,69 +23,123 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 const OverviewTab = dynamic(
   () => import("@/components/OverviewTab").then((m) => m.OverviewTab),
-  { loading: () => <LoadingSpinner size="md" message="Loading overview..." />, ssr: false },
+  {
+    loading: () => <LoadingSpinner size="md" message="Loading overview..." />,
+    ssr: false,
+  }
 );
 
 const TechnicalIndicatorsDisplay = dynamic(
-  () => import("@/components/TechnicalIndicatorsDisplay").then((m) => m.TechnicalIndicatorsDisplay),
-  { loading: () => <LoadingSpinner size="md" message="Loading technicals..." />, ssr: false },
+  () =>
+    import("@/components/TechnicalIndicatorsDisplay").then(
+      (m) => m.TechnicalIndicatorsDisplay
+    ),
+  {
+    loading: () => <LoadingSpinner size="md" message="Loading technicals..." />,
+    ssr: false,
+  }
 );
 
 const ForecastDisplay = dynamic(
   () => import("@/components/ForecastDisplay").then((m) => m.ForecastDisplay),
-  { loading: () => <LoadingSpinner size="md" message="Loading forecasts..." />, ssr: false },
+  {
+    loading: () => <LoadingSpinner size="md" message="Loading forecasts..." />,
+    ssr: false,
+  }
 );
 
 const SeasonalHeatmap = dynamic(
   () => import("@/components/SeasonalHeatmap").then((m) => m.SeasonalHeatmap),
-  { loading: () => <LoadingSpinner size="md" message="Loading seasonals..." />, ssr: false },
+  {
+    loading: () => <LoadingSpinner size="md" message="Loading seasonals..." />,
+    ssr: false,
+  }
 );
 
 const FinancialsTable = dynamic(
   () => import("@/components/FinancialsTable").then((m) => m.FinancialsTable),
-  { loading: () => <LoadingSpinner size="md" message="Loading financials..." />, ssr: false },
+  {
+    loading: () => <LoadingSpinner size="md" message="Loading financials..." />,
+    ssr: false,
+  }
 );
 
 const FearGreedGauge = dynamic(
   () => import("@/components/FearGreedGauge").then((m) => m.FearGreedGauge),
-  { loading: () => <div style={{ minHeight: 320 }}><LoadingSpinner size="md" message="Loading Fear & Greed..." /></div>, ssr: false },
+  {
+    loading: () => (
+      <div style={{ minHeight: 320 }}>
+        <LoadingSpinner size="md" message="Loading Fear & Greed..." />
+      </div>
+    ),
+    ssr: false,
+  }
 );
 
 const WorldMarkets = dynamic(
   () => import("@/components/WorldMarkets").then((m) => m.WorldMarkets),
-  { loading: () => <div style={{ minHeight: 300 }}><LoadingSpinner size="md" message="Loading world markets..." /></div>, ssr: false },
+  {
+    loading: () => (
+      <div style={{ minHeight: 300 }}>
+        <LoadingSpinner size="md" message="Loading world markets..." />
+      </div>
+    ),
+    ssr: false,
+  }
 );
 
 const SectorHub = dynamic(
   () => import("@/components/SectorHub").then((m) => m.SectorHub),
-  { loading: () => <div style={{ minHeight: 300 }}><LoadingSpinner size="md" message="Loading sectors..." /></div>, ssr: false },
+  {
+    loading: () => (
+      <div style={{ minHeight: 300 }}>
+        <LoadingSpinner size="md" message="Loading sectors..." />
+      </div>
+    ),
+    ssr: false,
+  }
 );
 
 const HeatmapHub = dynamic(
   () => import("@/components/HeatmapHub").then((m) => m.HeatmapHub),
-  { loading: () => <LoadingSpinner size="md" message="Loading heatmaps..." />, ssr: false },
+  {
+    loading: () => <LoadingSpinner size="md" message="Loading heatmaps..." />,
+    ssr: false,
+  }
 );
 
 const ScreenerHub = dynamic(
   () => import("@/components/ScreenerHub").then((m) => m.ScreenerHub),
-  { loading: () => <LoadingSpinner size="md" message="Loading screener..." />, ssr: false },
+  {
+    loading: () => <LoadingSpinner size="md" message="Loading screener..." />,
+    ssr: false,
+  }
 );
 
 const CalendarHub = dynamic(
   () => import("@/components/CalendarHub").then((m) => m.CalendarHub),
-  { loading: () => <LoadingSpinner size="md" message="Loading calendars..." />, ssr: false },
+  {
+    loading: () => <LoadingSpinner size="md" message="Loading calendars..." />,
+    ssr: false,
+  }
 );
 
 const Footer = dynamic(
   () => import("@/components/Footer").then((m) => m.Footer),
-  { ssr: false },
+  { ssr: false }
 );
 
 /**
  * Defers rendering of children until the wrapper scrolls near the viewport.
  * Reduces initial JS execution and DOM size for below-the-fold sections.
  */
-function LazySection({ children, className }: { children: React.ReactNode; className?: string }) {
+function LazySection({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -91,7 +153,7 @@ function LazySection({ children, className }: { children: React.ReactNode; class
           observer.disconnect();
         }
       },
-      { rootMargin: "200px" },
+      { rootMargin: "200px" }
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -104,7 +166,12 @@ function LazySection({ children, className }: { children: React.ReactNode; class
   );
 }
 
-type TabType = "overview" | "financials" | "technicals" | "forecasts" | "seasonals";
+type TabType =
+  | "overview"
+  | "financials"
+  | "technicals"
+  | "forecasts"
+  | "seasonals";
 
 export default function Home() {
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
@@ -114,10 +181,13 @@ export default function Home() {
   const [timeRange, setTimeRange] = useState<TimeRange>("1M");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [technicalIndicators, setTechnicalIndicators] = useState<TechnicalIndicators | null>(null);
+  const [technicalIndicators, setTechnicalIndicators] =
+    useState<TechnicalIndicators | null>(null);
   const [forecastData, setForecastData] = useState<ForecastData | null>(null);
   const [seasonalData, setSeasonalData] = useState<SeasonalData | null>(null);
-  const [financialData, setFinancialData] = useState<FinancialData | null>(null);
+  const [financialData, setFinancialData] = useState<FinancialData | null>(
+    null
+  );
 
   // Fetch symbol data when selected
   useEffect(() => {
@@ -129,7 +199,9 @@ export default function Home() {
 
       try {
         // Fetch current symbol data
-        const symbolResponse = await fetch(`/api/market/symbol/${selectedSymbol}`);
+        const symbolResponse = await fetch(
+          `/api/market/symbol/${selectedSymbol}`
+        );
         if (!symbolResponse.ok) {
           throw new Error("Failed to fetch symbol data");
         }
@@ -147,35 +219,45 @@ export default function Home() {
         setHistoricalData(historicalResult.data);
 
         // Fetch technical indicators
-        const indicatorsResponse = await fetch(`/api/market/indicators/${selectedSymbol}`);
+        const indicatorsResponse = await fetch(
+          `/api/market/indicators/${selectedSymbol}`
+        );
         if (indicatorsResponse.ok) {
           const indicatorsResult = await indicatorsResponse.json();
           setTechnicalIndicators(indicatorsResult.data);
         }
 
         // Fetch forecast data
-        const forecastResponse = await fetch(`/api/market/forecast/${selectedSymbol}`);
+        const forecastResponse = await fetch(
+          `/api/market/forecast/${selectedSymbol}`
+        );
         if (forecastResponse.ok) {
           const forecastResult = await forecastResponse.json();
           setForecastData(forecastResult.data);
         }
 
         // Fetch seasonal data
-        const seasonalResponse = await fetch(`/api/market/seasonal/${selectedSymbol}`);
+        const seasonalResponse = await fetch(
+          `/api/market/seasonal/${selectedSymbol}`
+        );
         if (seasonalResponse.ok) {
           const seasonalResult = await seasonalResponse.json();
           setSeasonalData(seasonalResult.data);
         }
 
         // Fetch financials data
-        const financialsResponse = await fetch(`/api/market/financials/${selectedSymbol}`);
+        const financialsResponse = await fetch(
+          `/api/market/financials/${selectedSymbol}`
+        );
         if (financialsResponse.ok) {
           const financialsResult = await financialsResponse.json();
           setFinancialData(financialsResult.data);
         }
       } catch (err) {
         console.error("Error fetching symbol data:", err);
-        setError(err instanceof Error ? err.message : "Failed to load symbol data");
+        setError(
+          err instanceof Error ? err.message : "Failed to load symbol data"
+        );
       } finally {
         setLoading(false);
       }
@@ -208,8 +290,8 @@ export default function Home() {
         </div>
 
         <div className="mt-4 sm:mt-6 md:mt-8 lg:mt-10">
-          <SearchBar 
-            placeholder="Search stocks by symbol (e.g., AAPL, TSLA, MSFT)..." 
+          <SearchBar
+            placeholder="Search stocks by symbol (e.g., AAPL, TSLA, MSFT)..."
             onSelect={(symbol) => {
               setSelectedSymbol(symbol);
               setActiveTab("overview");
@@ -232,7 +314,9 @@ export default function Home() {
             {error && !loading && (
               <div className="text-center py-12">
                 <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 max-w-md mx-auto">
-                  <h2 className="text-xl font-semibold mb-2">Error Loading Symbol</h2>
+                  <h2 className="text-xl font-semibold mb-2">
+                    Error Loading Symbol
+                  </h2>
                   <p className="mb-4">{error}</p>
                   <button
                     onClick={() => setSelectedSymbol(null)}
@@ -250,7 +334,10 @@ export default function Home() {
                 <SymbolHeader symbolData={symbolData} />
 
                 {/* Tab Navigation */}
-                <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+                <TabNavigation
+                  activeTab={activeTab}
+                  onTabChange={setActiveTab}
+                />
 
                 {/* Tab Content */}
                 <div className="mt-6">
@@ -266,7 +353,9 @@ export default function Home() {
                     <FinancialsTable financials={financialData} />
                   )}
                   {activeTab === "technicals" && (
-                    <TechnicalIndicatorsDisplay indicators={technicalIndicators} />
+                    <TechnicalIndicatorsDisplay
+                      indicators={technicalIndicators}
+                    />
                   )}
                   {activeTab === "forecasts" && (
                     <ForecastDisplay forecast={forecastData} />
@@ -303,7 +392,6 @@ function DashboardContent({
 }: {
   onSymbolClick: (symbol: string) => void;
 }) {
-
   return (
     <>
       <FearGreedGauge />
@@ -314,10 +402,7 @@ function DashboardContent({
         <SectorHub />
       </div>
       <LazySection className="mt-6 sm:mt-8 lg:mt-10">
-        <HeatmapHub
-          refreshInterval={60000}
-          onSymbolClick={onSymbolClick}
-        />
+        <HeatmapHub refreshInterval={60000} onSymbolClick={onSymbolClick} />
       </LazySection>
       <LazySection className="mt-6 sm:mt-8 lg:mt-10">
         <ScreenerHub onSymbolClick={onSymbolClick} />

@@ -202,14 +202,9 @@ describe("ScreenerPresets", () => {
 
   it("should show loading state initially", () => {
     (global.fetch as ReturnType<typeof vi.fn>).mockReturnValueOnce(
-      new Promise(() => {}),
+      new Promise(() => {})
     );
-    render(
-      <ScreenerPresets
-        currentFilters={[]}
-        onPresetSelect={vi.fn()}
-      />,
-    );
+    render(<ScreenerPresets currentFilters={[]} onPresetSelect={vi.fn()} />);
     expect(screen.getByTestId("presets-loading")).toBeDefined();
   });
 
@@ -217,12 +212,7 @@ describe("ScreenerPresets", () => {
 
   it("should fetch and display all 7 default presets", async () => {
     mockFetchPresets();
-    render(
-      <ScreenerPresets
-        currentFilters={[]}
-        onPresetSelect={vi.fn()}
-      />,
-    );
+    render(<ScreenerPresets currentFilters={[]} onPresetSelect={vi.fn()} />);
 
     await waitFor(() => {
       expect(screen.getByTestId("screener-presets")).toBeDefined();
@@ -239,12 +229,7 @@ describe("ScreenerPresets", () => {
 
   it("should call GET /api/screener/presets on mount", async () => {
     mockFetchPresets();
-    render(
-      <ScreenerPresets
-        currentFilters={[]}
-        onPresetSelect={vi.fn()}
-      />,
-    );
+    render(<ScreenerPresets currentFilters={[]} onPresetSelect={vi.fn()} />);
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith("/api/screener/presets");
@@ -255,12 +240,7 @@ describe("ScreenerPresets", () => {
 
   it("should display error when fetch fails", async () => {
     mockFetchPresetsError();
-    render(
-      <ScreenerPresets
-        currentFilters={[]}
-        onPresetSelect={vi.fn()}
-      />,
-    );
+    render(<ScreenerPresets currentFilters={[]} onPresetSelect={vi.fn()} />);
 
     await waitFor(() => {
       expect(screen.getByTestId("presets-error")).toBeDefined();
@@ -273,10 +253,7 @@ describe("ScreenerPresets", () => {
     mockFetchPresets();
     const onPresetSelect = vi.fn();
     render(
-      <ScreenerPresets
-        currentFilters={[]}
-        onPresetSelect={onPresetSelect}
-      />,
+      <ScreenerPresets currentFilters={[]} onPresetSelect={onPresetSelect} />
     );
 
     await waitFor(() => {
@@ -289,7 +266,7 @@ describe("ScreenerPresets", () => {
       expect.objectContaining({
         id: "day-gainers",
         name: "Day Gainers",
-      }),
+      })
     );
   });
 
@@ -297,12 +274,7 @@ describe("ScreenerPresets", () => {
 
   it("should highlight the selected preset with aria-pressed", async () => {
     mockFetchPresets();
-    render(
-      <ScreenerPresets
-        currentFilters={[]}
-        onPresetSelect={vi.fn()}
-      />,
-    );
+    render(<ScreenerPresets currentFilters={[]} onPresetSelect={vi.fn()} />);
 
     await waitFor(() => {
       expect(screen.getByText("Day Gainers")).toBeDefined();
@@ -317,31 +289,22 @@ describe("ScreenerPresets", () => {
 
   it("should deselect previous preset when a new one is clicked", async () => {
     mockFetchPresets();
-    render(
-      <ScreenerPresets
-        currentFilters={[]}
-        onPresetSelect={vi.fn()}
-      />,
-    );
+    render(<ScreenerPresets currentFilters={[]} onPresetSelect={vi.fn()} />);
 
     await waitFor(() => {
       expect(screen.getByText("Day Gainers")).toBeDefined();
     });
 
     fireEvent.click(screen.getByTestId("preset-day-gainers"));
-    fireEvent.click(
-      screen.getByTestId("preset-most-active-penny-stocks"),
-    );
+    fireEvent.click(screen.getByTestId("preset-most-active-penny-stocks"));
 
     expect(
-      screen
-        .getByTestId("preset-day-gainers")
-        .getAttribute("aria-pressed"),
+      screen.getByTestId("preset-day-gainers").getAttribute("aria-pressed")
     ).toBe("false");
     expect(
       screen
         .getByTestId("preset-most-active-penny-stocks")
-        .getAttribute("aria-pressed"),
+        .getAttribute("aria-pressed")
     ).toBe("true");
   });
 
@@ -349,19 +312,14 @@ describe("ScreenerPresets", () => {
 
   it("should disable save button when no filters are active", async () => {
     mockFetchPresets();
-    render(
-      <ScreenerPresets
-        currentFilters={[]}
-        onPresetSelect={vi.fn()}
-      />,
-    );
+    render(<ScreenerPresets currentFilters={[]} onPresetSelect={vi.fn()} />);
 
     await waitFor(() => {
       expect(screen.getByTestId("save-preset-btn")).toBeDefined();
     });
 
     expect(
-      (screen.getByTestId("save-preset-btn") as HTMLButtonElement).disabled,
+      (screen.getByTestId("save-preset-btn") as HTMLButtonElement).disabled
     ).toBe(true);
   });
 
@@ -371,7 +329,7 @@ describe("ScreenerPresets", () => {
       <ScreenerPresets
         currentFilters={sampleFilters}
         onPresetSelect={vi.fn()}
-      />,
+      />
     );
 
     await waitFor(() => {
@@ -379,7 +337,7 @@ describe("ScreenerPresets", () => {
     });
 
     expect(
-      (screen.getByTestId("save-preset-btn") as HTMLButtonElement).disabled,
+      (screen.getByTestId("save-preset-btn") as HTMLButtonElement).disabled
     ).toBe(false);
   });
 
@@ -389,7 +347,7 @@ describe("ScreenerPresets", () => {
       <ScreenerPresets
         currentFilters={sampleFilters}
         onPresetSelect={vi.fn()}
-      />,
+      />
     );
 
     await waitFor(() => {
@@ -408,7 +366,7 @@ describe("ScreenerPresets", () => {
       <ScreenerPresets
         currentFilters={sampleFilters}
         onPresetSelect={vi.fn()}
-      />,
+      />
     );
 
     await waitFor(() => {
@@ -427,7 +385,7 @@ describe("ScreenerPresets", () => {
       <ScreenerPresets
         currentFilters={sampleFilters}
         onPresetSelect={vi.fn()}
-      />,
+      />
     );
 
     await waitFor(() => {
@@ -472,7 +430,7 @@ describe("ScreenerPresets", () => {
       <ScreenerPresets
         currentFilters={sampleFilters}
         onPresetSelect={vi.fn()}
-      />,
+      />
     );
 
     await waitFor(() => {
@@ -489,13 +447,11 @@ describe("ScreenerPresets", () => {
     fireEvent.click(screen.getByTestId("save-preset-confirm"));
 
     await waitFor(() => {
-      expect(
-        screen.getByTestId("custom-badge-custom-my-preset"),
-      ).toBeDefined();
+      expect(screen.getByTestId("custom-badge-custom-my-preset")).toBeDefined();
     });
 
     expect(
-      screen.getByTestId("custom-badge-custom-my-preset").textContent,
+      screen.getByTestId("custom-badge-custom-my-preset").textContent
     ).toBe("Custom");
   });
 
@@ -503,20 +459,13 @@ describe("ScreenerPresets", () => {
 
   it("should not show Custom badge on default presets", async () => {
     mockFetchPresets();
-    render(
-      <ScreenerPresets
-        currentFilters={[]}
-        onPresetSelect={vi.fn()}
-      />,
-    );
+    render(<ScreenerPresets currentFilters={[]} onPresetSelect={vi.fn()} />);
 
     await waitFor(() => {
       expect(screen.getByText("Day Gainers")).toBeDefined();
     });
 
-    expect(
-      screen.queryByTestId("custom-badge-day-gainers"),
-    ).toBeNull();
+    expect(screen.queryByTestId("custom-badge-day-gainers")).toBeNull();
   });
 
   // --- Save button disabled when name is empty ---
@@ -527,7 +476,7 @@ describe("ScreenerPresets", () => {
       <ScreenerPresets
         currentFilters={sampleFilters}
         onPresetSelect={vi.fn()}
-      />,
+      />
     );
 
     await waitFor(() => {
@@ -537,8 +486,7 @@ describe("ScreenerPresets", () => {
     fireEvent.click(screen.getByTestId("save-preset-btn"));
 
     expect(
-      (screen.getByTestId("save-preset-confirm") as HTMLButtonElement)
-        .disabled,
+      (screen.getByTestId("save-preset-confirm") as HTMLButtonElement).disabled
     ).toBe(true);
   });
 });

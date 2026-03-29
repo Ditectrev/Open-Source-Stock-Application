@@ -4,16 +4,23 @@ test.describe("Technical Indicators Tab", () => {
   /**
    * Helper: search for a symbol and wait for data to load
    */
-  async function selectSymbol(page: import("@playwright/test").Page, symbol: string) {
+  async function selectSymbol(
+    page: import("@playwright/test").Page,
+    symbol: string
+  ) {
     await page.goto("http://localhost:3000");
     const searchInput = page.getByPlaceholder(/search stocks/i);
     await searchInput.fill(symbol);
     await searchInput.press("Enter");
     // Wait for symbol header to appear
-    await expect(page.getByRole("heading", { name: new RegExp(symbol, "i") })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: new RegExp(symbol, "i") })
+    ).toBeVisible();
   }
 
-  test("should display Technical Indicators heading when Technicals tab is clicked", async ({ page }) => {
+  test("should display Technical Indicators heading when Technicals tab is clicked", async ({
+    page,
+  }) => {
     await selectSymbol(page, "AAPL");
     await page.getByRole("tab", { name: "Technicals" }).click();
     await expect(page.getByText("Technical Indicators")).toBeVisible();
@@ -38,7 +45,9 @@ test.describe("Technical Indicators Tab", () => {
     const gauge = page.getByTestId("sentiment-gauge");
     await expect(gauge).toBeVisible();
     // Should contain one of the sentiment labels
-    await expect(gauge).toContainText(/Overall: Appears (Overpriced|Underpriced|Fairly Priced)/);
+    await expect(gauge).toContainText(
+      /Overall: Appears (Overpriced|Underpriced|Fairly Priced)/
+    );
   });
 
   test("should display signal badges with correct labels", async ({ page }) => {
@@ -46,23 +55,31 @@ test.describe("Technical Indicators Tab", () => {
     await page.getByRole("tab", { name: "Technicals" }).click();
 
     // At least one badge should be visible (every indicator has a signal badge)
-    const badges = page.locator("text=/^(Overpriced|Underpriced|Fairly Priced)$/");
+    const badges = page.locator(
+      "text=/^(Overpriced|Underpriced|Fairly Priced)$/"
+    );
     const count = await badges.count();
     // 4 indicator cards + 1 sentiment badge = 5 badges minimum
     expect(count).toBeGreaterThanOrEqual(5);
   });
 
-  test("should show tooltip when hovering over an indicator name", async ({ page }) => {
+  test("should show tooltip when hovering over an indicator name", async ({
+    page,
+  }) => {
     await selectSymbol(page, "NVDA");
     await page.getByRole("tab", { name: "Technicals" }).click();
 
     // Hover over RSI indicator info button
-    const rsiButton = page.getByLabel("More info about RSI (Relative Strength Index)");
+    const rsiButton = page.getByLabel(
+      "More info about RSI (Relative Strength Index)"
+    );
     await expect(rsiButton).toBeVisible();
     await rsiButton.hover();
 
     // Tooltip should appear with RSI explanation
-    await expect(page.getByText(/RSI measures the speed and magnitude/)).toBeVisible({ timeout: 3000 });
+    await expect(
+      page.getByText(/RSI measures the speed and magnitude/)
+    ).toBeVisible({ timeout: 3000 });
   });
 
   test("should not contain Buy or Sell language", async ({ page }) => {
@@ -105,7 +122,9 @@ test.describe("Technical Indicators Tab", () => {
     expect(count).toBeGreaterThanOrEqual(4);
   });
 
-  test("should switch back to Overview tab from Technicals", async ({ page }) => {
+  test("should switch back to Overview tab from Technicals", async ({
+    page,
+  }) => {
     await selectSymbol(page, "AAPL");
 
     // Go to Technicals

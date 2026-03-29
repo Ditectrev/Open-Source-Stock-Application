@@ -12,7 +12,11 @@ import { FearGreedData } from "@/types";
 
 // Mock useTheme
 vi.mock("@/lib/theme-context", () => ({
-  useTheme: () => ({ theme: "light", resolvedTheme: "light", setTheme: vi.fn() }),
+  useTheme: () => ({
+    theme: "light",
+    resolvedTheme: "light",
+    setTheme: vi.fn(),
+  }),
 }));
 
 // Mock fetch
@@ -53,16 +57,22 @@ describe("FearGreedGauge", () => {
   it("should display historical timeline when history data exists (Req 9.3)", () => {
     render(<FearGreedGauge data={mockData} />);
     expect(screen.getByTestId("fear-greed-history")).toBeDefined();
-    expect(screen.getByRole("img", { name: /historical timeline/i })).toBeDefined();
+    expect(
+      screen.getByRole("img", { name: /historical timeline/i })
+    ).toBeDefined();
   });
 
   it("should label ranges: Extreme Fear, Fear, Neutral, Greed, Extreme Greed (Req 9.4)", () => {
     render(<FearGreedGauge data={mockData} />);
-    expect(screen.getAllByText(/Extreme Fear/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/Extreme Fear/).length).toBeGreaterThanOrEqual(
+      1
+    );
     expect(screen.getAllByText(/^Fear$/).length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText(/^Neutral$/).length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText(/^Greed$/).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText(/Extreme Greed/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/Extreme Greed/).length).toBeGreaterThanOrEqual(
+      1
+    );
   });
 
   it("should display the current label matching the value (Req 9.4)", () => {
@@ -72,7 +82,9 @@ describe("FearGreedGauge", () => {
 
   it("should show tooltip on hover explaining the index (Req 9.5)", async () => {
     render(<FearGreedGauge data={mockData} />);
-    const infoButton = screen.getByLabelText("What is the Fear and Greed Index?");
+    const infoButton = screen.getByLabelText(
+      "What is the Fear and Greed Index?"
+    );
     fireEvent.mouseEnter(infoButton.parentElement!);
 
     await waitFor(() => {
@@ -84,7 +96,9 @@ describe("FearGreedGauge", () => {
 
   it("should hide tooltip on mouse leave", async () => {
     render(<FearGreedGauge data={mockData} />);
-    const infoButton = screen.getByLabelText("What is the Fear and Greed Index?");
+    const infoButton = screen.getByLabelText(
+      "What is the Fear and Greed Index?"
+    );
     const parent = infoButton.parentElement!;
 
     fireEvent.mouseEnter(parent);
@@ -116,7 +130,9 @@ describe("FearGreedGauge", () => {
 
     await waitFor(() => {
       expect(screen.getByTestId("fear-greed-error")).toBeDefined();
-      expect(screen.getByText("Failed to fetch Fear & Greed data")).toBeDefined();
+      expect(
+        screen.getByText("Failed to fetch Fear & Greed data")
+      ).toBeDefined();
     });
   });
 
@@ -129,7 +145,9 @@ describe("FearGreedGauge", () => {
     render(<FearGreedGauge />);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith("/api/market/fear-greed?limit=30");
+      expect(global.fetch).toHaveBeenCalledWith(
+        "/api/market/fear-greed?limit=30"
+      );
       expect(screen.getByTestId("fear-greed-value").textContent).toBe("35");
     });
   });
@@ -145,7 +163,9 @@ describe("FearGreedGauge", () => {
         data={{ ...mockData, value: 10, label: "Extreme Fear" }}
       />
     );
-    expect(screen.getByTestId("fear-greed-label").textContent).toBe("Extreme Fear");
+    expect(screen.getByTestId("fear-greed-label").textContent).toBe(
+      "Extreme Fear"
+    );
     expect(screen.getByTestId("fear-greed-value").textContent).toBe("10");
   });
 
@@ -155,7 +175,9 @@ describe("FearGreedGauge", () => {
         data={{ ...mockData, value: 90, label: "Extreme Greed" }}
       />
     );
-    expect(screen.getByTestId("fear-greed-label").textContent).toBe("Extreme Greed");
+    expect(screen.getByTestId("fear-greed-label").textContent).toBe(
+      "Extreme Greed"
+    );
     expect(screen.getByTestId("fear-greed-value").textContent).toBe("90");
   });
 
@@ -169,9 +191,7 @@ describe("FearGreedGauge", () => {
   });
 
   it("should not render history section when history is empty", () => {
-    render(
-      <FearGreedGauge data={{ ...mockData, history: [] }} />
-    );
+    render(<FearGreedGauge data={{ ...mockData, history: [] }} />);
     expect(screen.queryByTestId("fear-greed-history")).toBeNull();
   });
 

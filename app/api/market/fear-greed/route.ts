@@ -9,7 +9,10 @@ import { logger } from "@/lib/logger";
 
 export async function GET(request: NextRequest) {
   try {
-    const limitParam = parseInt(request.nextUrl.searchParams.get("limit") || "30", 10);
+    const limitParam = parseInt(
+      request.nextUrl.searchParams.get("limit") || "30",
+      10
+    );
     // 0 means "all data" for the Alternative.me API
     const clampedLimit = limitParam === 0 ? 0 : Math.max(1, limitParam);
     const data = await marketDataService.getFearGreedIndex(clampedLimit);
@@ -25,7 +28,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Failed to fetch Fear & Greed Index",
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch Fear & Greed Index",
         timestamp: new Date(),
       },
       { status: 500 }

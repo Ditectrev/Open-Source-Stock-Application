@@ -116,16 +116,7 @@ test.describe("ETF Heatmap", () => {
     const etfHeatmap = page.getByTestId("etf-heatmap");
     await expect(etfHeatmap).toBeVisible({ timeout: 15000 });
 
-    for (const period of [
-      "1D",
-      "1W",
-      "1M",
-      "3M",
-      "1Y",
-      "5Y",
-      "YTD",
-      "MAX",
-    ]) {
+    for (const period of ["1D", "1W", "1M", "3M", "1Y", "5Y", "YTD", "MAX"]) {
       await expect(page.getByTestId(`heatmap-period-${period}`)).toBeVisible();
     }
   });

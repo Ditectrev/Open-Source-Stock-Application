@@ -5,13 +5,17 @@ test.describe("Sectors Hub", () => {
     await page.goto("/");
   });
 
-  test("should display the Sectors Hub section on the home page", async ({ page }) => {
+  test("should display the Sectors Hub section on the home page", async ({
+    page,
+  }) => {
     const sectorHub = page.getByTestId("sector-hub");
     await expect(sectorHub).toBeVisible({ timeout: 15000 });
     await expect(sectorHub.getByText("Sectors Hub")).toBeVisible();
   });
 
-  test("should display sector cards with performance percentages (Req 23.1, 23.3)", async ({ page }) => {
+  test("should display sector cards with performance percentages (Req 23.1, 23.3)", async ({
+    page,
+  }) => {
     const sectorHub = page.getByTestId("sector-hub");
     await expect(sectorHub).toBeVisible({ timeout: 15000 });
 
@@ -20,7 +24,9 @@ test.describe("Sectors Hub", () => {
     await expect(changeLocator).toBeVisible();
   });
 
-  test("should color-code positive green and negative red (Req 23.4)", async ({ page }) => {
+  test("should color-code positive green and negative red (Req 23.4)", async ({
+    page,
+  }) => {
     const sectorHub = page.getByTestId("sector-hub");
     await expect(sectorHub).toBeVisible({ timeout: 15000 });
 
@@ -40,12 +46,17 @@ test.describe("Sectors Hub", () => {
     await expect(page.getByTestId("period-YTD")).toBeVisible();
   });
 
-  test("should show comparison view when sectors are clicked (Req 23.5)", async ({ page }) => {
+  test("should show comparison view when sectors are clicked (Req 23.5)", async ({
+    page,
+  }) => {
     const sectorHub = page.getByTestId("sector-hub");
     await expect(sectorHub).toBeVisible({ timeout: 15000 });
 
     // Click the first sector card in the grid
-    const firstSector = sectorHub.getByTestId("sector-grid").locator("[data-testid^='sector-']").first();
+    const firstSector = sectorHub
+      .getByTestId("sector-grid")
+      .locator("[data-testid^='sector-']")
+      .first();
     await firstSector.click();
 
     await expect(page.getByTestId("comparison-view")).toBeVisible();
@@ -55,21 +66,29 @@ test.describe("Sectors Hub", () => {
     const sectorHub = page.getByTestId("sector-hub");
     await expect(sectorHub).toBeVisible({ timeout: 15000 });
 
-    const firstSector = sectorHub.getByTestId("sector-grid").locator("[data-testid^='sector-']").first();
+    const firstSector = sectorHub
+      .getByTestId("sector-grid")
+      .locator("[data-testid^='sector-']")
+      .first();
     await firstSector.hover();
 
     const tooltip = sectorHub.locator("[role='tooltip']").first();
     await expect(tooltip).toBeVisible({ timeout: 3000 });
   });
 
-  test("should sort sectors when sort button is clicked (Req 23.12)", async ({ page }) => {
+  test("should sort sectors when sort button is clicked (Req 23.12)", async ({
+    page,
+  }) => {
     const sectorHub = page.getByTestId("sector-hub");
     await expect(sectorHub).toBeVisible({ timeout: 15000 });
 
     await page.getByTestId("sort-name").click();
 
     // After sorting by name, first sector alphabetically should be first
-    const firstSector = sectorHub.getByTestId("sector-grid").locator("[data-testid^='sector-']").first();
+    const firstSector = sectorHub
+      .getByTestId("sector-grid")
+      .locator("[data-testid^='sector-']")
+      .first();
     const testId = await firstSector.getAttribute("data-testid");
     expect(testId).toBe("sector-Communication");
   });

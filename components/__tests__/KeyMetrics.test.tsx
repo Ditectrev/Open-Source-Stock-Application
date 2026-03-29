@@ -28,7 +28,7 @@ describe("KeyMetrics", () => {
 
   it("should render all key metrics", () => {
     render(<KeyMetrics symbolData={mockSymbolData} />);
-    
+
     expect(screen.getByText("Market Cap")).toBeInTheDocument();
     expect(screen.getByText("Volume")).toBeInTheDocument();
     expect(screen.getByText("52-Week High")).toBeInTheDocument();
@@ -38,43 +38,43 @@ describe("KeyMetrics", () => {
 
   it("should format market cap correctly", () => {
     render(<KeyMetrics symbolData={mockSymbolData} />);
-    
+
     expect(screen.getByText("$2.50T")).toBeInTheDocument();
   });
 
   it("should format volume correctly", () => {
     render(<KeyMetrics symbolData={mockSymbolData} />);
-    
+
     expect(screen.getByText("50.00M")).toBeInTheDocument();
   });
 
   it("should display 52-week high", () => {
     render(<KeyMetrics symbolData={mockSymbolData} />);
-    
+
     expect(screen.getByText("$180.00")).toBeInTheDocument();
   });
 
   it("should display 52-week low", () => {
     render(<KeyMetrics symbolData={mockSymbolData} />);
-    
+
     expect(screen.getByText("$120.00")).toBeInTheDocument();
   });
 
   it("should display 52-week range", () => {
     render(<KeyMetrics symbolData={mockSymbolData} />);
-    
+
     expect(screen.getByText("$120.00 - $180.00")).toBeInTheDocument();
   });
 
   it("should show tooltip on hover", () => {
     render(<KeyMetrics symbolData={mockSymbolData} />);
-    
+
     const marketCapCards = screen.getAllByText("Market Cap");
     const marketCapCard = marketCapCards[0].closest("div");
-    
+
     if (marketCapCard) {
       fireEvent.mouseEnter(marketCapCard);
-      
+
       expect(
         screen.getByText(/Market Capitalization is the total value/)
       ).toBeInTheDocument();
@@ -83,16 +83,16 @@ describe("KeyMetrics", () => {
 
   it("should hide tooltip on mouse leave", () => {
     render(<KeyMetrics symbolData={mockSymbolData} />);
-    
+
     const marketCapCards = screen.getAllByText("Market Cap");
     const marketCapCard = marketCapCards[0].closest("div");
-    
+
     if (marketCapCard) {
       fireEvent.mouseEnter(marketCapCard);
       expect(
         screen.getByText(/Market Capitalization is the total value/)
       ).toBeInTheDocument();
-      
+
       fireEvent.mouseLeave(marketCapCard);
       expect(
         screen.queryByText(/Market Capitalization is the total value/)
@@ -105,9 +105,9 @@ describe("KeyMetrics", () => {
       ...mockSymbolData,
       marketCap: 50000000000, // 50B
     };
-    
+
     render(<KeyMetrics symbolData={billionData} />);
-    
+
     expect(screen.getByText("$50.00B")).toBeInTheDocument();
   });
 
@@ -116,9 +116,9 @@ describe("KeyMetrics", () => {
       ...mockSymbolData,
       marketCap: 500000000, // 500M
     };
-    
+
     render(<KeyMetrics symbolData={millionData} />);
-    
+
     expect(screen.getByText("$500.00M")).toBeInTheDocument();
   });
 
@@ -127,9 +127,9 @@ describe("KeyMetrics", () => {
       ...mockSymbolData,
       volume: 2000000000, // 2B
     };
-    
+
     render(<KeyMetrics symbolData={highVolumeData} />);
-    
+
     expect(screen.getByText("2.00B")).toBeInTheDocument();
   });
 });

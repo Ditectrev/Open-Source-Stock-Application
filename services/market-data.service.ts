@@ -52,7 +52,11 @@ export class MarketDataService {
   /**
    * Search for symbols with caching and rate limiting
    */
-  async searchSymbols(query: string): Promise<Array<{ symbol: string; name: string; type: string; exchange: string }>> {
+  async searchSymbols(
+    query: string
+  ): Promise<
+    Array<{ symbol: string; name: string; type: string; exchange: string }>
+  > {
     if (!query || query.trim().length === 0) {
       return [];
     }
@@ -61,7 +65,10 @@ export class MarketDataService {
     const cacheKey = `search:${normalizedQuery}`;
 
     // Check cache first
-    const cached = cacheService.get<Array<{ symbol: string; name: string; type: string; exchange: string }>>(cacheKey);
+    const cached =
+      cacheService.get<
+        Array<{ symbol: string; name: string; type: string; exchange: string }>
+      >(cacheKey);
     if (cached) {
       return cached;
     }
@@ -69,12 +76,22 @@ export class MarketDataService {
     // Check rate limit
     const endpoint = `yahoo:search:${normalizedQuery}`;
     const allowed = await rateLimiter.checkLimit(endpoint);
-    
+
     if (!allowed) {
-      logger.warn("Rate limit exceeded for search, serving stale cache if available", { query });
-      const stale = cacheService.get<Array<{ symbol: string; name: string; type: string; exchange: string }>>(cacheKey);
+      logger.warn(
+        "Rate limit exceeded for search, serving stale cache if available",
+        { query }
+      );
+      const stale = cacheService.get<
+        Array<{
+          symbol: string;
+          name: string;
+          type: string;
+          exchange: string;
+        }>
+      >(cacheKey);
       if (stale) return stale;
-      
+
       throw new Error("Rate limit exceeded and no cached data available");
     }
 
@@ -103,13 +120,15 @@ export class MarketDataService {
     // Check rate limit
     const endpoint = `yahoo:quote:${symbol}`;
     const allowed = await rateLimiter.checkLimit(endpoint);
-    
+
     if (!allowed) {
-      logger.warn("Rate limit exceeded, serving stale cache if available", { symbol });
+      logger.warn("Rate limit exceeded, serving stale cache if available", {
+        symbol,
+      });
       // Try to serve stale cache
       const stale = cacheService.get<SymbolData>(cacheKey);
       if (stale) return stale;
-      
+
       throw new Error("Rate limit exceeded and no cached data available");
     }
 
@@ -126,7 +145,10 @@ export class MarketDataService {
   /**
    * Get historical prices with caching and rate limiting
    */
-  async getHistoricalPrices(symbol: string, range: TimeRange): Promise<PriceData[]> {
+  async getHistoricalPrices(
+    symbol: string,
+    range: TimeRange
+  ): Promise<PriceData[]> {
     const cacheKey = cacheService.generateKey(symbol, `historical:${range}`);
 
     // Check cache first
@@ -138,12 +160,15 @@ export class MarketDataService {
     // Check rate limit
     const endpoint = `yahoo:historical:${symbol}`;
     const allowed = await rateLimiter.checkLimit(endpoint);
-    
+
     if (!allowed) {
-      logger.warn("Rate limit exceeded, serving stale cache if available", { symbol, range });
+      logger.warn("Rate limit exceeded, serving stale cache if available", {
+        symbol,
+        range,
+      });
       const stale = cacheService.get<PriceData[]>(cacheKey);
       if (stale) return stale;
-      
+
       throw new Error("Rate limit exceeded and no cached data available");
     }
 
@@ -171,7 +196,7 @@ export class MarketDataService {
 
     // Get historical data to calculate indicators
     const priceData = await this.getHistoricalPrices(symbol, "1Y");
-    
+
     // Calculate indicators
     const indicators = this.calculateIndicators(priceData);
 
@@ -198,7 +223,9 @@ export class MarketDataService {
     const allowed = await rateLimiter.checkLimit(endpoint);
 
     if (!allowed) {
-      logger.warn("Rate limit exceeded, serving stale cache if available", { symbol });
+      logger.warn("Rate limit exceeded, serving stale cache if available", {
+        symbol,
+      });
       const stale = cacheService.get<ForecastData>(cacheKey);
       if (stale) return stale;
       throw new Error("Rate limit exceeded and no cached data available");
@@ -228,7 +255,7 @@ export class MarketDataService {
 
     // Get max historical data
     const priceData = await this.getHistoricalPrices(symbol, "Max");
-    
+
     // Calculate seasonal patterns
     const seasonal = this.calculateSeasonalPatterns(priceData);
 
@@ -253,12 +280,14 @@ export class MarketDataService {
     // Check rate limit
     const endpoint = `yahoo:financials:${symbol}`;
     const allowed = await rateLimiter.checkLimit(endpoint);
-    
+
     if (!allowed) {
-      logger.warn("Rate limit exceeded, serving stale cache if available", { symbol });
+      logger.warn("Rate limit exceeded, serving stale cache if available", {
+        symbol,
+      });
       const stale = cacheService.get<FinancialData>(cacheKey);
       if (stale) return stale;
-      
+
       throw new Error("Rate limit exceeded and no cached data available");
     }
 
@@ -287,12 +316,12 @@ export class MarketDataService {
     // Check rate limit
     const endpoint = "cnn:fear-greed";
     const allowed = await rateLimiter.checkLimit(endpoint);
-    
+
     if (!allowed) {
       logger.warn("Rate limit exceeded, serving stale cache if available");
       const stale = cacheService.get<FearGreedData>(cacheKey);
       if (stale) return stale;
-      
+
       throw new Error("Rate limit exceeded and no cached data available");
     }
 
@@ -321,12 +350,12 @@ export class MarketDataService {
     // Check rate limit
     const endpoint = "cnn:world-markets";
     const allowed = await rateLimiter.checkLimit(endpoint);
-    
+
     if (!allowed) {
       logger.warn("Rate limit exceeded, serving stale cache if available");
       const stale = cacheService.get<MarketIndex[]>(cacheKey);
       if (stale) return stale;
-      
+
       throw new Error("Rate limit exceeded and no cached data available");
     }
 
@@ -335,9 +364,12 @@ export class MarketDataService {
     try {
       data = await cnnApiService.getWorldMarkets();
     } catch (cnnError) {
-      logger.warn("CNN world markets unavailable, falling back to Yahoo Finance", {
-        error: (cnnError as Error).message,
-      });
+      logger.warn(
+        "CNN world markets unavailable, falling back to Yahoo Finance",
+        {
+          error: (cnnError as Error).message,
+        }
+      );
       data = await yahooFinanceService.getWorldMarkets();
     }
     rateLimiter.recordCall(endpoint);
@@ -383,15 +415,24 @@ export class MarketDataService {
     try {
       data = await cnnApiService.getEconomicEvents(country, importance);
     } catch (cnnError) {
-      logger.warn("CNN economic events unavailable, falling back to Trading Economics", {
-        error: (cnnError as Error).message,
-      });
+      logger.warn(
+        "CNN economic events unavailable, falling back to Trading Economics",
+        {
+          error: (cnnError as Error).message,
+        }
+      );
       try {
-        data = await tradingEconomicsService.getEconomicEvents(country, importance);
+        data = await tradingEconomicsService.getEconomicEvents(
+          country,
+          importance
+        );
       } catch (teError) {
-        logger.warn("Trading Economics also unavailable, returning empty list", {
-          error: (teError as Error).message,
-        });
+        logger.warn(
+          "Trading Economics also unavailable, returning empty list",
+          {
+            error: (teError as Error).message,
+          }
+        );
         data = [];
       }
     }
@@ -434,7 +475,10 @@ export class MarketDataService {
     }
 
     // Fetch from API
-    const data = await yahooFinanceService.getEarningsCalendar(startDate, endDate);
+    const data = await yahooFinanceService.getEarningsCalendar(
+      startDate,
+      endDate
+    );
     rateLimiter.recordCall(endpoint);
 
     // Cache the result
@@ -514,19 +558,19 @@ export class MarketDataService {
    * Get sector performance (placeholder - would integrate with sector data API)
    */
   async getSectorPerformance(period: string = "1d"): Promise<SectorData[]> {
-      const cacheKey = `market:sectors:${period}`;
+    const cacheKey = `market:sectors:${period}`;
 
-      const cached = cacheService.get<SectorData[]>(cacheKey);
-      if (cached) {
-        return cached;
-      }
-
-      const data = await yahooFinanceService.getSectorPerformance(period);
-
-      cacheService.set(cacheKey, data, this.cacheTTL);
-
-      return data;
+    const cached = cacheService.get<SectorData[]>(cacheKey);
+    if (cached) {
+      return cached;
     }
+
+    const data = await yahooFinanceService.getSectorPerformance(period);
+
+    cacheService.set(cacheKey, data, this.cacheTTL);
+
+    return data;
+  }
 
   /**
    * Get ETF performance data grouped by category
@@ -649,7 +693,7 @@ export class MarketDataService {
       const date = new Date(priceData[i].timestamp);
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
-      
+
       const prevClose = priceData[i - 1].close;
       const currClose = priceData[i].close;
       const returnPct = ((currClose - prevClose) / prevClose) * 100;
@@ -664,7 +708,8 @@ export class MarketDataService {
     const averageByMonth: Record<number, number> = {};
     for (const month in monthlyReturns) {
       const returns = monthlyReturns[month];
-      averageByMonth[month] = returns.reduce((sum, val) => sum + val, 0) / returns.length;
+      averageByMonth[month] =
+        returns.reduce((sum, val) => sum + val, 0) / returns.length;
     }
 
     return { heatmap, averageByMonth };

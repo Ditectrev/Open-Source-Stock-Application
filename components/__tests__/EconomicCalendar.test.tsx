@@ -11,14 +11,19 @@ import { EconomicCalendar } from "../EconomicCalendar";
 import { EconomicEvent } from "@/types";
 
 vi.mock("@/lib/theme-context", () => ({
-  useTheme: () => ({ theme: "light", resolvedTheme: "light", setTheme: vi.fn() }),
+  useTheme: () => ({
+    theme: "light",
+    resolvedTheme: "light",
+    setTheme: vi.fn(),
+  }),
 }));
 
 global.fetch = vi.fn();
 
 // Generate dates relative to today so tests always fall within the default date range
 const now = new Date();
-const daysFromNow = (d: number) => new Date(now.getTime() + d * 24 * 60 * 60 * 1000);
+const daysFromNow = (d: number) =>
+  new Date(now.getTime() + d * 24 * 60 * 60 * 1000);
 
 const mockEvents: EconomicEvent[] = [
   {
@@ -138,7 +143,9 @@ describe("EconomicCalendar", () => {
     render(<EconomicCalendar data={mockEvents} />);
 
     // Filter to Japan country
-    fireEvent.change(screen.getByTestId("country-filter"), { target: { value: "Japan" } });
+    fireEvent.change(screen.getByTestId("country-filter"), {
+      target: { value: "Japan" },
+    });
     // Deselect low importance (only JP event is low)
     fireEvent.click(screen.getByTestId("importance-low"));
 
@@ -157,7 +164,9 @@ describe("EconomicCalendar", () => {
     fireEvent.click(screen.getByTestId("importance-low"));
 
     // Low should still be pressed
-    expect(screen.getByTestId("importance-low").getAttribute("aria-pressed")).toBe("true");
+    expect(
+      screen.getByTestId("importance-low").getAttribute("aria-pressed")
+    ).toBe("true");
     expect(screen.getByText("Trade Balance")).toBeDefined();
   });
 
@@ -168,8 +177,12 @@ describe("EconomicCalendar", () => {
     const tomorrow = new Date(now.getTime() + 1 * 24 * 60 * 60 * 1000);
     const tomorrowStr = tomorrow.toISOString().slice(0, 10);
 
-    fireEvent.change(screen.getByTestId("start-date"), { target: { value: tomorrowStr } });
-    fireEvent.change(screen.getByTestId("end-date"), { target: { value: tomorrowStr } });
+    fireEvent.change(screen.getByTestId("start-date"), {
+      target: { value: tomorrowStr },
+    });
+    fireEvent.change(screen.getByTestId("end-date"), {
+      target: { value: tomorrowStr },
+    });
 
     expect(screen.getByText("Non-Farm Payrolls")).toBeDefined();
     expect(screen.queryByText("BOE Interest Rate Decision")).toBeNull();
@@ -239,10 +252,14 @@ describe("EconomicCalendar", () => {
     render(<EconomicCalendar data={mockEvents} />);
     // 4 events on 4 different days = 4 day groups
     const eventsList = screen.getByTestId("events-list");
-    const dayGroups = eventsList.querySelectorAll("[data-testid^='day-group-']");
+    const dayGroups = eventsList.querySelectorAll(
+      "[data-testid^='day-group-']"
+    );
     expect(dayGroups.length).toBe(4);
     // Each group has a header
-    const dayHeaders = eventsList.querySelectorAll("[data-testid^='day-header-']");
+    const dayHeaders = eventsList.querySelectorAll(
+      "[data-testid^='day-header-']"
+    );
     expect(dayHeaders.length).toBe(4);
   });
 });

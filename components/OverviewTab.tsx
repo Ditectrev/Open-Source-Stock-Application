@@ -3,7 +3,7 @@
 /**
  * OverviewTab Component
  * Displays price chart, current price, change, and key metrics
- * 
+ *
  * Requirements: 4.1, 4.2, 4.3, 4.4, 4.5
  */
 
@@ -61,7 +61,9 @@ export function OverviewTab({
             >
               ${symbolData.price.toFixed(2)}
             </div>
-            <div className={`text-lg sm:text-xl font-semibold mt-1 sm:mt-2 ${changeColor}`}>
+            <div
+              className={`text-lg sm:text-xl font-semibold mt-1 sm:mt-2 ${changeColor}`}
+            >
               {isPositive ? "+" : ""}
               {symbolData.change.toFixed(2)} ({isPositive ? "+" : ""}
               {symbolData.changePercent.toFixed(2)}%)
@@ -69,7 +71,8 @@ export function OverviewTab({
           </div>
           <div className={`px-4 py-2 rounded-lg ${changeBgColor}`}>
             <span className={`text-sm font-medium ${changeColor}`}>
-              {isPositive ? "▲" : "▼"} {Math.abs(symbolData.changePercent).toFixed(2)}% Today
+              {isPositive ? "▲" : "▼"}{" "}
+              {Math.abs(symbolData.changePercent).toFixed(2)}% Today
             </span>
           </div>
         </div>

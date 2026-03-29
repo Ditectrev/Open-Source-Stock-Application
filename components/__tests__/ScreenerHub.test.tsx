@@ -83,9 +83,7 @@ vi.mock("../ScreenerHeatmapView", () => ({
 // Helpers
 // ---------------------------------------------------------------------------
 
-function makeResult(
-  overrides: Partial<ScreenerResult> = {},
-): ScreenerResult {
+function makeResult(overrides: Partial<ScreenerResult> = {}): ScreenerResult {
   return {
     symbol: "AAPL",
     name: "Apple Inc.",
@@ -209,10 +207,10 @@ describe("ScreenerHub", () => {
     fireEvent.click(screen.getByTestId("view-toggle-heatmap"));
 
     expect(
-      screen.getByTestId("view-toggle-heatmap").getAttribute("aria-selected"),
+      screen.getByTestId("view-toggle-heatmap").getAttribute("aria-selected")
     ).toBe("true");
     expect(
-      screen.getByTestId("view-toggle-table").getAttribute("aria-selected"),
+      screen.getByTestId("view-toggle-table").getAttribute("aria-selected")
     ).toBe("false");
   });
 
@@ -298,7 +296,12 @@ describe("ScreenerHub", () => {
     expect(capturedOnFiltersChange).toBeDefined();
 
     const filters: ScreenerFilter[] = [
-      { field: "peRatio", operator: "lte", value: 20, label: "P/E Ratio <= 20" },
+      {
+        field: "peRatio",
+        operator: "lte",
+        value: 20,
+        label: "P/E Ratio <= 20",
+      },
     ];
 
     act(() => {
@@ -312,7 +315,12 @@ describe("ScreenerHub", () => {
 
   it("should restore filters from localStorage on mount", async () => {
     const filters: ScreenerFilter[] = [
-      { field: "sector", operator: "in", value: ["Technology"], label: "Sector: Technology" },
+      {
+        field: "sector",
+        operator: "in",
+        value: ["Technology"],
+        label: "Sector: Technology",
+      },
     ];
     localStorage.setItem("screener-filters", JSON.stringify(filters));
 
@@ -326,7 +334,9 @@ describe("ScreenerHub", () => {
   it("should remove localStorage key when filters are cleared", () => {
     localStorage.setItem(
       "screener-filters",
-      JSON.stringify([{ field: "peRatio", operator: "lte", value: 15, label: "P/E <= 15" }]),
+      JSON.stringify([
+        { field: "peRatio", operator: "lte", value: 15, label: "P/E <= 15" },
+      ])
     );
 
     render(<ScreenerHub />);
@@ -363,7 +373,12 @@ describe("ScreenerHub", () => {
     render(<ScreenerHub />);
 
     const filters: ScreenerFilter[] = [
-      { field: "volume", operator: "gte", value: 1000000, label: "Volume >= 1,000,000" },
+      {
+        field: "volume",
+        operator: "gte",
+        value: 1000000,
+        label: "Volume >= 1,000,000",
+      },
     ];
 
     // Should not throw even when localStorage.setItem fails
@@ -410,15 +425,15 @@ describe("ScreenerHub", () => {
     render(<ScreenerHub refreshInterval={5000} />);
 
     // No filters set — fetch should not be called on interval
-    const callsBefore = (global.fetch as ReturnType<typeof vi.fn>).mock
-      .calls.length;
+    const callsBefore = (global.fetch as ReturnType<typeof vi.fn>).mock.calls
+      .length;
 
     await act(async () => {
       vi.advanceTimersByTime(5000);
     });
 
-    const callsAfter = (global.fetch as ReturnType<typeof vi.fn>).mock
-      .calls.length;
+    const callsAfter = (global.fetch as ReturnType<typeof vi.fn>).mock.calls
+      .length;
     expect(callsAfter).toBe(callsBefore);
   });
 
@@ -431,15 +446,15 @@ describe("ScreenerHub", () => {
       ]);
     });
 
-    const callsBefore = (global.fetch as ReturnType<typeof vi.fn>).mock
-      .calls.length;
+    const callsBefore = (global.fetch as ReturnType<typeof vi.fn>).mock.calls
+      .length;
 
     await act(async () => {
       vi.advanceTimersByTime(60000);
     });
 
-    const callsAfter = (global.fetch as ReturnType<typeof vi.fn>).mock
-      .calls.length;
+    const callsAfter = (global.fetch as ReturnType<typeof vi.fn>).mock.calls
+      .length;
     expect(callsAfter).toBe(callsBefore);
   });
 
@@ -454,21 +469,21 @@ describe("ScreenerHub", () => {
 
     unmount();
 
-    const callsBefore = (global.fetch as ReturnType<typeof vi.fn>).mock
-      .calls.length;
+    const callsBefore = (global.fetch as ReturnType<typeof vi.fn>).mock.calls
+      .length;
 
     await act(async () => {
       vi.advanceTimersByTime(10000);
     });
 
-    const callsAfter = (global.fetch as ReturnType<typeof vi.fn>).mock
-      .calls.length;
+    const callsAfter = (global.fetch as ReturnType<typeof vi.fn>).mock.calls
+      .length;
     expect(callsAfter).toBe(callsBefore);
   });
 
   it("should handle auto-refresh fetch errors gracefully", async () => {
     (global.fetch as ReturnType<typeof vi.fn>).mockRejectedValue(
-      new Error("Network error"),
+      new Error("Network error")
     );
 
     render(<ScreenerHub refreshInterval={5000} />);

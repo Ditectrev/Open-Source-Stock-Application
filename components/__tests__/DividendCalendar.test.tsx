@@ -110,30 +110,28 @@ describe("DividendCalendar", () => {
 
   it("should display dividend amount and yield (Req 24.15)", () => {
     render(<DividendCalendar data={mockEvents} />);
-    expect(
-      screen.getByTestId("amount-div-JNJ-2026-04-01").textContent
-    ).toBe("Div: $1.24");
-    expect(
-      screen.getByTestId("yield-div-JNJ-2026-04-01").textContent
-    ).toBe("Yield: 2.95%");
+    expect(screen.getByTestId("amount-div-JNJ-2026-04-01").textContent).toBe(
+      "Div: $1.24"
+    );
+    expect(screen.getByTestId("yield-div-JNJ-2026-04-01").textContent).toBe(
+      "Yield: 2.95%"
+    );
   });
 
   it("should display payment date (Req 24.15)", () => {
     render(<DividendCalendar data={mockEvents} />);
-    const payEl = screen.getByTestId(
-      "payment-date-div-JNJ-2026-04-01"
-    );
+    const payEl = screen.getByTestId("payment-date-div-JNJ-2026-04-01");
     expect(payEl.textContent).toContain("Pay:");
   });
 
   it("should display frequency (Req 24.15)", () => {
     render(<DividendCalendar data={mockEvents} />);
-    expect(
-      screen.getByTestId("frequency-div-JNJ-2026-04-01").textContent
-    ).toBe("quarterly");
-    expect(
-      screen.getByTestId("frequency-div-O-2026-04-05").textContent
-    ).toBe("monthly");
+    expect(screen.getByTestId("frequency-div-JNJ-2026-04-01").textContent).toBe(
+      "quarterly"
+    );
+    expect(screen.getByTestId("frequency-div-O-2026-04-05").textContent).toBe(
+      "monthly"
+    );
   });
 
   it("should group events by ex-dividend date with day headers", () => {
@@ -169,9 +167,7 @@ describe("DividendCalendar", () => {
       target: { value: "UK" },
     });
     expect(screen.getByText("Exxon Mobil Corp.")).toBeDefined();
-    expect(
-      screen.getByText("Enterprise Products Partners")
-    ).toBeDefined();
+    expect(screen.getByText("Enterprise Products Partners")).toBeDefined();
     expect(screen.queryByText("Johnson & Johnson")).toBeNull();
     expect(screen.queryByText("Coca-Cola Co.")).toBeNull();
   });
@@ -330,13 +326,9 @@ describe("DividendCalendar", () => {
   // --- Loading / Error / Empty states ---
 
   it("should show loading state when fetching data", () => {
-    (global.fetch as any).mockImplementation(
-      () => new Promise(() => {})
-    );
+    (global.fetch as any).mockImplementation(() => new Promise(() => {}));
     render(<DividendCalendar />);
-    expect(
-      screen.getByTestId("dividend-calendar-loading")
-    ).toBeDefined();
+    expect(screen.getByTestId("dividend-calendar-loading")).toBeDefined();
   });
 
   it("should show error state on fetch failure with retry button", async () => {
@@ -348,9 +340,7 @@ describe("DividendCalendar", () => {
     render(<DividendCalendar />);
 
     await waitFor(() => {
-      expect(
-        screen.getByTestId("dividend-calendar-error")
-      ).toBeDefined();
+      expect(screen.getByTestId("dividend-calendar-error")).toBeDefined();
       expect(screen.getByText("Try again")).toBeDefined();
     });
   });
@@ -364,12 +354,8 @@ describe("DividendCalendar", () => {
     render(<DividendCalendar />);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith(
-        "/api/calendar/dividends"
-      );
-      expect(
-        screen.getByTestId("dividend-calendar")
-      ).toBeDefined();
+      expect(global.fetch).toHaveBeenCalledWith("/api/calendar/dividends");
+      expect(screen.getByTestId("dividend-calendar")).toBeDefined();
     });
   });
 

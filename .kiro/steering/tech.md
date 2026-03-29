@@ -2,21 +2,21 @@
 
 ## Core Stack
 
-| Layer        | Technology                          |
-|--------------|-------------------------------------|
-| Framework    | Next.js 15 (App Router)             |
-| Language     | TypeScript (strict mode)            |
-| Runtime      | Bun (primary), Node.js 18+ (compat) |
-| Styling      | Tailwind CSS 3, dark mode via class |
-| Charts       | lightweight-charts v5               |
-| Data Fetching| SWR for client, fetch for server    |
-| Auth/DB      | Appwrite (node-appwrite)            |
-| Deployment   | Vercel                              |
+| Layer         | Technology                          |
+| ------------- | ----------------------------------- |
+| Framework     | Next.js 15 (App Router)             |
+| Language      | TypeScript (strict mode)            |
+| Runtime       | Bun (primary), Node.js 18+ (compat) |
+| Styling       | Tailwind CSS 3, dark mode via class |
+| Charts        | lightweight-charts v5               |
+| Data Fetching | SWR for client, fetch for server    |
+| Auth/DB       | Appwrite (node-appwrite)            |
+| Deployment    | Vercel                              |
 
 ## Testing
 
-| Type         | Tool                                |
-|--------------|-------------------------------------|
+| Type             | Tool                             |
+| ---------------- | -------------------------------- |
 | Unit/Integration | Vitest + Testing Library (jsdom) |
 | Property-Based   | fast-check                       |
 | E2E              | Playwright                       |

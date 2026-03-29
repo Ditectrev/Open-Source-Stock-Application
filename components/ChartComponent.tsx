@@ -4,7 +4,7 @@
  * ChartComponent
  * Main chart component with support for multiple chart types, time ranges,
  * interactive features, and technical indicators
- * 
+ *
  * Requirements: 4.2, 11.2, 11.3, 11.4, 11.5
  */
 
@@ -41,7 +41,16 @@ export interface ChartComponentProps {
   height?: number;
 }
 
-const TIME_RANGES: TimeRange[] = ["1D", "1W", "1M", "3M", "1Y", "5Y", "YTD", "Max"];
+const TIME_RANGES: TimeRange[] = [
+  "1D",
+  "1W",
+  "1M",
+  "3M",
+  "1Y",
+  "5Y",
+  "YTD",
+  "Max",
+];
 
 /**
  * ChartComponent with time range selection, multiple chart types,
@@ -67,45 +76,50 @@ export function ChartComponent({
   const isDark = resolvedTheme === "dark";
 
   // Filter data based on selected time range
-  const getFilteredData = useCallback((allData: PriceData[], range: TimeRange): PriceData[] => {
-    if (!allData || allData.length === 0) return [];
-    
-    const now = new Date();
-    const startDate = new Date();
-    
-    switch (range) {
-      case "1D":
-        startDate.setHours(now.getHours() - 24);
-        break;
-      case "1W":
-        startDate.setDate(now.getDate() - 7);
-        break;
-      case "1M":
-        startDate.setMonth(now.getMonth() - 1);
-        break;
-      case "3M":
-        startDate.setMonth(now.getMonth() - 3);
-        break;
-      case "1Y":
-        startDate.setFullYear(now.getFullYear() - 1);
-        break;
-      case "5Y":
-        startDate.setFullYear(now.getFullYear() - 5);
-        break;
-      case "Max":
-        return allData;
-    }
-    
-    const filtered = allData.filter(d => new Date(d.timestamp) >= startDate);
-    
-    // If no data found, return at least the last few points
-    if (filtered.length === 0 && allData.length > 0) {
-      const count = Math.min(10, allData.length);
-      return allData.slice(-count);
-    }
-    
-    return filtered;
-  }, []);
+  const getFilteredData = useCallback(
+    (allData: PriceData[], range: TimeRange): PriceData[] => {
+      if (!allData || allData.length === 0) return [];
+
+      const now = new Date();
+      const startDate = new Date();
+
+      switch (range) {
+        case "1D":
+          startDate.setHours(now.getHours() - 24);
+          break;
+        case "1W":
+          startDate.setDate(now.getDate() - 7);
+          break;
+        case "1M":
+          startDate.setMonth(now.getMonth() - 1);
+          break;
+        case "3M":
+          startDate.setMonth(now.getMonth() - 3);
+          break;
+        case "1Y":
+          startDate.setFullYear(now.getFullYear() - 1);
+          break;
+        case "5Y":
+          startDate.setFullYear(now.getFullYear() - 5);
+          break;
+        case "Max":
+          return allData;
+      }
+
+      const filtered = allData.filter(
+        (d) => new Date(d.timestamp) >= startDate
+      );
+
+      // If no data found, return at least the last few points
+      if (filtered.length === 0 && allData.length > 0) {
+        const count = Math.min(10, allData.length);
+        return allData.slice(-count);
+      }
+
+      return filtered;
+    },
+    []
+  );
 
   const filteredData = getFilteredData(data, selectedTimeRange);
 
@@ -123,7 +137,7 @@ export function ChartComponent({
   // Handle chart type change
   const handleChartTypeChange = useCallback((newType: ChartType) => {
     setChartType(newType);
-    setChartKey(prev => prev + 1); // Force chart recreation
+    setChartKey((prev) => prev + 1); // Force chart recreation
   }, []);
 
   // Convert PriceData to chart format
@@ -148,13 +162,16 @@ export function ChartComponent({
     [chartType]
   );
   // Convert volume data
-  const convertVolumeData = useCallback((priceData: PriceData[]): HistogramData[] => {
-    return priceData.map((d) => ({
-      time: Math.floor(new Date(d.timestamp).getTime() / 1000) as Time,
-      value: d.volume,
-      color: d.close >= d.open ? "#26a69a" : "#ef5350",
-    }));
-  }, []);
+  const convertVolumeData = useCallback(
+    (priceData: PriceData[]): HistogramData[] => {
+      return priceData.map((d) => ({
+        time: Math.floor(new Date(d.timestamp).getTime() / 1000) as Time,
+        value: d.volume,
+        color: d.close >= d.open ? "#26a69a" : "#ef5350",
+      }));
+    },
+    []
+  );
 
   // Initialize chart with data
   const initializeChart = useCallback(
@@ -170,7 +187,10 @@ export function ChartComponent({
         const volumeData = convertVolumeData(filteredData);
 
         // Create main series based on chart type
-        let mainSeries: ISeriesApi<"Candlestick"> | ISeriesApi<"Area"> | ISeriesApi<"Line">;
+        let mainSeries:
+          | ISeriesApi<"Candlestick">
+          | ISeriesApi<"Area">
+          | ISeriesApi<"Line">;
 
         if (chartType === "candlestick") {
           mainSeries = chart.addSeries(CandlestickSeries, {
@@ -355,7 +375,8 @@ export function ChartComponent({
 
           const timestamp = (param.time as number) * 1000;
           const point = filteredData.find(
-            (d) => Math.floor(new Date(d.timestamp).getTime() / 1000) === param.time
+            (d) =>
+              Math.floor(new Date(d.timestamp).getTime() / 1000) === param.time
           );
 
           if (point) {
@@ -393,7 +414,9 @@ export function ChartComponent({
       const avg = slice.reduce((sum, d) => sum + d.close, 0) / period;
 
       result.push({
-        time: Math.floor(new Date(priceData[i].timestamp).getTime() / 1000) as Time,
+        time: Math.floor(
+          new Date(priceData[i].timestamp).getTime() / 1000
+        ) as Time,
         value: avg,
       });
     }
@@ -479,7 +502,9 @@ export function ChartComponent({
       </ChartWrapper>
 
       {/* Chart Instructions */}
-      <div className={`mt-2 text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}>
+      <div
+        className={`mt-2 text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}
+      >
         <p className="hidden sm:block">
           💡 Use mouse wheel to zoom, drag to pan, hover for details
         </p>

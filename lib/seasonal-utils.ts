@@ -36,7 +36,10 @@ export function aggregateSeasonalData(
   }
 
   // Group daily returns by year-month and sum them
-  const grouped = new Map<string, { year: number; month: number; total: number }>();
+  const grouped = new Map<
+    string,
+    { year: number; month: number; total: number }
+  >();
 
   for (const entry of data.heatmap) {
     const key = `${entry.year}-${entry.month}`;
@@ -44,7 +47,11 @@ export function aggregateSeasonalData(
     if (existing) {
       existing.total += entry.return;
     } else {
-      grouped.set(key, { year: entry.year, month: entry.month, total: entry.return });
+      grouped.set(key, {
+        year: entry.year,
+        month: entry.month,
+        total: entry.return,
+      });
     }
   }
 
@@ -88,13 +95,25 @@ export function getReturnForCell(
   year: number,
   month: number
 ): number | undefined {
-  const entry = monthlyReturns.find((r) => r.year === year && r.month === month);
+  const entry = monthlyReturns.find(
+    (r) => r.year === year && r.month === month
+  );
   return entry?.return;
 }
 
 const MONTH_LABELS = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
 ] as const;
 
 /**

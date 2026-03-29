@@ -39,9 +39,7 @@ describe("next.config.ts - static asset optimization", () => {
     const { default: nextConfig } = await import("../next.config");
     const headers = await nextConfig.headers!();
 
-    const staticRule = headers.find((h) =>
-      h.source.includes("_next/static")
-    );
+    const staticRule = headers.find((h) => h.source.includes("_next/static"));
     expect(staticRule).toBeDefined();
 
     const cacheHeader = staticRule!.headers.find(

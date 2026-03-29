@@ -4,22 +4,31 @@ test.describe("Forecasts Tab", () => {
   /**
    * Helper: search for a symbol and navigate to the Forecasts tab
    */
-  async function goToForecasts(page: import("@playwright/test").Page, symbol: string) {
+  async function goToForecasts(
+    page: import("@playwright/test").Page,
+    symbol: string
+  ) {
     await page.goto("http://localhost:3000");
     const searchInput = page.getByPlaceholder(/search stocks/i);
     await searchInput.fill(symbol);
     await searchInput.press("Enter");
-    await expect(page.getByRole("heading", { name: new RegExp(symbol, "i") })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: new RegExp(symbol, "i") })
+    ).toBeVisible();
     await page.getByRole("tab", { name: "Forecasts" }).click();
   }
 
-  test("should display Forecast Data heading when Forecasts tab is clicked", async ({ page }) => {
+  test("should display Forecast Data heading when Forecasts tab is clicked", async ({
+    page,
+  }) => {
     await goToForecasts(page, "AAPL");
     await expect(page.getByText("Forecast Data")).toBeVisible();
   });
 
   // Requirement 6.1: Price targets
-  test("should display Price Targets section with low, average, and high", async ({ page }) => {
+  test("should display Price Targets section with low, average, and high", async ({
+    page,
+  }) => {
     await goToForecasts(page, "AAPL");
     await expect(page.getByText("Price Targets")).toBeVisible();
     await expect(page.getByText("Low")).toBeVisible();
@@ -34,7 +43,9 @@ test.describe("Forecasts Tab", () => {
   });
 
   // Requirement 6.2: Analyst ratings
-  test("should display Analyst Ratings section with all rating labels", async ({ page }) => {
+  test("should display Analyst Ratings section with all rating labels", async ({
+    page,
+  }) => {
     await goToForecasts(page, "AAPL");
     await expect(page.getByText("Analyst Ratings")).toBeVisible();
     await expect(page.getByText("Strong Buy")).toBeVisible();
@@ -56,36 +67,52 @@ test.describe("Forecasts Tab", () => {
   });
 
   // Requirement 6.5: Tooltips
-  test("should show tooltip when hovering over Price Targets heading", async ({ page }) => {
+  test("should show tooltip when hovering over Price Targets heading", async ({
+    page,
+  }) => {
     await goToForecasts(page, "NVDA");
     const hoverTarget = page.getByLabel("More info about Price Targets");
     await expect(hoverTarget).toBeVisible();
     await hoverTarget.hover();
-    await expect(page.getByText(/Analyst price targets represent/)).toBeVisible({ timeout: 3000 });
+    await expect(page.getByText(/Analyst price targets represent/)).toBeVisible(
+      { timeout: 3000 }
+    );
   });
 
-  test("should show tooltip when hovering over Analyst Ratings heading", async ({ page }) => {
+  test("should show tooltip when hovering over Analyst Ratings heading", async ({
+    page,
+  }) => {
     await goToForecasts(page, "NVDA");
     const hoverTarget = page.getByLabel("More info about Analyst Ratings");
     await expect(hoverTarget).toBeVisible();
     await hoverTarget.hover();
-    await expect(page.getByText(/Analyst ratings show the distribution/)).toBeVisible({ timeout: 3000 });
+    await expect(
+      page.getByText(/Analyst ratings show the distribution/)
+    ).toBeVisible({ timeout: 3000 });
   });
 
-  test("should show tooltip when hovering over EPS Forecasts heading", async ({ page }) => {
+  test("should show tooltip when hovering over EPS Forecasts heading", async ({
+    page,
+  }) => {
     await goToForecasts(page, "GOOGL");
     const hoverTarget = page.getByLabel("More info about EPS Forecasts");
     await expect(hoverTarget).toBeVisible();
     await hoverTarget.hover();
-    await expect(page.getByText(/Earnings Per Share/)).toBeVisible({ timeout: 3000 });
+    await expect(page.getByText(/Earnings Per Share/)).toBeVisible({
+      timeout: 3000,
+    });
   });
 
-  test("should show tooltip when hovering over Revenue Forecasts heading", async ({ page }) => {
+  test("should show tooltip when hovering over Revenue Forecasts heading", async ({
+    page,
+  }) => {
     await goToForecasts(page, "GOOGL");
     const hoverTarget = page.getByLabel("More info about Revenue Forecasts");
     await expect(hoverTarget).toBeVisible();
     await hoverTarget.hover();
-    await expect(page.getByText(/Revenue forecasts compare analyst estimates/)).toBeVisible({ timeout: 3000 });
+    await expect(
+      page.getByText(/Revenue forecasts compare analyst estimates/)
+    ).toBeVisible({ timeout: 3000 });
   });
 
   test("should display help icons for each section", async ({ page }) => {
@@ -96,7 +123,9 @@ test.describe("Forecasts Tab", () => {
   });
 
   // Navigation
-  test("should switch back to Overview tab from Forecasts", async ({ page }) => {
+  test("should switch back to Overview tab from Forecasts", async ({
+    page,
+  }) => {
     await goToForecasts(page, "AAPL");
     await expect(page.getByText("Forecast Data")).toBeVisible();
     await page.getByRole("tab", { name: "Overview" }).click();

@@ -79,8 +79,7 @@ const TOOLTIPS: Record<string, string> = {
     "Annual dividend payment as a percentage of the stock price. Higher yields provide more income per dollar invested.",
   payoutRatio:
     "Percentage of earnings paid out as dividends. A lower ratio suggests the dividend is more sustainable.",
-  sector:
-    "Filter by industry sector to focus on specific areas of the market.",
+  sector: "Filter by industry sector to focus on specific areas of the market.",
   marketCap:
     "Market capitalization is the total market value of a company's outstanding shares. Small Cap < $2B, Mid Cap $2B–$10B, Large Cap > $10B.",
   volume:
@@ -320,7 +319,11 @@ export function AssetScreener({
   useEffect(() => {
     if (!initialFilters || initialFilters.length === 0) return;
 
-    const next: FilterState = { ...INITIAL_FILTER_STATE, sectors: [], marketCap: [] };
+    const next: FilterState = {
+      ...INITIAL_FILTER_STATE,
+      sectors: [],
+      marketCap: [],
+    };
 
     for (const f of initialFilters) {
       // Range-based numeric fields
@@ -352,7 +355,11 @@ export function AssetScreener({
             max: String(f.value),
           };
         }
-      } else if (f.field === "sector" && f.operator === "in" && Array.isArray(f.value)) {
+      } else if (
+        f.field === "sector" &&
+        f.operator === "in" &&
+        Array.isArray(f.value)
+      ) {
         next.sectors = f.value as string[];
       } else if (f.field === "marketCap") {
         if (f.operator === "lt" && f.value === 2_000_000_000) {
@@ -362,7 +369,10 @@ export function AssetScreener({
         } else if (f.operator === "gte" && f.value === 10_000_000_000) {
           next.marketCap = [...next.marketCap, "large"];
         }
-      } else if (f.field === "volume" && (f.operator === "gte" || f.operator === "gt")) {
+      } else if (
+        f.field === "volume" &&
+        (f.operator === "gte" || f.operator === "gt")
+      ) {
         next.minVolume = String(f.value);
       }
     }
@@ -371,10 +381,7 @@ export function AssetScreener({
   }, [initialFilters]);
 
   // Derive active filters from state
-  const activeFilters = useMemo(
-    () => buildFilters(filterState),
-    [filterState]
-  );
+  const activeFilters = useMemo(() => buildFilters(filterState), [filterState]);
 
   // ------ handlers ------
 

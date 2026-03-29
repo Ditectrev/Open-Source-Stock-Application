@@ -23,7 +23,7 @@ const STORAGE_KEY = "screener-filters";
 /** Persist filters the same way ScreenerHub.handleFiltersChange does. */
 function persistFilters(
   storage: Map<string, string>,
-  filters: ScreenerFilter[],
+  filters: ScreenerFilter[]
 ): void {
   if (filters.length === 0) {
     storage.delete(STORAGE_KEY);
@@ -33,9 +33,7 @@ function persistFilters(
 }
 
 /** Restore filters the same way ScreenerHub's mount effect does. */
-function restoreFilters(
-  storage: Map<string, string>,
-): ScreenerFilter[] | null {
+function restoreFilters(storage: Map<string, string>): ScreenerFilter[] | null {
   const raw = storage.get(STORAGE_KEY);
   if (!raw) return null;
   const parsed: unknown = JSON.parse(raw);
@@ -52,9 +50,9 @@ function restoreFilters(
 
 /** Replace -0 with +0 (JSON.stringify already does this). */
 const safeDouble = (opts: { min: number; max: number }) =>
-  fc.double({ ...opts, noNaN: true, noDefaultInfinity: true }).map((n) =>
-    Object.is(n, -0) ? 0 : n,
-  );
+  fc
+    .double({ ...opts, noNaN: true, noDefaultInfinity: true })
+    .map((n) => (Object.is(n, -0) ? 0 : n));
 
 // ---------------------------------------------------------------------------
 // Arbitraries
@@ -65,7 +63,7 @@ const operatorArb = fc.constantFrom(
   "lt" as const,
   "eq" as const,
   "gte" as const,
-  "lte" as const,
+  "lte" as const
 );
 
 const numericFieldArb = fc.constantFrom(
@@ -79,7 +77,7 @@ const numericFieldArb = fc.constantFrom(
   "dividendYield",
   "revenueGrowth",
   "earningsGrowth",
-  "payoutRatio",
+  "payoutRatio"
 );
 
 const numericFilterArb: fc.Arbitrary<ScreenerFilter> = fc
@@ -122,7 +120,7 @@ const sectorFilterArb: fc.Arbitrary<ScreenerFilter> = fc
       "Utilities",
       "Communication",
     ],
-    { minLength: 1 },
+    { minLength: 1 }
   )
   .map((sectors) => ({
     field: "sector",
@@ -134,7 +132,7 @@ const sectorFilterArb: fc.Arbitrary<ScreenerFilter> = fc
 const filterArb: fc.Arbitrary<ScreenerFilter> = fc.oneof(
   { weight: 3, arbitrary: numericFilterArb },
   { weight: 1, arbitrary: betweenFilterArb },
-  { weight: 1, arbitrary: sectorFilterArb },
+  { weight: 1, arbitrary: sectorFilterArb }
 );
 
 const filtersArb = fc.array(filterArb, { minLength: 1, maxLength: 10 });
@@ -160,7 +158,7 @@ describe("Property 19: Screener State Persistence", () => {
         expect(restored).not.toBeNull();
         expect(restored).toEqual(filters);
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
@@ -180,7 +178,7 @@ describe("Property 19: Screener State Persistence", () => {
           expect(restored[i].label).toBe(filters[i].label);
         }
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
@@ -195,7 +193,7 @@ describe("Property 19: Screener State Persistence", () => {
           expect(f).toEqual(filters[i]);
         });
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
@@ -209,7 +207,7 @@ describe("Property 19: Screener State Persistence", () => {
 
         expect(restored).toEqual(filtersB);
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
@@ -224,7 +222,7 @@ describe("Property 19: Screener State Persistence", () => {
 
         expect(restored).toBeNull();
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
@@ -243,7 +241,7 @@ describe("Property 19: Screener State Persistence", () => {
         expect(secondRestore).toEqual(filters);
         expect(secondRestore).toEqual(firstRestore);
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
@@ -263,9 +261,9 @@ describe("Property 19: Screener State Persistence", () => {
             expect(rest[0]).toBe(orig[0]);
             expect(rest[1]).toBe(orig[1]);
           }
-        },
+        }
       ),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
@@ -282,9 +280,9 @@ describe("Property 19: Screener State Persistence", () => {
             expect(Array.isArray(restored[i].value)).toBe(true);
             expect(restored[i].value).toEqual(filters[i].value);
           }
-        },
+        }
       ),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 });

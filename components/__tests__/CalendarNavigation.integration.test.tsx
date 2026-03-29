@@ -12,7 +12,11 @@ import { CalendarHub } from "@/components/CalendarHub";
 import { EarningsEvent, DividendEvent } from "@/types";
 
 vi.mock("@/lib/theme-context", () => ({
-  useTheme: () => ({ theme: "light", resolvedTheme: "light", setTheme: vi.fn() }),
+  useTheme: () => ({
+    theme: "light",
+    resolvedTheme: "light",
+    setTheme: vi.fn(),
+  }),
 }));
 
 const now = new Date();
@@ -92,21 +96,24 @@ describe("Calendar Navigation Integration", () => {
   describe("calendar type switching", () => {
     it("defaults to economic calendar tab", () => {
       render(<CalendarHub />);
-      expect(
-        screen.getByTestId("calendar-tab-economic")
-      ).toHaveAttribute("aria-selected", "true");
+      expect(screen.getByTestId("calendar-tab-economic")).toHaveAttribute(
+        "aria-selected",
+        "true"
+      );
     });
 
     it("switches from economic to earnings calendar", async () => {
       render(<CalendarHub />);
       fireEvent.click(screen.getByTestId("calendar-tab-earnings"));
 
-      expect(
-        screen.getByTestId("calendar-tab-earnings")
-      ).toHaveAttribute("aria-selected", "true");
-      expect(
-        screen.getByTestId("calendar-tab-economic")
-      ).toHaveAttribute("aria-selected", "false");
+      expect(screen.getByTestId("calendar-tab-earnings")).toHaveAttribute(
+        "aria-selected",
+        "true"
+      );
+      expect(screen.getByTestId("calendar-tab-economic")).toHaveAttribute(
+        "aria-selected",
+        "false"
+      );
 
       await waitFor(() => {
         expect(screen.getByTestId("earnings-calendar")).toBeInTheDocument();
@@ -117,9 +124,10 @@ describe("Calendar Navigation Integration", () => {
       render(<CalendarHub />);
       fireEvent.click(screen.getByTestId("calendar-tab-dividends"));
 
-      expect(
-        screen.getByTestId("calendar-tab-dividends")
-      ).toHaveAttribute("aria-selected", "true");
+      expect(screen.getByTestId("calendar-tab-dividends")).toHaveAttribute(
+        "aria-selected",
+        "true"
+      );
 
       await waitFor(() => {
         expect(screen.getByTestId("dividend-calendar")).toBeInTheDocument();
@@ -130,9 +138,10 @@ describe("Calendar Navigation Integration", () => {
       render(<CalendarHub />);
       fireEvent.click(screen.getByTestId("calendar-tab-ipos"));
 
-      expect(
-        screen.getByTestId("calendar-tab-ipos")
-      ).toHaveAttribute("aria-selected", "true");
+      expect(screen.getByTestId("calendar-tab-ipos")).toHaveAttribute(
+        "aria-selected",
+        "true"
+      );
 
       await waitFor(() => {
         expect(screen.getByTestId("ipo-calendar")).toBeInTheDocument();

@@ -33,8 +33,7 @@ const ERROR_CONFIGS: Record<ErrorType, ErrorConfig> = {
   api: {
     icon: "⚠️",
     title: "Something went wrong",
-    description:
-      "We couldn't complete your request. Please try again later.",
+    description: "We couldn't complete your request. Please try again later.",
   },
   "not-found": {
     icon: "🔍",

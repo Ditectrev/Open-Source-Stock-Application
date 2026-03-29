@@ -28,17 +28,17 @@ No paywall for core features. No tracking. Just a clean stock analysis tool you 
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Next.js 14+ (App Router) |
-| Language | TypeScript |
-| Runtime | Bun (or Node.js 18+) |
-| Styling | Tailwind CSS |
-| Auth | Appwrite |
-| Database | Appwrite |
+| Layer       | Technology                 |
+| ----------- | -------------------------- |
+| Framework   | Next.js 14+ (App Router)   |
+| Language    | TypeScript                 |
+| Runtime     | Bun (or Node.js 18+)       |
+| Styling     | Tailwind CSS               |
+| Auth        | Appwrite                   |
+| Database    | Appwrite                   |
 | Market Data | Yahoo Finance, FairEconomy |
-| Deployment | Vercel |
-| Testing | Vitest, Playwright |
+| Deployment  | Vercel                     |
+| Testing     | Vitest, Playwright         |
 
 ## Getting Started
 
@@ -71,21 +71,21 @@ Open [http://localhost:3000](http://localhost:3000) to view the application.
 
 ### Required
 
-| Variable | Description |
-|----------|-------------|
-| `NEXT_PUBLIC_APPWRITE_ENDPOINT` | Appwrite API endpoint |
-| `NEXT_PUBLIC_APPWRITE_PROJECT_ID` | Appwrite project ID |
-| `APPWRITE_API_KEY` | Appwrite server-side API key |
+| Variable                          | Description                  |
+| --------------------------------- | ---------------------------- |
+| `NEXT_PUBLIC_APPWRITE_ENDPOINT`   | Appwrite API endpoint        |
+| `NEXT_PUBLIC_APPWRITE_PROJECT_ID` | Appwrite project ID          |
+| `APPWRITE_API_KEY`                | Appwrite server-side API key |
 
 ### Optional
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `YAHOO_FINANCE_API_URL` | Yahoo Finance API base URL | `https://query1.finance.yahoo.com` |
-| `CACHE_TTL_SECONDS` | Cache TTL in seconds | `300` |
-| `RATE_LIMIT_MAX_REQUESTS` | Max API requests per window | `100` |
-| `RATE_LIMIT_WINDOW_SECONDS` | Rate limit window in seconds | `60` |
-| `LOG_LEVEL` | Logging level | `info` |
+| Variable                    | Description                  | Default                            |
+| --------------------------- | ---------------------------- | ---------------------------------- |
+| `YAHOO_FINANCE_API_URL`     | Yahoo Finance API base URL   | `https://query1.finance.yahoo.com` |
+| `CACHE_TTL_SECONDS`         | Cache TTL in seconds         | `300`                              |
+| `RATE_LIMIT_MAX_REQUESTS`   | Max API requests per window  | `100`                              |
+| `RATE_LIMIT_WINDOW_SECONDS` | Rate limit window in seconds | `60`                               |
+| `LOG_LEVEL`                 | Logging level                | `info`                             |
 
 See `.env.example` for the full list.
 
@@ -104,18 +104,23 @@ See `.env.example` for the full list.
 ## Features in Detail
 
 ### Stock Analysis
+
 Search any stock symbol and get a multi-tab view: Overview, Financials, Technical Indicators, Forecasts, and Seasonal patterns.
 
 ### Economic Calendar
+
 Live economic events grouped by day with country flags, importance filters, and date range selection. Data sourced from FairEconomy (ForexFactory feed).
 
 ### Technical Indicators
+
 SMA, EMA, RSI, MACD, and Bollinger Bands overlaid on interactive price charts.
 
 ### Sector Performance
+
 Track all major market sectors with performance metrics and visual indicators.
 
 ### World Markets
+
 Global market indices overview showing real-time performance across regions.
 
 ## Scripts

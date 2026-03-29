@@ -27,7 +27,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Failed to fetch earnings events",
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch earnings events",
         timestamp: new Date(),
       },
       { status: 500 }

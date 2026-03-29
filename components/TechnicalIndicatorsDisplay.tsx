@@ -41,27 +41,35 @@ function getSignalColors(signal: Signal, isDark: boolean) {
   switch (signal) {
     case "overpriced":
       return {
-        badge: isDark ? "bg-red-900/60 text-red-300" : "bg-red-100 text-red-700",
+        badge: isDark
+          ? "bg-red-900/60 text-red-300"
+          : "bg-red-100 text-red-700",
         border: isDark ? "border-red-700" : "border-red-300",
         dot: "bg-red-500",
       };
     case "underpriced":
       return {
-        badge: isDark ? "bg-green-900/60 text-green-300" : "bg-green-100 text-green-700",
+        badge: isDark
+          ? "bg-green-900/60 text-green-300"
+          : "bg-green-100 text-green-700",
         border: isDark ? "border-green-700" : "border-green-300",
         dot: "bg-green-500",
       };
     case "fair":
     default:
       return {
-        badge: isDark ? "bg-gray-700 text-gray-300" : "bg-gray-100 text-gray-600",
+        badge: isDark
+          ? "bg-gray-700 text-gray-300"
+          : "bg-gray-100 text-gray-600",
         border: isDark ? "border-gray-600" : "border-gray-300",
         dot: "bg-gray-400",
       };
   }
 }
 
-function buildIndicatorCards(indicators: TechnicalIndicators): IndicatorCardData[] {
+function buildIndicatorCards(
+  indicators: TechnicalIndicators
+): IndicatorCardData[] {
   return [
     {
       name: "RSI (Relative Strength Index)",
@@ -105,7 +113,9 @@ function buildIndicatorCards(indicators: TechnicalIndicators): IndicatorCardData
   ];
 }
 
-export function TechnicalIndicatorsDisplay({ indicators }: TechnicalIndicatorsDisplayProps) {
+export function TechnicalIndicatorsDisplay({
+  indicators,
+}: TechnicalIndicatorsDisplayProps) {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
@@ -154,7 +164,9 @@ export function TechnicalIndicatorsDisplay({ indicators }: TechnicalIndicatorsDi
         }`}
       >
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
-          <div className={`w-3 h-3 rounded-full flex-shrink-0 ${sentimentColors.dot}`} />
+          <div
+            className={`w-3 h-3 rounded-full flex-shrink-0 ${sentimentColors.dot}`}
+          />
           <span
             className={`text-sm sm:text-base font-semibold ${isDark ? "text-white" : "text-gray-900"}`}
           >
@@ -196,9 +208,7 @@ function IndicatorCard({ card, isDark }: IndicatorCardProps) {
       } transition-colors`}
     >
       <div className="flex items-start justify-between mb-3">
-        <div
-          className="relative flex items-center gap-2"
-        >
+        <div className="relative flex items-center gap-2">
           <span
             className={`text-sm font-medium ${isDark ? "text-gray-200" : "text-gray-800"}`}
           >
@@ -208,8 +218,10 @@ function IndicatorCard({ card, isDark }: IndicatorCardProps) {
             type="button"
             className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs cursor-help
               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
-              isDark ? "bg-gray-600 text-gray-300" : "bg-gray-200 text-gray-600"
-            }`}
+                isDark
+                  ? "bg-gray-600 text-gray-300"
+                  : "bg-gray-200 text-gray-600"
+              }`}
             aria-label={`More info about ${card.name}`}
             onMouseEnter={() => setShowTooltip(true)}
             onMouseLeave={() => setShowTooltip(false)}
@@ -257,7 +269,6 @@ function IndicatorCard({ card, isDark }: IndicatorCardProps) {
           </div>
         ))}
       </div>
-
     </div>
   );
 }

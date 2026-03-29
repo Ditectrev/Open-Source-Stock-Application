@@ -91,7 +91,10 @@ class CacheService {
     }
 
     keysToDelete.forEach((key) => this.cache.delete(key));
-    logger.info("Symbol cache invalidated", { symbol, count: keysToDelete.length });
+    logger.info("Symbol cache invalidated", {
+      symbol,
+      count: keysToDelete.length,
+    });
   }
 
   /**

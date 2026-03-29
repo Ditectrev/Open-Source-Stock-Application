@@ -51,7 +51,10 @@ function formatShares(value: number | undefined): string {
 const todayStr = toDateString(new Date());
 const defaultStart = todayStr;
 
-export function IPOCalendar({ data: externalData, onSymbolClick }: IPOCalendarProps) {
+export function IPOCalendar({
+  data: externalData,
+  onSymbolClick,
+}: IPOCalendarProps) {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
@@ -133,7 +136,14 @@ export function IPOCalendar({ data: externalData, onSymbolClick }: IPOCalendarPr
         className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
         data-testid="ipo-calendar-error"
       >
-        <ErrorMessage type="api" message={error} onRetry={() => { setLoading(true); fetchData(); }} />
+        <ErrorMessage
+          type="api"
+          message={error}
+          onRetry={() => {
+            setLoading(true);
+            fetchData();
+          }}
+        />
       </div>
     );
   }
@@ -174,8 +184,8 @@ export function IPOCalendar({ data: externalData, onSymbolClick }: IPOCalendarPr
           No upcoming IPOs match the selected filters.
           {!externalData && (
             <span className="block mt-1 text-xs">
-              The data source may be temporarily unavailable. Try again in a
-              few minutes.
+              The data source may be temporarily unavailable. Try again in a few
+              minutes.
             </span>
           )}
         </p>
@@ -230,9 +240,7 @@ export function IPOCalendar({ data: externalData, onSymbolClick }: IPOCalendarPr
                       <div
                         key={event.id}
                         className={`flex items-start gap-3 px-3 py-2 ${
-                          isDark
-                            ? "hover:bg-gray-700/50"
-                            : "hover:bg-gray-50"
+                          isDark ? "hover:bg-gray-700/50" : "hover:bg-gray-50"
                         }`}
                         data-testid={`event-${event.id}`}
                       >
@@ -278,8 +286,7 @@ export function IPOCalendar({ data: externalData, onSymbolClick }: IPOCalendarPr
                           >
                             {hasPriceRange && (
                               <span data-testid={`price-range-${event.id}`}>
-                                Price:{" "}
-                                {formatPrice(event.priceRangeLow)} –{" "}
+                                Price: {formatPrice(event.priceRangeLow)} –{" "}
                                 {formatPrice(event.priceRangeHigh)}
                               </span>
                             )}

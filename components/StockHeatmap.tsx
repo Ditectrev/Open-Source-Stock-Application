@@ -78,7 +78,7 @@ export function StockHeatmap({
   const loading = !response && !error;
   const stockData: StockData[] = useMemo(
     () => (response?.success ? response.data : []),
-    [response],
+    [response]
   );
   const heatmapData = useMemo(() => toHeatmapData(stockData), [stockData]);
 
@@ -94,7 +94,7 @@ export function StockHeatmap({
     (item: HeatmapData) => {
       onStockClick?.(item.symbol);
     },
-    [onStockClick],
+    [onStockClick]
   );
 
   const handleSortChange = useCallback(
@@ -102,7 +102,7 @@ export function StockHeatmap({
       setSortField(field);
       setSortDirection(direction);
     },
-    [],
+    []
   );
 
   const handleRefresh = useCallback(() => {

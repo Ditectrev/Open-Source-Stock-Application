@@ -73,9 +73,7 @@ export function DividendCalendar({
       if (!json.success) throw new Error(json.error ?? "Unknown error");
       setData(json.data);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to load data"
-      );
+      setError(err instanceof Error ? err.message : "Failed to load data");
     } finally {
       setLoading(false);
     }
@@ -135,9 +133,7 @@ export function DividendCalendar({
       if (!groups[key]) groups[key] = [];
       groups[key].push(event);
     }
-    return Object.entries(groups).sort(([a], [b]) =>
-      a.localeCompare(b)
-    );
+    return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
   }, [filteredEvents]);
 
   if (loading) {
@@ -157,7 +153,14 @@ export function DividendCalendar({
         className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
         data-testid="dividend-calendar-error"
       >
-        <ErrorMessage type="api" message={error} onRetry={() => { setLoading(true); fetchData(); }} />
+        <ErrorMessage
+          type="api"
+          message={error}
+          onRetry={() => {
+            setLoading(true);
+            fetchData();
+          }}
+        />
       </div>
     );
   }
@@ -262,8 +265,8 @@ export function DividendCalendar({
           No dividend events match the selected filters.
           {!externalData && (
             <span className="block mt-1 text-xs">
-              The data source may be temporarily unavailable. Try again
-              in a few minutes.
+              The data source may be temporarily unavailable. Try again in a few
+              minutes.
             </span>
           )}
         </p>
@@ -318,9 +321,7 @@ export function DividendCalendar({
                       <div
                         key={event.id}
                         className={`flex items-start gap-3 px-3 py-2 ${
-                          isDark
-                            ? "hover:bg-gray-700/50"
-                            : "hover:bg-gray-50"
+                          isDark ? "hover:bg-gray-700/50" : "hover:bg-gray-50"
                         }`}
                         data-testid={`event-${event.id}`}
                       >
@@ -359,9 +360,7 @@ export function DividendCalendar({
                             </span>
                             <span
                               className={`capitalize ${
-                                isDark
-                                  ? "text-gray-400"
-                                  : "text-gray-500"
+                                isDark ? "text-gray-400" : "text-gray-500"
                               }`}
                               data-testid={`frequency-${event.id}`}
                             >

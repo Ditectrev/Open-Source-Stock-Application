@@ -330,72 +330,122 @@ describe("AssetScreener", () => {
 
   it("should populate filter UI from initialFilters prop", () => {
     const filters: ScreenerFilter[] = [
-      { field: "peRatio", operator: "between", value: [5, 30] as [number, number], label: "P/E 5–30" },
-      { field: "sector", operator: "in", value: ["Technology", "Healthcare"], label: "Sector" },
+      {
+        field: "peRatio",
+        operator: "between",
+        value: [5, 30] as [number, number],
+        label: "P/E 5–30",
+      },
+      {
+        field: "sector",
+        operator: "in",
+        value: ["Technology", "Healthcare"],
+        label: "Sector",
+      },
     ];
     render(<AssetScreener initialFilters={filters} />);
 
-    expect((screen.getByLabelText("P/E Ratio minimum") as HTMLInputElement).value).toBe("5");
-    expect((screen.getByLabelText("P/E Ratio maximum") as HTMLInputElement).value).toBe("30");
-    expect(screen.getByText("Technology").getAttribute("aria-pressed")).toBe("true");
-    expect(screen.getByText("Healthcare").getAttribute("aria-pressed")).toBe("true");
-    expect(screen.getByText("Energy").getAttribute("aria-pressed")).toBe("false");
+    expect(
+      (screen.getByLabelText("P/E Ratio minimum") as HTMLInputElement).value
+    ).toBe("5");
+    expect(
+      (screen.getByLabelText("P/E Ratio maximum") as HTMLInputElement).value
+    ).toBe("30");
+    expect(screen.getByText("Technology").getAttribute("aria-pressed")).toBe(
+      "true"
+    );
+    expect(screen.getByText("Healthcare").getAttribute("aria-pressed")).toBe(
+      "true"
+    );
+    expect(screen.getByText("Energy").getAttribute("aria-pressed")).toBe(
+      "false"
+    );
   });
 
   it("should populate gte range filter from initialFilters", () => {
     const filters = [
-      { field: "dividendYield", operator: "gte" as const, value: 3, label: "Yield >= 3" },
+      {
+        field: "dividendYield",
+        operator: "gte" as const,
+        value: 3,
+        label: "Yield >= 3",
+      },
     ];
     render(<AssetScreener initialFilters={filters} />);
 
     expect(
-      (screen.getByLabelText("Dividend Yield (%) minimum") as HTMLInputElement).value,
+      (screen.getByLabelText("Dividend Yield (%) minimum") as HTMLInputElement)
+        .value
     ).toBe("3");
     expect(
-      (screen.getByLabelText("Dividend Yield (%) maximum") as HTMLInputElement).value,
+      (screen.getByLabelText("Dividend Yield (%) maximum") as HTMLInputElement)
+        .value
     ).toBe("");
   });
 
   it("should populate lte range filter from initialFilters", () => {
     const filters = [
-      { field: "pbRatio", operator: "lte" as const, value: 2, label: "P/B <= 2" },
+      {
+        field: "pbRatio",
+        operator: "lte" as const,
+        value: 2,
+        label: "P/B <= 2",
+      },
     ];
     render(<AssetScreener initialFilters={filters} />);
 
     expect(
-      (screen.getByLabelText("P/B Ratio minimum") as HTMLInputElement).value,
+      (screen.getByLabelText("P/B Ratio minimum") as HTMLInputElement).value
     ).toBe("");
     expect(
-      (screen.getByLabelText("P/B Ratio maximum") as HTMLInputElement).value,
+      (screen.getByLabelText("P/B Ratio maximum") as HTMLInputElement).value
     ).toBe("2");
   });
 
   it("should populate market cap filter from initialFilters", () => {
     const filters = [
-      { field: "marketCap", operator: "gte" as const, value: 10_000_000_000, label: "Large Cap" },
-    ];
-    render(<AssetScreener initialFilters={filters} />);
-
-    expect(screen.getByText("Large Cap (> $10B)").getAttribute("aria-pressed")).toBe("true");
-    expect(screen.getByText("Small Cap (< $2B)").getAttribute("aria-pressed")).toBe("false");
-  });
-
-  it("should populate volume filter from initialFilters", () => {
-    const filters = [
-      { field: "volume", operator: "gte" as const, value: 5000000, label: "Volume >= 5M" },
+      {
+        field: "marketCap",
+        operator: "gte" as const,
+        value: 10_000_000_000,
+        label: "Large Cap",
+      },
     ];
     render(<AssetScreener initialFilters={filters} />);
 
     expect(
-      (screen.getByLabelText("Minimum volume") as HTMLInputElement).value,
+      screen.getByText("Large Cap (> $10B)").getAttribute("aria-pressed")
+    ).toBe("true");
+    expect(
+      screen.getByText("Small Cap (< $2B)").getAttribute("aria-pressed")
+    ).toBe("false");
+  });
+
+  it("should populate volume filter from initialFilters", () => {
+    const filters = [
+      {
+        field: "volume",
+        operator: "gte" as const,
+        value: 5000000,
+        label: "Volume >= 5M",
+      },
+    ];
+    render(<AssetScreener initialFilters={filters} />);
+
+    expect(
+      (screen.getByLabelText("Minimum volume") as HTMLInputElement).value
     ).toBe("5000000");
   });
 
   it("should not change state when initialFilters is empty array", () => {
     render(<AssetScreener initialFilters={[]} />);
 
-    expect((screen.getByLabelText("P/E Ratio minimum") as HTMLInputElement).value).toBe("");
-    expect(screen.getByText("Technology").getAttribute("aria-pressed")).toBe("false");
+    expect(
+      (screen.getByLabelText("P/E Ratio minimum") as HTMLInputElement).value
+    ).toBe("");
+    expect(screen.getByText("Technology").getAttribute("aria-pressed")).toBe(
+      "false"
+    );
   });
 
   // --- Multiple filters active count ---
@@ -443,17 +493,35 @@ describe("AssetScreener", () => {
 
   it("should clear filters populated from initialFilters on Clear All", () => {
     const filters = [
-      { field: "peRatio", operator: "gte" as const, value: 10, label: "P/E >= 10" },
-      { field: "sector", operator: "in" as const, value: ["Energy"], label: "Sector: Energy" },
+      {
+        field: "peRatio",
+        operator: "gte" as const,
+        value: 10,
+        label: "P/E >= 10",
+      },
+      {
+        field: "sector",
+        operator: "in" as const,
+        value: ["Energy"],
+        label: "Sector: Energy",
+      },
     ];
     render(<AssetScreener initialFilters={filters} />);
 
-    expect((screen.getByLabelText("P/E Ratio minimum") as HTMLInputElement).value).toBe("10");
-    expect(screen.getByText("Energy").getAttribute("aria-pressed")).toBe("true");
+    expect(
+      (screen.getByLabelText("P/E Ratio minimum") as HTMLInputElement).value
+    ).toBe("10");
+    expect(screen.getByText("Energy").getAttribute("aria-pressed")).toBe(
+      "true"
+    );
 
     fireEvent.click(screen.getByText("Clear All"));
 
-    expect((screen.getByLabelText("P/E Ratio minimum") as HTMLInputElement).value).toBe("");
-    expect(screen.getByText("Energy").getAttribute("aria-pressed")).toBe("false");
+    expect(
+      (screen.getByLabelText("P/E Ratio minimum") as HTMLInputElement).value
+    ).toBe("");
+    expect(screen.getByText("Energy").getAttribute("aria-pressed")).toBe(
+      "false"
+    );
   });
 });

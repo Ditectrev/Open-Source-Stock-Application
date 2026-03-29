@@ -31,9 +31,7 @@ vi.mock("../HeatmapComponent", () => ({
           <button
             key={d.symbol}
             data-testid={`tile-${d.symbol}`}
-            onClick={() =>
-              (props.onTileClick as (item: unknown) => void)?.(d)
-            }
+            onClick={() => (props.onTileClick as (item: unknown) => void)?.(d)}
           >
             {d.symbol} {d.changePercent}%
           </button>
@@ -47,9 +45,7 @@ vi.mock("../HeatmapComponent", () => ({
 // Helpers
 // ---------------------------------------------------------------------------
 
-function makeResult(
-  overrides: Partial<ScreenerResult> = {},
-): ScreenerResult {
+function makeResult(overrides: Partial<ScreenerResult> = {}): ScreenerResult {
   return {
     symbol: "AAPL",
     name: "Apple Inc.",
@@ -130,7 +126,7 @@ describe("ScreenerHeatmapView", () => {
       <ScreenerHeatmapView
         results={[makeResult({ symbol: "TSLA" })]}
         onSymbolClick={onClick}
-      />,
+      />
     );
 
     fireEvent.click(screen.getByTestId("tile-TSLA"));
@@ -138,9 +134,7 @@ describe("ScreenerHeatmapView", () => {
   });
 
   it("should not throw when tile clicked without onSymbolClick", () => {
-    render(
-      <ScreenerHeatmapView results={[makeResult({ symbol: "TSLA" })]} />,
-    );
+    render(<ScreenerHeatmapView results={[makeResult({ symbol: "TSLA" })]} />);
     expect(() => {
       fireEvent.click(screen.getByTestId("tile-TSLA"));
     }).not.toThrow();

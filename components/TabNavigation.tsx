@@ -12,7 +12,12 @@
 import { useRef, useCallback } from "react";
 import { useTheme } from "@/lib/theme-context";
 
-type TabType = "overview" | "financials" | "technicals" | "forecasts" | "seasonals";
+type TabType =
+  | "overview"
+  | "financials"
+  | "technicals"
+  | "forecasts"
+  | "seasonals";
 
 export interface TabNavigationProps {
   activeTab: TabType;
@@ -57,23 +62,27 @@ export function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
       onTabChange(TABS[nextIndex].id);
       tabRefs.current[nextIndex]?.focus();
     },
-    [onTabChange],
+    [onTabChange]
   );
 
   return (
     <div className="mt-6">
       <div
-        className={`border-b ${
-          isDark ? "border-gray-700" : "border-gray-200"
-        }`}
+        className={`border-b ${isDark ? "border-gray-700" : "border-gray-200"}`}
       >
-        <nav className="-mb-px flex space-x-2 sm:space-x-8 overflow-x-auto scrollbar-hide" role="tablist" aria-label="Symbol detail tabs">
+        <nav
+          className="-mb-px flex space-x-2 sm:space-x-8 overflow-x-auto scrollbar-hide"
+          role="tablist"
+          aria-label="Symbol detail tabs"
+        >
           {TABS.map((tab, index) => {
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
-                ref={(el) => { tabRefs.current[index] = el; }}
+                ref={(el) => {
+                  tabRefs.current[index] = el;
+                }}
                 onClick={() => onTabChange(tab.id)}
                 onKeyDown={(e) => handleKeyDown(e, index)}
                 role="tab"

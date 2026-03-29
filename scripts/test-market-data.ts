@@ -48,7 +48,9 @@ async function testCacheService() {
     const testData = { symbol: "AAPL", price: 150.0 };
 
     cacheService.set(testKey, testData, 60);
-    const retrieved = cacheService.get<{ symbol: string; price: number }>(testKey);
+    const retrieved = cacheService.get<{ symbol: string; price: number }>(
+      testKey
+    );
 
     if (retrieved && retrieved.symbol === "AAPL") {
       logSuccess("Cache set and get working");
@@ -133,16 +135,13 @@ async function testRetryBackoff() {
     let attempts = 0;
 
     // Test successful retry
-    const result = await retryWithBackoff(
-      async () => {
-        attempts++;
-        if (attempts < 2) {
-          throw new Error("Simulated failure");
-        }
-        return "success";
-      },
-      "test:retry"
-    );
+    const result = await retryWithBackoff(async () => {
+      attempts++;
+      if (attempts < 2) {
+        throw new Error("Simulated failure");
+      }
+      return "success";
+    }, "test:retry");
 
     if (result === "success" && attempts === 2) {
       logSuccess("Retry with backoff working (succeeded on attempt 2)");
@@ -188,9 +187,13 @@ async function testMarketDataService() {
     try {
       logInfo("Testing getSymbolData for AAPL...");
       const symbolData = await marketDataService.getSymbolData("AAPL");
-      logSuccess(`Symbol data retrieved: ${symbolData.name} at $${symbolData.price}`);
+      logSuccess(
+        `Symbol data retrieved: ${symbolData.name} at $${symbolData.price}`
+      );
     } catch (error) {
-      logWarning(`Symbol data test failed (expected): ${error instanceof Error ? error.message : error}`);
+      logWarning(
+        `Symbol data test failed (expected): ${error instanceof Error ? error.message : error}`
+      );
     }
 
     // Test historical data
@@ -202,7 +205,9 @@ async function testMarketDataService() {
       );
       logSuccess(`Historical data retrieved: ${historical.length} data points`);
     } catch (error) {
-      logWarning(`Historical data test failed (expected): ${error instanceof Error ? error.message : error}`);
+      logWarning(
+        `Historical data test failed (expected): ${error instanceof Error ? error.message : error}`
+      );
     }
 
     // Test technical indicators
@@ -213,7 +218,9 @@ async function testMarketDataService() {
         `Technical indicators calculated: RSI=${indicators.rsi.value.toFixed(2)}`
       );
     } catch (error) {
-      logWarning(`Technical indicators test failed (expected): ${error instanceof Error ? error.message : error}`);
+      logWarning(
+        `Technical indicators test failed (expected): ${error instanceof Error ? error.message : error}`
+      );
     }
 
     // Test Fear & Greed Index
@@ -224,7 +231,9 @@ async function testMarketDataService() {
         `Fear & Greed Index retrieved: ${fearGreed.value} (${fearGreed.label})`
       );
     } catch (error) {
-      logWarning(`Fear & Greed test failed (expected): ${error instanceof Error ? error.message : error}`);
+      logWarning(
+        `Fear & Greed test failed (expected): ${error instanceof Error ? error.message : error}`
+      );
     }
 
     // Test cache invalidation
@@ -275,7 +284,9 @@ async function testIntegration() {
 
     logInfo(`\nFinal Stats:`);
     logInfo(`  Cache entries: ${cacheStats.size}`);
-    logInfo(`  Rate limit endpoints tracked: ${Object.keys(rateLimitStats).length}`);
+    logInfo(
+      `  Rate limit endpoints tracked: ${Object.keys(rateLimitStats).length}`
+    );
   } catch (error) {
     logError(`Integration test failed: ${error}`);
   }

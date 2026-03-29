@@ -85,9 +85,7 @@ describe("CryptoHeatmap", () => {
   it("should render tiles for each crypto", () => {
     render(<CryptoHeatmap />);
     for (const crypto of mockCryptos) {
-      expect(
-        screen.getByTestId(`heatmap-tile-${crypto.symbol}`)
-      ).toBeDefined();
+      expect(screen.getByTestId(`heatmap-tile-${crypto.symbol}`)).toBeDefined();
     }
   });
 

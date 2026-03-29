@@ -3,7 +3,7 @@
 /**
  * KeyMetrics Component
  * Displays key financial metrics with tooltips
- * 
+ *
  * Requirements: 4.4, 4.5
  */
 
@@ -137,10 +137,8 @@ function MetricCard({ metric, isDark }: MetricCardProps) {
           onBlur={() => setShowTooltip(false)}
           className={`ml-2 flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs
             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
-            isDark
-              ? "bg-gray-600 text-gray-300"
-              : "bg-gray-200 text-gray-600"
-          }`}
+              isDark ? "bg-gray-600 text-gray-300" : "bg-gray-200 text-gray-600"
+            }`}
         >
           ?
         </button>
@@ -166,7 +164,9 @@ function MetricCard({ metric, isDark }: MetricCardProps) {
             {/* Arrow */}
             <div
               className={`absolute w-3 h-3 transform rotate-45 ${
-                isDark ? "bg-gray-900 border-l border-t border-gray-700" : "bg-white border-l border-t border-gray-200"
+                isDark
+                  ? "bg-gray-900 border-l border-t border-gray-700"
+                  : "bg-white border-l border-t border-gray-200"
               }`}
               style={{
                 top: "-7px",

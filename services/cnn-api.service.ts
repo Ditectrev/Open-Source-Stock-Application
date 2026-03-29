@@ -21,58 +21,56 @@ export class CNNApiService {
    * @param limit Number of historical data points to fetch (default 30)
    */
   async getFearGreedIndex(limit: number = 30): Promise<FearGreedData> {
-    return retryWithBackoff(
-      async () => {
-        try {
-          const response = await fetch(
-            `https://api.alternative.me/fng/?limit=${limit}`,
-            { headers: { "Accept": "application/json" } }
+    return retryWithBackoff(async () => {
+      try {
+        const response = await fetch(
+          `https://api.alternative.me/fng/?limit=${limit}`,
+          { headers: { Accept: "application/json" } }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            `Alternative.me API error: ${response.status} ${response.statusText}`
           );
-
-          if (!response.ok) {
-            throw new Error(`Alternative.me API error: ${response.status} ${response.statusText}`);
-          }
-
-          const json = await response.json();
-          return this.parseAlternativeFngResponse(json);
-        } catch (error) {
-          logger.error("Failed to fetch Fear & Greed Index", error as Error);
-          throw error;
         }
-      },
-      "AlternativeMe:FearGreedIndex"
-    );
+
+        const json = await response.json();
+        return this.parseAlternativeFngResponse(json);
+      } catch (error) {
+        logger.error("Failed to fetch Fear & Greed Index", error as Error);
+        throw error;
+      }
+    }, "AlternativeMe:FearGreedIndex");
   }
 
   /**
    * Fetch world markets data
    */
   async getWorldMarkets(): Promise<MarketIndex[]> {
-    return retryWithBackoff(
-      async () => {
-        try {
-          const response = await fetch(`${this.baseUrl}/world-markets`, {
-            headers: {
-              "Accept": "application/json",
-            },
-          });
+    return retryWithBackoff(async () => {
+      try {
+        const response = await fetch(`${this.baseUrl}/world-markets`, {
+          headers: {
+            Accept: "application/json",
+          },
+        });
 
-          if (!response.ok) {
-            throw new Error(`CNN API error: ${response.status} ${response.statusText}`);
-          }
-
-          const data = await response.json();
-          
-          return this.parseWorldMarketsResponse(data);
-        } catch (error) {
-          logger.error("Failed to fetch world markets", error as Error, {
-            baseUrl: this.baseUrl,
-          });
-          throw error;
+        if (!response.ok) {
+          throw new Error(
+            `CNN API error: ${response.status} ${response.statusText}`
+          );
         }
-      },
-      "CNN:WorldMarkets"
-    );
+
+        const data = await response.json();
+
+        return this.parseWorldMarketsResponse(data);
+      } catch (error) {
+        logger.error("Failed to fetch world markets", error as Error, {
+          baseUrl: this.baseUrl,
+        });
+        throw error;
+      }
+    }, "CNN:WorldMarkets");
   }
 
   /**
@@ -82,39 +80,38 @@ export class CNNApiService {
     country?: string,
     importance?: "high" | "medium" | "low"
   ): Promise<EconomicEvent[]> {
-    return retryWithBackoff(
-      async () => {
-        try {
-          const params = new URLSearchParams();
-          if (country) params.append("country", country);
-          if (importance) params.append("importance", importance);
+    return retryWithBackoff(async () => {
+      try {
+        const params = new URLSearchParams();
+        if (country) params.append("country", country);
+        if (importance) params.append("importance", importance);
 
-          const url = `${this.baseUrl}/economic-events${params.toString() ? `?${params.toString()}` : ""}`;
-          
-          const response = await fetch(url, {
-            headers: {
-              "Accept": "application/json",
-            },
-          });
+        const url = `${this.baseUrl}/economic-events${params.toString() ? `?${params.toString()}` : ""}`;
 
-          if (!response.ok) {
-            throw new Error(`CNN API error: ${response.status} ${response.statusText}`);
-          }
+        const response = await fetch(url, {
+          headers: {
+            Accept: "application/json",
+          },
+        });
 
-          const data = await response.json();
-          
-          return this.parseEconomicEventsResponse(data);
-        } catch (error) {
-          logger.error("Failed to fetch economic events", error as Error, {
-            baseUrl: this.baseUrl,
-            country,
-            importance,
-          });
-          throw error;
+        if (!response.ok) {
+          throw new Error(
+            `CNN API error: ${response.status} ${response.statusText}`
+          );
         }
-      },
-      "CNN:EconomicEvents"
-    );
+
+        const data = await response.json();
+
+        return this.parseEconomicEventsResponse(data);
+      } catch (error) {
+        logger.error("Failed to fetch economic events", error as Error, {
+          baseUrl: this.baseUrl,
+          country,
+          importance,
+        });
+        throw error;
+      }
+    }, "CNN:EconomicEvents");
   }
 
   /**
@@ -132,10 +129,12 @@ export class CNNApiService {
     else if (value <= 75) label = "Greed";
     else label = "Extreme Greed";
 
-    const history = entries.map((item: any) => ({
-      date: new Date(parseInt(item.timestamp, 10) * 1000),
-      value: parseInt(item.value, 10),
-    })).reverse();
+    const history = entries
+      .map((item: any) => ({
+        date: new Date(parseInt(item.timestamp, 10) * 1000),
+        value: parseInt(item.value, 10),
+      }))
+      .reverse();
 
     return {
       value,
@@ -150,7 +149,7 @@ export class CNNApiService {
    */
   private parseFearGreedResponse(data: any): FearGreedData {
     const value = data.fear_and_greed?.score || data.score || 50;
-    
+
     let label: FearGreedData["label"];
     if (value <= 25) label = "Extreme Fear";
     else if (value <= 45) label = "Fear";
@@ -158,10 +157,12 @@ export class CNNApiService {
     else if (value <= 75) label = "Greed";
     else label = "Extreme Greed";
 
-    const history = (data.fear_and_greed?.history || data.history || []).map((item: any) => ({
-      date: new Date(item.date || item.timestamp),
-      value: item.score || item.value,
-    }));
+    const history = (data.fear_and_greed?.history || data.history || []).map(
+      (item: any) => ({
+        date: new Date(item.date || item.timestamp),
+        value: item.score || item.value,
+      })
+    );
 
     return {
       value,
@@ -176,19 +177,29 @@ export class CNNApiService {
    */
   private parseWorldMarketsResponse(data: any): MarketIndex[] {
     const markets = data.markets || data.indices || [];
-    
+
     return markets.map((market: any) => {
       let region: MarketIndex["region"] = "Americas";
-      
+
       // Determine region based on market name or symbol
       const name = (market.name || "").toLowerCase();
       const symbol = (market.symbol || "").toLowerCase();
-      
-      if (name.includes("asia") || name.includes("nikkei") || name.includes("hang seng") || 
-          symbol.includes("hsi") || symbol.includes("nikkei")) {
+
+      if (
+        name.includes("asia") ||
+        name.includes("nikkei") ||
+        name.includes("hang seng") ||
+        symbol.includes("hsi") ||
+        symbol.includes("nikkei")
+      ) {
         region = "Asia-Pacific";
-      } else if (name.includes("europe") || name.includes("ftse") || name.includes("dax") || 
-                 symbol.includes("ftse") || symbol.includes("dax")) {
+      } else if (
+        name.includes("europe") ||
+        name.includes("ftse") ||
+        name.includes("dax") ||
+        symbol.includes("ftse") ||
+        symbol.includes("dax")
+      ) {
         region = "Europe";
       }
 
@@ -197,7 +208,9 @@ export class CNNApiService {
         symbol: market.symbol || market.ticker,
         value: parseFloat(market.value || market.price || 0),
         change: parseFloat(market.change || market.changeAmount || 0),
-        changePercent: parseFloat(market.changePercent || market.changePct || 0),
+        changePercent: parseFloat(
+          market.changePercent || market.changePct || 0
+        ),
         region,
       };
     });
@@ -208,7 +221,7 @@ export class CNNApiService {
    */
   private parseEconomicEventsResponse(data: any): EconomicEvent[] {
     const events = data.events || data.calendar || [];
-    
+
     return events.map((event: any, index: number) => ({
       id: event.id || `event-${index}`,
       name: event.name || event.title || event.event,

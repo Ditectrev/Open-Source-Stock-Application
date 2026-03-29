@@ -41,66 +41,66 @@ graph TB
         TrialTimer[Trial Timer]
         DeviceFingerprint[Device Fingerprint]
     end
-    
+
     subgraph "Next.js Application"
         Pages[Pages/Routes]
         APIRoutes[API Routes]
         Components[React Components]
         StateManagement[State Management]
     end
-    
+
     subgraph "Authentication Layer"
         AppwriteAuth[Appwrite Auth]
         AppleSSO[Apple SSO]
         GoogleSSO[Google SSO]
         EmailOTP[Email OTP]
     end
-    
+
     subgraph "Data Layer"
         AppwriteDB[Appwrite Database]
         Cache[Redis/Vercel KV Cache]
     end
-    
+
     subgraph "External Services"
         CNNDataviz[CNN Dataviz API]
         YahooFinance[Yahoo Finance API]
         IPServices[IP Lookup Services]
     end
-    
+
     subgraph "AI Services"
         Ollama[Ollama Local]
         ExternalAI[OpenAI/Gemini/Mistral/DeepSeek]
         HostedAI[Hosted AI Service]
     end
-    
+
     subgraph "Monetization"
         AdsService[Ads Service]
         SubscriptionService[Subscription Service]
     end
-    
+
     Browser --> Pages
     Pages --> Components
     Components --> StateManagement
     StateManagement --> APIRoutes
-    
+
     APIRoutes --> AppwriteAuth
     APIRoutes --> AppwriteDB
     APIRoutes --> Cache
     APIRoutes --> CNNDataviz
     APIRoutes --> YahooFinance
     APIRoutes --> IPServices
-    
+
     AppwriteAuth --> AppleSSO
     AppwriteAuth --> GoogleSSO
     AppwriteAuth --> EmailOTP
-    
+
     Components --> Ollama
     APIRoutes --> ExternalAI
     APIRoutes --> HostedAI
-    
+
     Pages --> AdsService
     APIRoutes --> SubscriptionService
-    
+
     TrialTimer --> Browser
     DeviceFingerprint --> Browser
 ```
@@ -118,7 +118,7 @@ graph LR
         HeatmapsPage[Heatmaps Page]
         ScreenerPage[Screener Page]
     end
-    
+
     subgraph "Feature Components"
         SearchBar[Symbol Search]
         ChartComponent[Chart Component]
@@ -129,13 +129,13 @@ graph LR
         FearGreedGauge[Fear & Greed Gauge]
         WorldMarkets[World Markets]
     end
-    
+
     subgraph "Trial Components"
         TrialBanner[Trial Banner]
         TrialTimer[Trial Timer]
         AuthPrompt[Auth Prompt]
     end
-    
+
     subgraph "Shared Components"
         Layout[Layout]
         Navigation[Navigation]
@@ -143,17 +143,17 @@ graph LR
         ErrorBoundary[Error Boundary]
         Tooltip[Tooltip]
     end
-    
+
     SymbolPage --> ChartComponent
     SymbolPage --> TechnicalIndicators
     SymbolPage --> ForecastDisplay
     SymbolPage --> SeasonalHeatmap
     SymbolPage --> FinancialsTable
-    
+
     HomePage --> FearGreedGauge
     HomePage --> WorldMarkets
     HomePage --> SearchBar
-    
+
     Layout --> TrialBanner
     TrialBanner --> TrialTimer
     TrialTimer --> AuthPrompt
@@ -169,11 +169,11 @@ sequenceDiagram
     participant Cache
     participant ExternalAPI
     participant AppwriteDB
-    
+
     User->>Browser: Request Symbol Page
     Browser->>NextJS: GET /symbol/AAPL
     NextJS->>Cache: Check for cached data
-    
+
     alt Data in cache
         Cache-->>NextJS: Return cached data
     else Data not in cache
@@ -181,10 +181,10 @@ sequenceDiagram
         ExternalAPI-->>NextJS: Return market data
         NextJS->>Cache: Store in cache (TTL: 5min)
     end
-    
+
     NextJS->>AppwriteDB: Fetch user preferences
     AppwriteDB-->>NextJS: Return preferences
-    
+
     NextJS-->>Browser: Render page with data
     Browser-->>User: Display symbol page
 ```
@@ -198,6 +198,7 @@ sequenceDiagram
 **Purpose**: Handle user authentication via multiple providers
 
 **Interface**:
+
 ```typescript
 interface AuthenticationService {
   signInWithApple(): Promise<AuthResult>;
@@ -231,6 +232,7 @@ interface User {
 **Purpose**: Fetch, cache, and serve market data from external APIs
 
 **Interface**:
+
 ```typescript
 interface MarketDataService {
   getSymbolData(symbol: string): Promise<SymbolData>;
@@ -258,7 +260,7 @@ interface SymbolData {
   lastUpdated: Date;
 }
 
-type TimeRange = '1D' | '1W' | '1M' | '3M' | '1Y' | '5Y' | 'Max';
+type TimeRange = "1D" | "1W" | "1M" | "3M" | "1Y" | "5Y" | "Max";
 ```
 
 **Dependencies**: CNN dataviz API, Yahoo Finance API, Cache service
@@ -268,6 +270,7 @@ type TimeRange = '1D' | '1W' | '1M' | '3M' | '1Y' | '5Y' | 'Max';
 **Purpose**: Manage trial sessions with device fingerprinting and IP tracking
 
 **Interface**:
+
 ```typescript
 interface TrialManagementService {
   startTrial(): Promise<TrialSession>;
@@ -301,17 +304,24 @@ interface TrialStatus {
 **Purpose**: Manage user subscriptions and pricing tiers
 
 **Interface**:
+
 ```typescript
 interface SubscriptionService {
   getPricingTiers(): Promise<PricingTierInfo[]>;
   getCurrentTier(userId: string): Promise<PricingTier>;
   subscribeTier(userId: string, tier: PricingTier): Promise<SubscriptionResult>;
-  upgradeTier(userId: string, newTier: PricingTier): Promise<SubscriptionResult>;
-  downgradeTier(userId: string, newTier: PricingTier): Promise<SubscriptionResult>;
+  upgradeTier(
+    userId: string,
+    newTier: PricingTier
+  ): Promise<SubscriptionResult>;
+  downgradeTier(
+    userId: string,
+    newTier: PricingTier
+  ): Promise<SubscriptionResult>;
   cancelSubscription(userId: string): Promise<void>;
 }
 
-type PricingTier = 'FREE' | 'ADS_FREE' | 'LOCAL' | 'BYOK' | 'HOSTED_AI';
+type PricingTier = "FREE" | "ADS_FREE" | "LOCAL" | "BYOK" | "HOSTED_AI";
 
 interface PricingTierInfo {
   tier: PricingTier;
@@ -319,7 +329,7 @@ interface PricingTierInfo {
   description: string;
   features: string[];
   price: number;
-  billingPeriod: 'monthly' | 'yearly';
+  billingPeriod: "monthly" | "yearly";
 }
 
 interface SubscriptionResult {
@@ -336,16 +346,30 @@ interface SubscriptionResult {
 **Purpose**: Provide AI-powered explanations and insights
 
 **Interface**:
+
 ```typescript
 interface AIIntegrationService {
-  explainMetric(metric: string, value: number, context: any): Promise<AIExplanation>;
-  analyzeChart(chartData: PriceData[], indicators: TechnicalIndicators): Promise<AIAnalysis>;
+  explainMetric(
+    metric: string,
+    value: number,
+    context: any
+  ): Promise<AIExplanation>;
+  analyzeChart(
+    chartData: PriceData[],
+    indicators: TechnicalIndicators
+  ): Promise<AIAnalysis>;
   answerQuestion(question: string, context: SymbolData): Promise<AIResponse>;
   validateAPIKey(provider: AIProvider, apiKey: string): Promise<boolean>;
   setAIProvider(provider: AIProvider, config: AIConfig): Promise<void>;
 }
 
-type AIProvider = 'OLLAMA' | 'OPENAI' | 'GEMINI' | 'MISTRAL' | 'DEEPSEEK' | 'HOSTED';
+type AIProvider =
+  | "OLLAMA"
+  | "OPENAI"
+  | "GEMINI"
+  | "MISTRAL"
+  | "DEEPSEEK"
+  | "HOSTED";
 
 interface AIExplanation {
   text: string;
@@ -354,7 +378,7 @@ interface AIExplanation {
 }
 
 interface VisualAnnotation {
-  type: 'highlight' | 'arrow' | 'circle' | 'label';
+  type: "highlight" | "arrow" | "circle" | "label";
   target: string; // CSS selector or data point identifier
   position: { x: number; y: number };
   label?: string;
@@ -375,10 +399,11 @@ interface AIAnalysis {
 **Purpose**: Render interactive financial charts
 
 **Interface**:
+
 ```typescript
 interface ChartComponentProps {
   data: PriceData[];
-  type: 'line' | 'area' | 'candlestick';
+  type: "line" | "area" | "candlestick";
   timeRange: TimeRange;
   indicators?: ChartIndicator[];
   annotations?: VisualAnnotation[];
@@ -397,7 +422,7 @@ interface PriceData {
 }
 
 interface ChartIndicator {
-  type: 'MA' | 'EMA' | 'RSI' | 'MACD' | 'BB';
+  type: "MA" | "EMA" | "RSI" | "MACD" | "BB";
   period?: number;
   color?: string;
   visible: boolean;
@@ -411,10 +436,11 @@ interface ChartIndicator {
 **Purpose**: Render performance heatmaps for various asset types
 
 **Interface**:
+
 ```typescript
 interface HeatmapComponentProps {
   data: HeatmapData[];
-  type: 'ETF' | 'CRYPTO' | 'STOCK' | 'MATRIX';
+  type: "ETF" | "CRYPTO" | "STOCK" | "MATRIX";
   timeRange: TimeRange;
   colorScheme: ColorScheme;
   onTileClick?: (item: HeatmapData) => void;
@@ -444,6 +470,7 @@ interface ColorScheme {
 **Purpose**: Filter and display assets based on multiple criteria
 
 **Interface**:
+
 ```typescript
 interface AssetScreenerProps {
   onResultsChange?: (results: ScreenerResult[]) => void;
@@ -451,7 +478,7 @@ interface AssetScreenerProps {
 
 interface ScreenerFilter {
   field: string;
-  operator: 'gt' | 'lt' | 'eq' | 'between' | 'in';
+  operator: "gt" | "lt" | "eq" | "between" | "in";
   value: number | string | [number, number] | string[];
 }
 
@@ -471,7 +498,7 @@ interface ScreenerResult {
   marketCap: number;
   sector: string;
   metrics: Record<string, number>;
-  valuationContext: 'overpriced' | 'underpriced' | 'fair';
+  valuationContext: "overpriced" | "underpriced" | "fair";
 }
 ```
 
@@ -595,7 +622,7 @@ interface User {
   id: string;
   email: string;
   name?: string;
-  authProvider: 'apple' | 'google' | 'email';
+  authProvider: "apple" | "google" | "email";
   pricingTier: PricingTier;
   subscription?: Subscription;
   preferences: UserPreferences;
@@ -606,9 +633,9 @@ interface User {
 
 interface UserPreferences {
   defaultTimeRange: TimeRange;
-  defaultChartType: 'line' | 'area' | 'candlestick';
+  defaultChartType: "line" | "area" | "candlestick";
   enabledIndicators: string[];
-  theme: 'light' | 'dark' | 'auto';
+  theme: "light" | "dark" | "auto";
   notifications: NotificationPreferences;
 }
 
@@ -627,10 +654,10 @@ interface Subscription {
   id: string;
   userId: string;
   tier: PricingTier;
-  status: 'active' | 'cancelled' | 'expired' | 'past_due';
+  status: "active" | "cancelled" | "expired" | "past_due";
   startDate: Date;
   endDate?: Date;
-  billingPeriod: 'monthly' | 'yearly';
+  billingPeriod: "monthly" | "yearly";
   amount: number;
   currency: string;
   paymentMethod: string;
@@ -668,7 +695,13 @@ interface TrialSession {
 interface CachedMarketData {
   key: string; // Composite key: symbol + data type
   symbol: string;
-  dataType: 'quote' | 'historical' | 'indicators' | 'forecast' | 'seasonal' | 'financials';
+  dataType:
+    | "quote"
+    | "historical"
+    | "indicators"
+    | "forecast"
+    | "seasonal"
+    | "financials";
   data: any;
   cachedAt: Date;
   expiresAt: Date;
@@ -685,7 +718,7 @@ interface EconomicEvent {
   country: string;
   date: Date;
   time?: string;
-  importance: 'high' | 'medium' | 'low';
+  importance: "high" | "medium" | "low";
   description: string;
   previous?: string;
   forecast?: string;
@@ -715,7 +748,7 @@ interface DividendEvent {
   paymentDate: Date;
   recordDate?: Date;
   yield: number;
-  frequency: 'monthly' | 'quarterly' | 'semi-annual' | 'annual';
+  frequency: "monthly" | "quarterly" | "semi-annual" | "annual";
 }
 
 interface IPOEvent {
@@ -746,7 +779,7 @@ interface ScreenerPreset {
 
 interface ScreenerFilter {
   field: string;
-  operator: 'gt' | 'lt' | 'eq' | 'gte' | 'lte' | 'between' | 'in';
+  operator: "gt" | "lt" | "eq" | "gte" | "lte" | "between" | "in";
   value: number | string | [number, number] | string[];
   label: string;
 }
@@ -765,144 +798,144 @@ interface ScreenerResult {
   dividendYield?: number;
   revenueGrowth?: number;
   earningsGrowth?: number;
-  valuationContext: 'overpriced' | 'underpriced' | 'fair';
+  valuationContext: "overpriced" | "underpriced" | "fair";
   matchScore: number; // How well it matches the filters
 }
 ```
 
 ## Correctness Properties
 
-*A property is a characteristic or behavior that should hold true across all valid executions of a system—essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees.*
+_A property is a characteristic or behavior that should hold true across all valid executions of a system—essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees._
 
 ### Property 1: Authentication Round Trip
 
-*For any* valid authentication provider (Apple SSO, Google SSO, or Email OTP) and valid credentials, successful authentication should create or retrieve a user session, and that session should contain the authenticated user's information.
+_For any_ valid authentication provider (Apple SSO, Google SSO, or Email OTP) and valid credentials, successful authentication should create or retrieve a user session, and that session should contain the authenticated user's information.
 
 **Validates: Requirements 1.2, 1.3, 1.4, 1.5**
 
 ### Property 2: Authentication Error Handling
 
-*For any* authentication failure (invalid credentials, network error, or provider unavailability), the system should display a descriptive error message and not create a session.
+_For any_ authentication failure (invalid credentials, network error, or provider unavailability), the system should display a descriptive error message and not create a session.
 
 **Validates: Requirements 1.6**
 
 ### Property 3: Market Data Caching
 
-*For any* market data request, if the data is cached and the TTL has not expired, subsequent requests should return the cached data without making external API calls.
+_For any_ market data request, if the data is cached and the TTL has not expired, subsequent requests should return the cached data without making external API calls.
 
 **Validates: Requirements 3.4, 17.2**
 
 ### Property 4: API Error Handling
 
-*For any* API request failure (network error, rate limit, or service unavailability), the system should display a user-friendly error message and provide a retry mechanism.
+_For any_ API request failure (network error, rate limit, or service unavailability), the system should display a user-friendly error message and provide a retry mechanism.
 
 **Validates: Requirements 3.5, 14.2, 14.5**
 
 ### Property 5: Rate Limit Enforcement
 
-*For any* sequence of API requests within a time window, the number of requests should not exceed the configured rate limit, and when the limit is reached, cached data should be served if available.
+_For any_ sequence of API requests within a time window, the number of requests should not exceed the configured rate limit, and when the limit is reached, cached data should be served if available.
 
 **Validates: Requirements 17.1, 17.4**
 
 ### Property 6: Exponential Backoff
 
-*For any* sequence of failed API requests, the delay between retry attempts should increase exponentially (e.g., 1s, 2s, 4s, 8s).
+_For any_ sequence of failed API requests, the delay between retry attempts should increase exponentially (e.g., 1s, 2s, 4s, 8s).
 
 **Validates: Requirements 17.5**
 
 ### Property 7: Trial Session Creation
 
-*For any* unauthenticated user accessing the application, a trial session should be created with start_time, end_time (15 minutes after start), is_active flag set to true, and a device_fingerprint generated from browser characteristics.
+_For any_ unauthenticated user accessing the application, a trial session should be created with start_time, end_time (15 minutes after start), is_active flag set to true, and a device_fingerprint generated from browser characteristics.
 
 **Validates: Requirements 21.1, 21.2, 21.3**
 
 ### Property 8: Trial Enforcement
 
-*For any* device fingerprint that has previously been used for a trial, subsequent trial attempts should be denied and an authentication prompt should be displayed, regardless of browser mode or cleared cookies.
+_For any_ device fingerprint that has previously been used for a trial, subsequent trial attempts should be denied and an authentication prompt should be displayed, regardless of browser mode or cleared cookies.
 
 **Validates: Requirements 21.4, 21.5, 21.19**
 
 ### Property 9: Trial Timer Accuracy
 
-*For any* active trial session, the displayed remaining time should equal the difference between end_time and current time, accurate to the second.
+_For any_ active trial session, the displayed remaining time should equal the difference between end_time and current time, accurate to the second.
 
 **Validates: Requirements 21.9**
 
 ### Property 10: Trial Access Control
 
-*For any* trial session where is_active is true, all application features should be accessible; when is_active is false, an authentication prompt should be displayed.
+_For any_ trial session where is_active is true, all application features should be accessible; when is_active is false, an authentication prompt should be displayed.
 
 **Validates: Requirements 21.11, 21.12**
 
 ### Property 11: Trial State Persistence
 
-*For any* trial session, refreshing the page should preserve the trial state (start_time, end_time, is_active, remaining time) using browser storage.
+_For any_ trial session, refreshing the page should preserve the trial state (start_time, end_time, is_active, remaining time) using browser storage.
 
 **Validates: Requirements 21.18**
 
 ### Property 12: API Key Encryption
 
-*For any* API key stored by the API_Key_Manager, the stored value should be encrypted, and decryption should yield the original key.
+_For any_ API key stored by the API_Key_Manager, the stored value should be encrypted, and decryption should yield the original key.
 
 **Validates: Requirements 22.13**
 
 ### Property 13: API Key Validation
 
-*For any* API key provided by a user, the system should validate it with the corresponding AI provider before storing it, and invalid keys should be rejected with an error message.
+_For any_ API key provided by a user, the system should validate it with the corresponding AI provider before storing it, and invalid keys should be rejected with an error message.
 
 **Validates: Requirements 22.14**
 
 ### Property 14: Tier Change Immediate Effect
 
-*For any* pricing tier change (upgrade or downgrade), the user's feature access should immediately reflect the new tier's capabilities.
+_For any_ pricing tier change (upgrade or downgrade), the user's feature access should immediately reflect the new tier's capabilities.
 
 **Validates: Requirements 22.24, 22.26**
 
 ### Property 15: Downgrade Grace Period
 
-*For any* downgrade from a paid tier, the user should retain access to the higher tier's features until the end of the current billing period.
+_For any_ downgrade from a paid tier, the user should retain access to the higher tier's features until the end of the current billing period.
 
 **Validates: Requirements 22.27**
 
 ### Property 16: Technical Indicator Color Coding
 
-*For any* technical indicator value, the color should be red when indicating overpriced, green when indicating underpriced, and gray when indicating fairly priced, based on the indicator's threshold values.
+_For any_ technical indicator value, the color should be red when indicating overpriced, green when indicating underpriced, and gray when indicating fairly priced, based on the indicator's threshold values.
 
 **Validates: Requirements 5.4**
 
 ### Property 17: Screener Filter Conjunction
 
-*For any* set of screener filters applied, the results should include only assets that match ALL filter criteria (AND logic), and the count of results should match the number of assets meeting all criteria.
+_For any_ set of screener filters applied, the results should include only assets that match ALL filter criteria (AND logic), and the count of results should match the number of assets meeting all criteria.
 
 **Validates: Requirements 26.8**
 
 ### Property 18: Screener Preset Application
 
-*For any* screener preset selected, the applied filters should exactly match the preset's defined filter combination.
+_For any_ screener preset selected, the applied filters should exactly match the preset's defined filter combination.
 
 **Validates: Requirements 26.13**
 
 ### Property 19: Screener State Persistence
 
-*For any* screener filter configuration, refreshing the page should restore the same filter selections using browser storage.
+_For any_ screener filter configuration, refreshing the page should restore the same filter selections using browser storage.
 
 **Validates: Requirements 26.23**
 
 ### Property 20: Custom Preset Round Trip
 
-*For any* custom screener preset saved by a user, retrieving the preset should return the exact same filter combination that was saved.
+_For any_ custom screener preset saved by a user, retrieving the preset should return the exact same filter combination that was saved.
 
 **Validates: Requirements 26.15**
 
 ### Property 21: Ollama Verification
 
-*For any* Local tier activation, the system should verify Ollama installation and accessibility before completing the activation, and should fail with an error message if Ollama is not available.
+_For any_ Local tier activation, the system should verify Ollama installation and accessibility before completing the activation, and should fail with an error message if Ollama is not available.
 
 **Validates: Requirements 22.10**
 
 ### Property 22: Symbol Data Fetching
 
-*For any* valid stock symbol, requesting symbol data should either return current market data or return a cached version if within TTL, but should never fail silently.
+_For any_ valid stock symbol, requesting symbol data should either return current market data or return a cached version if within TTL, but should never fail silently.
 
 **Validates: Requirements 3.1**
 
@@ -994,6 +1027,7 @@ class ApplicationError extends Error {
 ### Error Logging
 
 All errors are logged with:
+
 - Timestamp
 - User ID (if authenticated)
 - Error code and message
@@ -1016,6 +1050,7 @@ The application requires both unit testing and property-based testing for compre
 **Framework**: Jest + React Testing Library
 
 **Coverage Areas**:
+
 - Component rendering and user interactions
 - Specific authentication flows (Apple SSO success, Google SSO failure, etc.)
 - Edge cases: empty data, symbol not found, network offline
@@ -1024,17 +1059,18 @@ The application requires both unit testing and property-based testing for compre
 - Responsive layout breakpoints
 
 **Example Unit Tests**:
+
 ```typescript
-describe('TrialTimer', () => {
+describe("TrialTimer", () => {
   it('should display "Symbol not found" for invalid symbol', () => {
     // Specific edge case
   });
-  
-  it('should show authentication prompt when trial expires', () => {
+
+  it("should show authentication prompt when trial expires", () => {
     // Specific example
   });
-  
-  it('should render correctly on mobile viewport', () => {
+
+  it("should render correctly on mobile viewport", () => {
     // Responsive design test
   });
 });
@@ -1045,10 +1081,12 @@ describe('TrialTimer', () => {
 **Framework**: fast-check (JavaScript/TypeScript property-based testing library)
 
 **Configuration**:
+
 - Minimum 100 iterations per property test
 - Each test tagged with: `Feature: stock-exchange-application, Property {number}: {property_text}`
 
 **Coverage Areas**:
+
 - Authentication round trips
 - Caching behavior
 - Trial session management
@@ -1057,11 +1095,12 @@ describe('TrialTimer', () => {
 - Data transformations
 
 **Example Property Tests**:
-```typescript
-import fc from 'fast-check';
 
-describe('Property Tests', () => {
-  it('Property 3: Market Data Caching', () => {
+```typescript
+import fc from "fast-check";
+
+describe("Property Tests", () => {
+  it("Property 3: Market Data Caching", () => {
     // Feature: stock-exchange-application, Property 3: Market Data Caching
     fc.assert(
       fc.asyncProperty(
@@ -1070,7 +1109,7 @@ describe('Property Tests', () => {
         async (symbol, ttl) => {
           const firstFetch = await marketDataService.getSymbolData(symbol);
           const secondFetch = await marketDataService.getSymbolData(symbol);
-          
+
           // Should return cached data without API call
           expect(secondFetch).toEqual(firstFetch);
           expect(apiCallCount).toBe(1);
@@ -1079,44 +1118,47 @@ describe('Property Tests', () => {
       { numRuns: 100 }
     );
   });
-  
-  it('Property 7: Trial Session Creation', () => {
+
+  it("Property 7: Trial Session Creation", () => {
     // Feature: stock-exchange-application, Property 7: Trial Session Creation
     fc.assert(
       fc.asyncProperty(
         fc.record({
           userAgent: fc.string(),
           screenResolution: fc.string(),
-          timezone: fc.string()
+          timezone: fc.string(),
         }),
         async (browserInfo) => {
           const session = await trialService.startTrial();
-          
+
           expect(session.startTime).toBeDefined();
           expect(session.endTime).toBeDefined();
           expect(session.isActive).toBe(true);
           expect(session.deviceFingerprint).toBeDefined();
-          
-          const duration = session.endTime.getTime() - session.startTime.getTime();
+
+          const duration =
+            session.endTime.getTime() - session.startTime.getTime();
           expect(duration).toBe(15 * 60 * 1000); // 15 minutes
         }
       ),
       { numRuns: 100 }
     );
   });
-  
-  it('Property 17: Screener Filter Conjunction', () => {
+
+  it("Property 17: Screener Filter Conjunction", () => {
     // Feature: stock-exchange-application, Property 17: Screener Filter Conjunction
     fc.assert(
       fc.asyncProperty(
-        fc.array(fc.record({
-          field: fc.constantFrom('peRatio', 'marketCap', 'volume'),
-          operator: fc.constantFrom('gt', 'lt', 'between'),
-          value: fc.oneof(fc.float(), fc.tuple(fc.float(), fc.float()))
-        })),
+        fc.array(
+          fc.record({
+            field: fc.constantFrom("peRatio", "marketCap", "volume"),
+            operator: fc.constantFrom("gt", "lt", "between"),
+            value: fc.oneof(fc.float(), fc.tuple(fc.float(), fc.float())),
+          })
+        ),
         async (filters) => {
           const results = await screenerService.search(filters);
-          
+
           // Every result should match ALL filters
           for (const result of results) {
             for (const filter of filters) {
@@ -1136,6 +1178,7 @@ describe('Property Tests', () => {
 **Framework**: Playwright
 
 **Coverage Areas**:
+
 - End-to-end authentication flows
 - Trial session lifecycle
 - Subscription purchase flows
@@ -1147,6 +1190,7 @@ describe('Property Tests', () => {
 **Tools**: Lighthouse CI, WebPageTest
 
 **Targets**:
+
 - Lighthouse performance score > 80
 - First Contentful Paint < 1.5s
 - Time to Interactive < 3.5s
@@ -1157,8 +1201,8 @@ describe('Property Tests', () => {
 **Tools**: axe-core, WAVE
 
 **Requirements**:
+
 - WCAG 2.1 Level AA compliance
 - Keyboard navigation support
 - Screen reader compatibility
 - Color contrast ratios ≥ 4.5:1
-

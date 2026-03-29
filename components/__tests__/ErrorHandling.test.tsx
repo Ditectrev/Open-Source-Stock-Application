@@ -52,7 +52,9 @@ describe("Req 14.1: Loading indicators", () => {
     render(<LoadingSpinner message="Fetching market data..." />);
     const spinner = screen.getByTestId("loading-spinner");
     expect(spinner.getAttribute("aria-label")).toBe("Fetching market data...");
-    expect(screen.getAllByText("Fetching market data...").length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText("Fetching market data...").length
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it("FearGreedGauge shows loading spinner while fetching", () => {

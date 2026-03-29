@@ -74,8 +74,12 @@ export function SeasonalHeatmap({ data }: SeasonalHeatmapProps) {
   // Loading / empty state
   if (!data) {
     return (
-      <div className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}>
-        <h2 className={`text-lg font-semibold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}>
+      <div
+        className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
+      >
+        <h2
+          className={`text-lg font-semibold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}
+        >
           Seasonal Patterns
         </h2>
         <div className="space-y-3">
@@ -92,8 +96,12 @@ export function SeasonalHeatmap({ data }: SeasonalHeatmapProps) {
 
   if (years.length === 0) {
     return (
-      <div className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}>
-        <h2 className={`text-lg font-semibold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}>
+      <div
+        className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
+      >
+        <h2
+          className={`text-lg font-semibold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}
+        >
           Seasonal Patterns
         </h2>
         <p className={`text-sm ${isDark ? "text-gray-300" : "text-gray-500"}`}>
@@ -104,14 +112,22 @@ export function SeasonalHeatmap({ data }: SeasonalHeatmapProps) {
   }
 
   return (
-    <div className={`p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}>
-      <h2 className={`text-lg font-semibold mb-3 sm:mb-4 lg:mb-5 ${isDark ? "text-white" : "text-gray-900"}`}>
+    <div
+      className={`p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
+    >
+      <h2
+        className={`text-lg font-semibold mb-3 sm:mb-4 lg:mb-5 ${isDark ? "text-white" : "text-gray-900"}`}
+      >
         Seasonal Patterns
       </h2>
 
       {/* Heatmap grid */}
       <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
-        <table className="w-full border-collapse text-xs md:text-sm lg:text-base" role="grid" aria-label="Seasonal returns heatmap by month and year">
+        <table
+          className="w-full border-collapse text-xs md:text-sm lg:text-base"
+          role="grid"
+          aria-label="Seasonal returns heatmap by month and year"
+        >
           <thead>
             <tr>
               <th
@@ -177,7 +193,11 @@ export function SeasonalHeatmap({ data }: SeasonalHeatmapProps) {
                                 ? "bg-gray-900 text-gray-200 border border-gray-700"
                                 : "bg-white text-gray-700 border border-gray-200"
                             }`}
-                            style={{ bottom: "calc(100% + 4px)", left: "50%", transform: "translateX(-50%)" }}
+                            style={{
+                              bottom: "calc(100% + 4px)",
+                              left: "50%",
+                              transform: "translateX(-50%)",
+                            }}
                           >
                             <div className="font-semibold">
                               {getMonthLabel(month)} {year}
@@ -209,7 +229,9 @@ export function SeasonalHeatmap({ data }: SeasonalHeatmapProps) {
             ))}
 
             {/* Average row */}
-            <tr className={`border-t-2 ${isDark ? "border-gray-600" : "border-gray-300"}`}>
+            <tr
+              className={`border-t-2 ${isDark ? "border-gray-600" : "border-gray-300"}`}
+            >
               <td
                 className={`px-2 py-1 font-semibold ${
                   isDark ? "text-gray-200" : "text-gray-800"
@@ -239,22 +261,40 @@ export function SeasonalHeatmap({ data }: SeasonalHeatmapProps) {
 
       {/* Legend */}
       <div className="mt-3 sm:mt-4 flex items-center gap-2 sm:gap-4 text-xs flex-wrap">
-        <span className={isDark ? "text-gray-300" : "text-gray-500"}>Legend:</span>
+        <span className={isDark ? "text-gray-300" : "text-gray-500"}>
+          Legend:
+        </span>
         <div className="flex items-center gap-1">
-          <div className={`w-4 h-4 rounded ${isDark ? "bg-green-600" : "bg-green-500"}`} />
-          <span className={isDark ? "text-gray-300" : "text-gray-500"}>Strong positive</span>
+          <div
+            className={`w-4 h-4 rounded ${isDark ? "bg-green-600" : "bg-green-500"}`}
+          />
+          <span className={isDark ? "text-gray-300" : "text-gray-500"}>
+            Strong positive
+          </span>
         </div>
         <div className="flex items-center gap-1">
-          <div className={`w-4 h-4 rounded ${isDark ? "bg-green-800" : "bg-green-200"}`} />
-          <span className={isDark ? "text-gray-300" : "text-gray-500"}>Mild positive</span>
+          <div
+            className={`w-4 h-4 rounded ${isDark ? "bg-green-800" : "bg-green-200"}`}
+          />
+          <span className={isDark ? "text-gray-300" : "text-gray-500"}>
+            Mild positive
+          </span>
         </div>
         <div className="flex items-center gap-1">
-          <div className={`w-4 h-4 rounded ${isDark ? "bg-red-800" : "bg-red-200"}`} />
-          <span className={isDark ? "text-gray-300" : "text-gray-500"}>Mild negative</span>
+          <div
+            className={`w-4 h-4 rounded ${isDark ? "bg-red-800" : "bg-red-200"}`}
+          />
+          <span className={isDark ? "text-gray-300" : "text-gray-500"}>
+            Mild negative
+          </span>
         </div>
         <div className="flex items-center gap-1">
-          <div className={`w-4 h-4 rounded ${isDark ? "bg-red-600" : "bg-red-500"}`} />
-          <span className={isDark ? "text-gray-300" : "text-gray-500"}>Strong negative</span>
+          <div
+            className={`w-4 h-4 rounded ${isDark ? "bg-red-600" : "bg-red-500"}`}
+          />
+          <span className={isDark ? "text-gray-300" : "text-gray-500"}>
+            Strong negative
+          </span>
         </div>
       </div>
 

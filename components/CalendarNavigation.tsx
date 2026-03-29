@@ -59,7 +59,7 @@ export function CalendarNavigation({
       onCalendarChange(CALENDAR_TABS[nextIndex].key);
       tabRefs.current[nextIndex]?.focus();
     },
-    [onCalendarChange],
+    [onCalendarChange]
   );
 
   return (
@@ -74,7 +74,9 @@ export function CalendarNavigation({
         return (
           <button
             key={key}
-            ref={(el) => { tabRefs.current[index] = el; }}
+            ref={(el) => {
+              tabRefs.current[index] = el;
+            }}
             role="tab"
             aria-selected={isActive}
             tabIndex={isActive ? 0 : -1}
@@ -82,12 +84,12 @@ export function CalendarNavigation({
             onKeyDown={(e) => handleKeyDown(e, index)}
             className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap min-h-[44px]
               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 ${
-              isActive
-                ? "bg-blue-600 text-white"
-                : isDark
-                  ? "text-gray-400 hover:text-gray-200 hover:bg-gray-700"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-            }`}
+                isActive
+                  ? "bg-blue-600 text-white"
+                  : isDark
+                    ? "text-gray-400 hover:text-gray-200 hover:bg-gray-700"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+              }`}
             data-testid={`calendar-tab-${key}`}
           >
             <span aria-hidden="true">{icon}</span>

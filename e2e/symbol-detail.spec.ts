@@ -5,14 +5,18 @@ test.describe("Symbol Detail on Home Page", () => {
     await page.goto("http://localhost:3000");
   });
 
-  test("should display welcome message when no symbol selected", async ({ page }) => {
+  test("should display welcome message when no symbol selected", async ({
+    page,
+  }) => {
     await expect(page.getByText("Search for a Stock Symbol")).toBeVisible();
     await expect(
       page.getByText("Use the search bar above to find and analyze stocks")
     ).toBeVisible();
   });
 
-  test("should display symbol header after selecting a symbol", async ({ page }) => {
+  test("should display symbol header after selecting a symbol", async ({
+    page,
+  }) => {
     // Search for a symbol
     const searchInput = page.getByPlaceholder(/search stocks/i);
     await searchInput.fill("AAPL");
@@ -22,7 +26,9 @@ test.describe("Symbol Detail on Home Page", () => {
     await expect(page.getByRole("heading", { name: /AAPL/i })).toBeVisible();
   });
 
-  test("should display current price with change indicators", async ({ page }) => {
+  test("should display current price with change indicators", async ({
+    page,
+  }) => {
     // Select a symbol
     const searchInput = page.getByPlaceholder(/search stocks/i);
     await searchInput.fill("AAPL");
@@ -30,7 +36,7 @@ test.describe("Symbol Detail on Home Page", () => {
 
     // Check for price display
     await expect(page.getByText(/\$/)).toBeVisible();
-    
+
     // Check for change percentage (either positive or negative)
     const changeText = page.locator("text=/[+-]?\\d+\\.\\d+%/").first();
     await expect(changeText).toBeVisible();

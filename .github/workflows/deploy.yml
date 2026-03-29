@@ -11,8 +11,8 @@ env:
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
 jobs:
-  test:
-    name: Lint & Test
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,10 +21,33 @@ jobs:
 
       - run: bun install
 
-      - name: Lint
+      - name: ESLint
         run: bun run lint
 
-      - name: Unit tests
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - run: bun install
+
+      - name: Prettier check
+        run: bunx prettier --check .
+
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - run: bun install
+
+      - name: Vitest
         run: bun run test -- --run
 
   security:
@@ -42,7 +65,7 @@ jobs:
 
   accessibility:
     name: Accessibility Audit
-    needs: test
+    needs: [lint, format, test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -65,7 +88,7 @@ jobs:
 
   e2e:
     name: E2E Tests
-    needs: test
+    needs: [lint, format, test]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     continue-on-error: true
@@ -95,7 +118,7 @@ jobs:
 
   lighthouse:
     name: Lighthouse Audit
-    needs: test
+    needs: [lint, format, test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -120,7 +143,7 @@ jobs:
 
   deploy-preview:
     name: Deploy Preview
-    needs: [test, security, accessibility, e2e, lighthouse]
+    needs: [lint, format, test, security, accessibility, e2e, lighthouse]
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
@@ -140,7 +163,7 @@ jobs:
 
   deploy-production:
     name: Deploy Production
-    needs: [test, security, accessibility, e2e, lighthouse]
+    needs: [lint, format, test, security, accessibility, e2e, lighthouse]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:

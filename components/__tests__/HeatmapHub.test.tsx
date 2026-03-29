@@ -22,35 +22,40 @@ describe("HeatmapHub", () => {
 
   it("defaults to ETF heatmap", () => {
     render(<HeatmapHub />);
-    expect(
-      screen.getByTestId("heatmap-tab-etf")
-    ).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByTestId("heatmap-tab-etf")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    );
   });
 
   it("switches to crypto heatmap on tab click", () => {
     render(<HeatmapHub />);
     fireEvent.click(screen.getByTestId("heatmap-tab-crypto"));
-    expect(
-      screen.getByTestId("heatmap-tab-crypto")
-    ).toHaveAttribute("aria-selected", "true");
-    expect(
-      screen.getByTestId("heatmap-tab-etf")
-    ).toHaveAttribute("aria-selected", "false");
+    expect(screen.getByTestId("heatmap-tab-crypto")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    );
+    expect(screen.getByTestId("heatmap-tab-etf")).toHaveAttribute(
+      "aria-selected",
+      "false"
+    );
   });
 
   it("switches to stock heatmap on tab click", () => {
     render(<HeatmapHub />);
     fireEvent.click(screen.getByTestId("heatmap-tab-stock"));
-    expect(
-      screen.getByTestId("heatmap-tab-stock")
-    ).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByTestId("heatmap-tab-stock")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    );
   });
 
   it("accepts a defaultHeatmap prop", () => {
     render(<HeatmapHub defaultHeatmap="stock" />);
-    expect(
-      screen.getByTestId("heatmap-tab-stock")
-    ).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByTestId("heatmap-tab-stock")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    );
   });
 
   it("renders the Heatmaps heading", () => {

@@ -11,13 +11,18 @@ import { EarningsCalendar } from "../EarningsCalendar";
 import { EarningsEvent } from "@/types";
 
 vi.mock("@/lib/theme-context", () => ({
-  useTheme: () => ({ theme: "light", resolvedTheme: "light", setTheme: vi.fn() }),
+  useTheme: () => ({
+    theme: "light",
+    resolvedTheme: "light",
+    setTheme: vi.fn(),
+  }),
 }));
 
 global.fetch = vi.fn();
 
 const now = new Date();
-const daysFromNow = (d: number) => new Date(now.getTime() + d * 24 * 60 * 60 * 1000);
+const daysFromNow = (d: number) =>
+  new Date(now.getTime() + d * 24 * 60 * 60 * 1000);
 
 const mockEvents: EarningsEvent[] = [
   {
@@ -94,7 +99,9 @@ describe("EarningsCalendar", () => {
   it("should group events by day with day headers", () => {
     render(<EarningsCalendar data={mockEvents} />);
     const eventsList = screen.getByTestId("events-list");
-    const dayGroups = eventsList.querySelectorAll("[data-testid^='day-group-']");
+    const dayGroups = eventsList.querySelectorAll(
+      "[data-testid^='day-group-']"
+    );
     // 3 distinct days: daysFromNow(1), daysFromNow(3), daysFromNow(7)
     expect(dayGroups.length).toBe(3);
   });
@@ -120,10 +127,14 @@ describe("EarningsCalendar", () => {
     render(<EarningsCalendar data={mockEvents} />);
     // AAPL beat: +0.09, +6.29%
     expect(screen.getByTestId("eps-surprise-1").textContent).toContain("0.09");
-    expect(screen.getByTestId("eps-surprise-1").textContent).toContain("+6.29%");
+    expect(screen.getByTestId("eps-surprise-1").textContent).toContain(
+      "+6.29%"
+    );
     // TSLA miss: -0.11, -15.07%
     expect(screen.getByTestId("eps-surprise-3").textContent).toContain("-0.11");
-    expect(screen.getByTestId("eps-surprise-3").textContent).toContain("-15.07%");
+    expect(screen.getByTestId("eps-surprise-3").textContent).toContain(
+      "-15.07%"
+    );
   });
 
   it("should show dash for missing EPS estimate", () => {
@@ -166,8 +177,12 @@ describe("EarningsCalendar", () => {
     const target = daysFromNow(3);
     const targetStr = target.toISOString().slice(0, 10);
 
-    fireEvent.change(screen.getByTestId("start-date"), { target: { value: targetStr } });
-    fireEvent.change(screen.getByTestId("end-date"), { target: { value: targetStr } });
+    fireEvent.change(screen.getByTestId("start-date"), {
+      target: { value: targetStr },
+    });
+    fireEvent.change(screen.getByTestId("end-date"), {
+      target: { value: targetStr },
+    });
 
     expect(screen.getByText("Tesla Inc.")).toBeDefined();
     expect(screen.queryByText("Apple Inc.")).toBeNull();

@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
             : "Failed to fetch stock performance",
         timestamp: new Date(),
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

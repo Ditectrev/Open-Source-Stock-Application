@@ -1,6 +1,6 @@
-import '@testing-library/jest-dom';
-import { cleanup } from '@testing-library/react';
-import { afterEach, vi } from 'vitest';
+import "@testing-library/jest-dom";
+import { cleanup } from "@testing-library/react";
+import { afterEach, vi } from "vitest";
 
 // Cleanup after each test
 afterEach(() => {
@@ -8,7 +8,7 @@ afterEach(() => {
 });
 
 // Mock window.matchMedia
-Object.defineProperty(window, 'matchMedia', {
+Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: (query: string) => ({
     matches: false,
@@ -33,7 +33,7 @@ global.localStorage = localStorageMock as any;
 
 // Mock HTMLCanvasElement and CanvasRenderingContext2D
 HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
-  fillStyle: '',
+  fillStyle: "",
   fillRect: vi.fn(),
   clearRect: vi.fn(),
   getImageData: vi.fn(),
@@ -67,7 +67,7 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
 }));
 
 // Mock Lightweight Charts
-vi.mock('lightweight-charts', () => {
+vi.mock("lightweight-charts", () => {
   const mockSeries = () => ({
     setData: vi.fn(),
     applyOptions: vi.fn(),

@@ -27,13 +27,18 @@ const FORECAST_TOOLTIPS: Record<string, string> = {
     "Analyst price targets represent the range of prices that analysts expect the stock to reach. The low, average, and high values show the spread of analyst opinions.",
   analystRatings:
     "Analyst ratings show the distribution of recommendations from financial analysts covering this stock, ranging from Strong Buy to Strong Sell.",
-  eps:
-    "Earnings Per Share (EPS) forecasts compare analyst estimates with actual reported earnings. A positive surprise means the company earned more than expected.",
+  eps: "Earnings Per Share (EPS) forecasts compare analyst estimates with actual reported earnings. A positive surprise means the company earned more than expected.",
   revenue:
     "Revenue forecasts compare analyst estimates with actual reported revenue. Comparing actuals to estimates helps gauge company performance against expectations.",
 };
 
-const RATING_LABELS = ["Strong Buy", "Buy", "Hold", "Sell", "Strong Sell"] as const;
+const RATING_LABELS = [
+  "Strong Buy",
+  "Buy",
+  "Hold",
+  "Sell",
+  "Strong Sell",
+] as const;
 const RATING_KEYS: Array<keyof ForecastData["analystRatings"]> = [
   "strongBuy",
   "buy",
@@ -57,9 +62,7 @@ function TooltipTrigger({ label, tooltip, isDark }: TooltipTriggerProps) {
   const [showTooltip, setShowTooltip] = useState(false);
 
   return (
-    <div
-      className="relative flex items-center gap-2"
-    >
+    <div className="relative flex items-center gap-2">
       <h3
         className={`text-base font-semibold ${isDark ? "text-white" : "text-gray-900"}`}
       >
@@ -69,8 +72,8 @@ function TooltipTrigger({ label, tooltip, isDark }: TooltipTriggerProps) {
         type="button"
         className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs cursor-help
           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
-          isDark ? "bg-gray-600 text-gray-300" : "bg-gray-200 text-gray-600"
-        }`}
+            isDark ? "bg-gray-600 text-gray-300" : "bg-gray-200 text-gray-600"
+          }`}
         aria-label={`More info about ${label}`}
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
@@ -139,7 +142,8 @@ function SurpriseIndicator({
       className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${colorClass} ${bgClass}`}
     >
       {icon} {label}
-      {surprisePercent !== undefined && ` (${surprisePercent > 0 ? "+" : ""}${surprisePercent.toFixed(2)}%)`}
+      {surprisePercent !== undefined &&
+        ` (${surprisePercent > 0 ? "+" : ""}${surprisePercent.toFixed(2)}%)`}
     </span>
   );
 }
@@ -161,13 +165,19 @@ function PriceTargetRange({
   return (
     <div className="mt-3">
       <div className="flex justify-between mb-1">
-        <span className={`text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}>
+        <span
+          className={`text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}
+        >
           Low: ${low.toFixed(2)}
         </span>
-        <span className={`text-xs font-medium ${isDark ? "text-blue-400" : "text-blue-600"}`}>
+        <span
+          className={`text-xs font-medium ${isDark ? "text-blue-400" : "text-blue-600"}`}
+        >
           Avg: ${average.toFixed(2)}
         </span>
-        <span className={`text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}>
+        <span
+          className={`text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}
+        >
           High: ${high.toFixed(2)}
         </span>
       </div>
@@ -182,7 +192,10 @@ function PriceTargetRange({
         <div
           data-testid="price-target-marker"
           className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow"
-          style={{ left: `${avgPosition}%`, transform: `translateX(-50%) translateY(-50%)` }}
+          style={{
+            left: `${avgPosition}%`,
+            transform: `translateX(-50%) translateY(-50%)`,
+          }}
         />
       </div>
     </div>
@@ -195,8 +208,12 @@ export function ForecastDisplay({ forecast }: ForecastDisplayProps) {
 
   if (!forecast) {
     return (
-      <div className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}>
-        <h2 className={`text-lg font-semibold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}>
+      <div
+        className={`p-6 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
+      >
+        <h2
+          className={`text-lg font-semibold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}
+        >
           Forecast Data
         </h2>
         <div className="space-y-4">
@@ -217,8 +234,14 @@ export function ForecastDisplay({ forecast }: ForecastDisplayProps) {
   );
 
   return (
-    <div className={`p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`} role="region" aria-label="Forecast Data">
-      <h2 className={`text-lg font-semibold mb-4 sm:mb-6 ${isDark ? "text-white" : "text-gray-900"}`}>
+    <div
+      className={`p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm ${isDark ? "bg-gray-800" : "bg-white"}`}
+      role="region"
+      aria-label="Forecast Data"
+    >
+      <h2
+        className={`text-lg font-semibold mb-4 sm:mb-6 ${isDark ? "text-white" : "text-gray-900"}`}
+      >
         Forecast Data
       </h2>
 
@@ -226,7 +249,9 @@ export function ForecastDisplay({ forecast }: ForecastDisplayProps) {
         {/* Price Targets Card */}
         <div
           className={`p-4 rounded-lg border ${
-            isDark ? "bg-gray-700/50 border-gray-600" : "bg-gray-50 border-gray-200"
+            isDark
+              ? "bg-gray-700/50 border-gray-600"
+              : "bg-gray-50 border-gray-200"
           }`}
         >
           <TooltipTrigger
@@ -236,20 +261,38 @@ export function ForecastDisplay({ forecast }: ForecastDisplayProps) {
           />
           <div className="mt-3 space-y-2">
             <div className="flex justify-between">
-              <span className={`text-sm ${isDark ? "text-gray-300" : "text-gray-500"}`}>Low</span>
-              <span className={`text-sm font-mono font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
+              <span
+                className={`text-sm ${isDark ? "text-gray-300" : "text-gray-500"}`}
+              >
+                Low
+              </span>
+              <span
+                className={`text-sm font-mono font-semibold ${isDark ? "text-white" : "text-gray-900"}`}
+              >
                 ${forecast.priceTargets.low.toFixed(2)}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className={`text-sm ${isDark ? "text-gray-300" : "text-gray-500"}`}>Average</span>
-              <span className={`text-sm font-mono font-semibold ${isDark ? "text-blue-400" : "text-blue-600"}`}>
+              <span
+                className={`text-sm ${isDark ? "text-gray-300" : "text-gray-500"}`}
+              >
+                Average
+              </span>
+              <span
+                className={`text-sm font-mono font-semibold ${isDark ? "text-blue-400" : "text-blue-600"}`}
+              >
                 ${forecast.priceTargets.average.toFixed(2)}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className={`text-sm ${isDark ? "text-gray-300" : "text-gray-500"}`}>High</span>
-              <span className={`text-sm font-mono font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
+              <span
+                className={`text-sm ${isDark ? "text-gray-300" : "text-gray-500"}`}
+              >
+                High
+              </span>
+              <span
+                className={`text-sm font-mono font-semibold ${isDark ? "text-white" : "text-gray-900"}`}
+              >
                 ${forecast.priceTargets.high.toFixed(2)}
               </span>
             </div>
@@ -265,7 +308,9 @@ export function ForecastDisplay({ forecast }: ForecastDisplayProps) {
         {/* Analyst Ratings Card */}
         <div
           className={`p-4 rounded-lg border ${
-            isDark ? "bg-gray-700/50 border-gray-600" : "bg-gray-50 border-gray-200"
+            isDark
+              ? "bg-gray-700/50 border-gray-600"
+              : "bg-gray-50 border-gray-200"
           }`}
         >
           <TooltipTrigger
@@ -308,7 +353,9 @@ export function ForecastDisplay({ forecast }: ForecastDisplayProps) {
         {/* EPS Forecasts Card */}
         <div
           className={`p-4 rounded-lg border ${
-            isDark ? "bg-gray-700/50 border-gray-600" : "bg-gray-50 border-gray-200"
+            isDark
+              ? "bg-gray-700/50 border-gray-600"
+              : "bg-gray-50 border-gray-200"
           }`}
         >
           <TooltipTrigger
@@ -324,16 +371,22 @@ export function ForecastDisplay({ forecast }: ForecastDisplayProps) {
                   isDark ? "border-gray-600" : "border-gray-200"
                 }`}
               >
-                <span className={`text-sm ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+                <span
+                  className={`text-sm ${isDark ? "text-gray-300" : "text-gray-700"}`}
+                >
                   {eps.quarter}
                 </span>
                 <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <div className={`text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}>
+                    <div
+                      className={`text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}
+                    >
                       Est: ${eps.estimate.toFixed(2)}
                     </div>
                     {eps.actual !== undefined && (
-                      <div className={`text-xs font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
+                      <div
+                        className={`text-xs font-semibold ${isDark ? "text-white" : "text-gray-900"}`}
+                      >
                         Act: ${eps.actual.toFixed(2)}
                       </div>
                     )}
@@ -354,7 +407,9 @@ export function ForecastDisplay({ forecast }: ForecastDisplayProps) {
         {/* Revenue Forecasts Card */}
         <div
           className={`p-4 rounded-lg border ${
-            isDark ? "bg-gray-700/50 border-gray-600" : "bg-gray-50 border-gray-200"
+            isDark
+              ? "bg-gray-700/50 border-gray-600"
+              : "bg-gray-50 border-gray-200"
           }`}
         >
           <TooltipTrigger
@@ -365,7 +420,9 @@ export function ForecastDisplay({ forecast }: ForecastDisplayProps) {
           <div className="mt-3 space-y-3">
             {forecast.revenueForecasts.map((rev) => {
               const hasActual = rev.actual !== undefined;
-              const surprise = hasActual ? rev.actual! - rev.estimate : undefined;
+              const surprise = hasActual
+                ? rev.actual! - rev.estimate
+                : undefined;
               return (
                 <div
                   key={rev.quarter}
@@ -373,16 +430,22 @@ export function ForecastDisplay({ forecast }: ForecastDisplayProps) {
                     isDark ? "border-gray-600" : "border-gray-200"
                   }`}
                 >
-                  <span className={`text-sm ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+                  <span
+                    className={`text-sm ${isDark ? "text-gray-300" : "text-gray-700"}`}
+                  >
                     {rev.quarter}
                   </span>
                   <div className="flex items-center gap-3">
                     <div className="text-right">
-                      <div className={`text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}>
+                      <div
+                        className={`text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}
+                      >
                         Est: {formatCurrency(rev.estimate)}
                       </div>
                       {hasActual && (
-                        <div className={`text-xs font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
+                        <div
+                          className={`text-xs font-semibold ${isDark ? "text-white" : "text-gray-900"}`}
+                        >
                           Act: {formatCurrency(rev.actual!)}
                         </div>
                       )}

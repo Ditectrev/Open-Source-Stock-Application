@@ -52,11 +52,11 @@ The implementation follows an incremental approach, building core infrastructure
     - Implement onAuthStateChange() for session monitoring
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
 
-  - [ ]* 2.2 Write property test for authentication round trip
+  - [ ]\* 2.2 Write property test for authentication round trip
     - **Property 1: Authentication Round Trip**
     - **Validates: Requirements 1.2, 1.3, 1.4, 1.5**
 
-  - [ ]* 2.3 Write property test for authentication error handling
+  - [ ]\* 2.3 Write property test for authentication error handling
     - **Property 2: Authentication Error Handling**
     - **Validates: Requirements 1.6**
 
@@ -73,7 +73,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Style authentication modal
     - _Requirements: 1.6, 21.13_
 
-  - [ ]* 2.6 Write unit tests for authentication UI
+  - [ ]\* 2.6 Write unit tests for authentication UI
     - Test provider button clicks
     - Test email form validation
     - Test error message display
@@ -101,15 +101,15 @@ The implementation follows an incremental approach, building core infrastructure
     - Store trial state in browser storage for persistence
     - _Requirements: 21.1, 21.2, 21.4, 21.5, 21.18, 21.19, 21.20_
 
-  - [ ]* 3.4 Write property test for trial session creation
+  - [ ]\* 3.4 Write property test for trial session creation
     - **Property 7: Trial Session Creation**
     - **Validates: Requirements 21.1, 21.2, 21.3**
 
-  - [ ]* 3.5 Write property test for trial enforcement
+  - [ ]\* 3.5 Write property test for trial enforcement
     - **Property 8: Trial Enforcement**
     - **Validates: Requirements 21.4, 21.5, 21.19**
 
-  - [ ]* 3.6 Write property test for trial state persistence
+  - [ ]\* 3.6 Write property test for trial state persistence
     - **Property 11: Trial State Persistence**
     - **Validates: Requirements 21.18**
 
@@ -126,11 +126,11 @@ The implementation follows an incremental approach, building core infrastructure
     - Show authentication prompt when expired
     - _Requirements: 21.9, 21.10, 21.12_
 
-  - [ ]* 3.9 Write property test for trial timer accuracy
+  - [ ]\* 3.9 Write property test for trial timer accuracy
     - **Property 9: Trial Timer Accuracy**
     - **Validates: Requirements 21.9**
 
-  - [ ]* 3.10 Write property test for trial access control
+  - [ ]\* 3.10 Write property test for trial access control
     - **Property 10: Trial Access Control**
     - **Validates: Requirements 21.11, 21.12**
 
@@ -140,7 +140,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Integrate with TrialTimer
     - _Requirements: 21.12, 21.13_
 
-  - [ ]* 3.12 Write unit tests for trial components
+  - [ ]\* 3.12 Write unit tests for trial components
     - Test timer countdown display
     - Test expiration prompt
     - Test authentication flow trigger
@@ -148,7 +148,6 @@ The implementation follows an incremental approach, building core infrastructure
 
 - [ ] 4. Checkpoint - Core authentication and trial system
   - Ensure all tests pass, ask the user if questions arise.
-
 
 - [x] 5. Market data infrastructure
   - [x] 5.1 Implement caching layer
@@ -158,7 +157,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Implement cache invalidation methods
     - _Requirements: 3.4, 17.2_
 
-  - [ ]* 5.2 Write property test for market data caching
+  - [ ]\* 5.2 Write property test for market data caching
     - **Property 3: Market Data Caching**
     - **Validates: Requirements 3.4, 17.2**
 
@@ -169,7 +168,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Serve cached data when rate limited
     - _Requirements: 17.1, 17.3, 17.4_
 
-  - [ ]* 5.4 Write property test for rate limit enforcement
+  - [ ]\* 5.4 Write property test for rate limit enforcement
     - **Property 5: Rate Limit Enforcement**
     - **Validates: Requirements 17.1, 17.4**
 
@@ -179,7 +178,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Add jitter to prevent thundering herd
     - _Requirements: 17.5_
 
-  - [ ]* 5.6 Write property test for exponential backoff
+  - [ ]\* 5.6 Write property test for exponential backoff
     - **Property 6: Exponential Backoff**
     - **Validates: Requirements 17.5**
 
@@ -196,11 +195,11 @@ The implementation follows an incremental approach, building core infrastructure
     - Implement invalidateCache()
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.6_
 
-  - [ ]* 5.8 Write property test for symbol data fetching
+  - [ ]\* 5.8 Write property test for symbol data fetching
     - **Property 22: Symbol Data Fetching**
     - **Validates: Requirements 3.1**
 
-  - [ ]* 5.9 Write property test for API error handling
+  - [ ]\* 5.9 Write property test for API error handling
     - **Property 4: API Error Handling**
     - **Validates: Requirements 3.5, 14.2, 14.5**
 
@@ -232,7 +231,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Implement GET /api/market/sectors
     - _Requirements: 3.1, 3.6_
 
-  - [x]* 5.13 Write unit tests for API routes
+  - [x]\* 5.13 Write unit tests for API routes
     - Test successful data retrieval
     - Test caching behavior
     - Test rate limiting
@@ -262,7 +261,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Make indicators toggleable
     - _Requirements: 5.1, 5.2_
 
-  - [x]* 6.4 Write unit tests for ChartComponent
+  - [x]\* 6.4 Write unit tests for ChartComponent
     - Test chart type switching
     - Test time range changes
     - Test responsive behavior
@@ -326,7 +325,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Avoid "Buy" or "Sell" language
     - _Requirements: 5.1, 5.3, 5.4, 5.5, 5.6_
 
-  - [x]* 9.3 Write property test for technical indicator color coding
+  - [x]\* 9.3 Write property test for technical indicator color coding
     - **Property 16: Technical Indicator Color Coding**
     - **Validates: Requirements 5.4**
 
@@ -339,7 +338,6 @@ The implementation follows an incremental approach, building core infrastructure
 
 - [x] 10. Checkpoint - Core market data and visualization
   - Ensure all tests pass, ask the user if questions arise.
-
 
 - [x] 11. Forecast data display
   - [x] 11.1 Create ForecastDisplay component
@@ -435,11 +433,11 @@ The implementation follows an incremental approach, building core infrastructure
     - Implement cancelSubscription()
     - _Requirements: 22.8, 22.17, 22.24, 22.26, 22.27_
 
-  - [ ]* 16.2 Write property test for tier change immediate effect
+  - [ ]\* 16.2 Write property test for tier change immediate effect
     - **Property 14: Tier Change Immediate Effect**
     - **Validates: Requirements 22.24, 22.26**
 
-  - [ ]* 16.3 Write property test for downgrade grace period
+  - [ ]\* 16.3 Write property test for downgrade grace period
     - **Property 15: Downgrade Grace Period**
     - **Validates: Requirements 22.27**
 
@@ -459,7 +457,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Implement DELETE /api/subscription/cancel
     - _Requirements: 22.8, 22.17, 22.26_
 
-  - [ ]* 16.6 Write unit tests for PricingPage
+  - [ ]\* 16.6 Write unit tests for PricingPage
     - Test tier display
     - Test comparison layout
     - Test subscription flow
@@ -478,7 +476,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Hide ads for paid tiers
     - _Requirements: 22.5, 22.7_
 
-  - [ ]* 17.3 Write unit tests for ads display
+  - [ ]\* 17.3 Write unit tests for ads display
     - Test ads show for Free tier
     - Test ads hidden for paid tiers
     - _Requirements: 22.5, 22.7_
@@ -503,11 +501,11 @@ The implementation follows an incremental approach, building core infrastructure
     - Allow provider selection
     - _Requirements: 22.12, 22.13, 22.14, 22.15_
 
-  - [ ]* 18.4 Write property test for API key encryption
+  - [ ]\* 18.4 Write property test for API key encryption
     - **Property 12: API Key Encryption**
     - **Validates: Requirements 22.13**
 
-  - [ ]* 18.5 Write property test for API key validation
+  - [ ]\* 18.5 Write property test for API key validation
     - **Property 13: API Key Validation**
     - **Validates: Requirements 22.14**
 
@@ -525,7 +523,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Implement setAIProvider()
     - _Requirements: 22.18, 22.19, 22.20, 22.21, 22.22, 22.23_
 
-  - [ ]* 18.8 Write unit tests for AI integration
+  - [ ]\* 18.8 Write unit tests for AI integration
     - Test Ollama connection
     - Test API key validation
     - Test provider switching
@@ -534,7 +532,6 @@ The implementation follows an incremental approach, building core infrastructure
 
 - [ ] 19. Checkpoint - Subscription and AI features
   - Ensure all tests pass, ask the user if questions arise.
-
 
 - [x] 20. Sectors Hub
   - [x] 20.1 Create SectorHub component
@@ -691,7 +688,6 @@ The implementation follows an incremental approach, building core infrastructure
 
 - [x] 26. Checkpoint - Calendars complete
   - Ensure all tests pass, ask the user if questions arise.
-
 
 - [x] 27. Heatmap infrastructure
   - [x] 27.1 Create base HeatmapComponent
@@ -902,7 +898,6 @@ The implementation follows an incremental approach, building core infrastructure
 - [x] 35. Checkpoint - Heatmaps and Screener complete
   - Ensure all tests pass, ask the user if questions arise.
 
-
 - [ ] 36. Database integration
   - [ ] 36.1 Implement DatabaseService
     - Connect to existing Appwrite database
@@ -913,7 +908,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Log errors and return appropriate responses
     - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5_
 
-  - [ ]* 36.2 Write unit tests for DatabaseService
+  - [ ]\* 36.2 Write unit tests for DatabaseService
     - Test connection handling
     - Test preferences CRUD operations
     - Test watchlist operations
@@ -1032,7 +1027,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Configure edge functions if needed
     - _Requirements: 16.3_
 
-  - [ ]* 41.3 Test deployment
+  - [ ]\* 41.3 Test deployment
     - Deploy to staging environment
     - Verify all features work in production
     - Test environment variable configuration
@@ -1064,7 +1059,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Log errors
     - _Requirements: 14.2_
 
-  - [ ]* 42.5 Write unit tests for shared components
+  - [ ]\* 42.5 Write unit tests for shared components
     - Test Layout rendering
     - Test Navigation links
     - Test Tooltip display
@@ -1080,7 +1075,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Add quick links to major sections
     - _Requirements: 9.1, 10.1_
 
-  - [ ]* 43.2 Write unit tests for home page
+  - [ ]\* 43.2 Write unit tests for home page
     - Test component rendering
     - Test navigation links
     - _Requirements: 9.1, 10.1_
@@ -1144,6 +1139,7 @@ The implementation follows an incremental approach, building core infrastructure
 ⚠️ **CRITICAL - MUST BE DONE AFTER EVERY TASK** ⚠️
 
 After completing each task, you MUST:
+
 1. **Write unit tests** (Vitest) for all components - REQUIRED, not optional
 2. **Write e2e tests** (Playwright) for all user-facing components - REQUIRED, not optional
 3. **Bump the version** in `package.json`:

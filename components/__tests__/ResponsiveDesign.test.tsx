@@ -119,9 +119,7 @@ describe("Responsive Design", () => {
 
     it("should render all five tabs on mobile (scrollable)", () => {
       const onTabChange = vi.fn();
-      render(
-        <TabNavigation activeTab="overview" onTabChange={onTabChange} />
-      );
+      render(<TabNavigation activeTab="overview" onTabChange={onTabChange} />);
       expect(screen.getByText("Overview")).toBeInTheDocument();
       expect(screen.getByText("Financials")).toBeInTheDocument();
       expect(screen.getByText("Technicals")).toBeInTheDocument();
@@ -130,9 +128,7 @@ describe("Responsive Design", () => {
     });
 
     it("should render KeyMetrics in single-column grid on mobile", () => {
-      const { container } = render(
-        <KeyMetrics symbolData={mockSymbolData} />
-      );
+      const { container } = render(<KeyMetrics symbolData={mockSymbolData} />);
       const grid = container.querySelector(".grid");
       expect(grid).not.toBeNull();
       expect(grid!.classList.contains("grid-cols-1")).toBe(true);
@@ -179,18 +175,14 @@ describe("Responsive Design", () => {
     });
 
     it("should render KeyMetrics with 2-column grid at sm breakpoint", () => {
-      const { container } = render(
-        <KeyMetrics symbolData={mockSymbolData} />
-      );
+      const { container } = render(<KeyMetrics symbolData={mockSymbolData} />);
       const grid = container.querySelector(".grid");
       expect(grid).not.toBeNull();
       expect(grid!.classList.contains("sm:grid-cols-2")).toBe(true);
     });
 
     it("should render KeyMetrics with 3-column grid at md breakpoint", () => {
-      const { container } = render(
-        <KeyMetrics symbolData={mockSymbolData} />
-      );
+      const { container } = render(<KeyMetrics symbolData={mockSymbolData} />);
       const grid = container.querySelector(".grid");
       expect(grid).not.toBeNull();
       expect(grid!.classList.contains("md:grid-cols-3")).toBe(true);
@@ -211,7 +203,9 @@ describe("Responsive Design", () => {
         <SymbolHeader symbolData={mockSymbolData} />
       );
       // The sm:text-right class is on the wrapper div around the price
-      const priceWrapper = container.querySelector(".text-left.sm\\:text-right");
+      const priceWrapper = container.querySelector(
+        ".text-left.sm\\:text-right"
+      );
       expect(priceWrapper).not.toBeNull();
       expect(priceWrapper!.className).toContain("sm:text-right");
     });
@@ -232,35 +226,27 @@ describe("Responsive Design", () => {
     });
 
     it("should render KeyMetrics with 4-column grid at lg breakpoint", () => {
-      const { container } = render(
-        <KeyMetrics symbolData={mockSymbolData} />
-      );
+      const { container } = render(<KeyMetrics symbolData={mockSymbolData} />);
       const grid = container.querySelector(".grid");
       expect(grid).not.toBeNull();
       expect(grid!.classList.contains("lg:grid-cols-4")).toBe(true);
     });
 
     it("should render KeyMetrics with 5-column grid at xl breakpoint", () => {
-      const { container } = render(
-        <KeyMetrics symbolData={mockSymbolData} />
-      );
+      const { container } = render(<KeyMetrics symbolData={mockSymbolData} />);
       const grid = container.querySelector(".grid");
       expect(grid).not.toBeNull();
       expect(grid!.classList.contains("xl:grid-cols-5")).toBe(true);
     });
 
     it("should render KeyMetrics with larger padding at lg+", () => {
-      const { container } = render(
-        <KeyMetrics symbolData={mockSymbolData} />
-      );
+      const { container } = render(<KeyMetrics symbolData={mockSymbolData} />);
       const wrapper = container.firstElementChild as HTMLElement;
       expect(wrapper.className).toContain("lg:p-8");
     });
 
     it("should render KeyMetrics with larger gap at lg+", () => {
-      const { container } = render(
-        <KeyMetrics symbolData={mockSymbolData} />
-      );
+      const { container } = render(<KeyMetrics symbolData={mockSymbolData} />);
       const grid = container.querySelector(".grid");
       expect(grid).not.toBeNull();
       expect(grid!.className).toContain("lg:gap-5");
@@ -346,9 +332,7 @@ describe("Responsive Design", () => {
     });
 
     it("should render metric cards with adequate padding for touch", () => {
-      const { container } = render(
-        <KeyMetrics symbolData={mockSymbolData} />
-      );
+      const { container } = render(<KeyMetrics symbolData={mockSymbolData} />);
       // Metric cards have p-3 base padding (touch-friendly)
       const cards = container.querySelectorAll(".rounded-lg.border");
       expect(cards.length).toBeGreaterThan(0);

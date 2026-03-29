@@ -92,7 +92,7 @@ test.describe("Asset Screener", () => {
 
     // Wait for results — either a table or a "No results" message
     await expect(
-      hub.locator("table, :text('No results'), :text('asset')").first(),
+      hub.locator("table, :text('No results'), :text('asset')").first()
     ).toBeVisible({ timeout: 10000 });
   });
 
@@ -102,9 +102,9 @@ test.describe("Asset Screener", () => {
 
     await hub.getByText("Apply Filters").click();
 
-    await expect(
-      hub.locator("text=/\\d+ assets? found/").first(),
-    ).toBeVisible({ timeout: 10000 });
+    await expect(hub.locator("text=/\\d+ assets? found/").first()).toBeVisible({
+      timeout: 10000,
+    });
   });
 
   // --- Table view is default (Req 26.9) ---
@@ -133,12 +133,14 @@ test.describe("Asset Screener", () => {
     await page.waitForTimeout(1000);
 
     await page.getByTestId("view-toggle-heatmap").click();
-    await expect(
-      page.getByTestId("view-toggle-heatmap"),
-    ).toHaveAttribute("aria-selected", "true");
-    await expect(
-      page.getByTestId("view-toggle-table"),
-    ).toHaveAttribute("aria-selected", "false");
+    await expect(page.getByTestId("view-toggle-heatmap")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    );
+    await expect(page.getByTestId("view-toggle-table")).toHaveAttribute(
+      "aria-selected",
+      "false"
+    );
   });
 
   test("should switch back to table view", async ({ page }) => {
@@ -148,9 +150,10 @@ test.describe("Asset Screener", () => {
     await page.getByTestId("view-toggle-heatmap").click();
     await page.getByTestId("view-toggle-table").click();
 
-    await expect(
-      page.getByTestId("view-toggle-table"),
-    ).toHaveAttribute("aria-selected", "true");
+    await expect(page.getByTestId("view-toggle-table")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    );
   });
 
   // --- Preset selection (Req 26.12) ---
@@ -269,7 +272,7 @@ test.describe("Asset Screener", () => {
     await expect(page.getByLabel("P/E Ratio minimum")).toHaveValue("15");
     await expect(hub.getByText("Technology")).toHaveAttribute(
       "aria-pressed",
-      "true",
+      "true"
     );
   });
 
@@ -291,7 +294,7 @@ test.describe("Asset Screener", () => {
     await expect(page.getByLabel("P/E Ratio minimum")).toHaveValue("");
     await expect(hub.getByText("Technology")).toHaveAttribute(
       "aria-pressed",
-      "false",
+      "false"
     );
   });
 });

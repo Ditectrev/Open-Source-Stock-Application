@@ -9,6 +9,7 @@ node scripts/quick-test.mjs
 ```
 
 **Expected output:**
+
 ```
 ✓ All infrastructure files created
 ✓ TypeScript types are valid
@@ -28,11 +29,13 @@ bun run dev
 ### Step 2: Test endpoints
 
 **Option A: Use the test script**
+
 ```bash
 ./scripts/test-api-endpoints.sh
 ```
 
 **Option B: Test manually with curl**
+
 ```bash
 # Test symbol data
 curl http://localhost:3000/api/market/symbol/AAPL | jq
@@ -47,6 +50,7 @@ curl http://localhost:3000/api/market/indicators/AAPL | jq
 **Option C: Use your browser**
 
 Open these URLs in your browser:
+
 - http://localhost:3000/api/market/symbol/AAPL
 - http://localhost:3000/api/market/fear-greed
 - http://localhost:3000/api/market/world-markets
@@ -54,6 +58,7 @@ Open these URLs in your browser:
 ## 📊 What to Expect
 
 ### ✅ Success Response
+
 ```json
 {
   "success": true,
@@ -65,11 +70,13 @@ Open these URLs in your browser:
 ### ⚠️ Expected Warnings
 
 Some API calls may fail with messages like:
+
 - "Failed to fetch symbol data"
 - "Yahoo Finance API error"
 - "CNN API error"
 
 **This is normal!** External APIs may not be accessible without:
+
 - Proper API keys
 - CORS configuration
 - Production deployment
@@ -85,7 +92,7 @@ The infrastructure (caching, rate limiting, retry logic) still works correctly.
 ✅ Rate limiting implemented  
 ✅ Retry logic with exponential backoff  
 ✅ 9 API endpoints created  
-✅ Error handling in place  
+✅ Error handling in place
 
 ## 📚 More Information
 
@@ -96,15 +103,19 @@ The infrastructure (caching, rate limiting, retry logic) still works correctly.
 ## 🐛 Troubleshooting
 
 **Problem: "command not found: bun"**
+
 - Solution: Use `npm run dev` instead
 
 **Problem: TypeScript errors**
+
 - Solution: Run `npm install` to ensure all dependencies are installed
 
 **Problem: Port 3000 already in use**
+
 - Solution: Kill the process using port 3000 or use a different port
 
 **Problem: All API calls fail**
+
 - Solution: This is expected without external API access. The infrastructure still works!
 
 ## ✨ Next Steps

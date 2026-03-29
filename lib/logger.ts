@@ -37,9 +37,7 @@ class Logger {
   }
 
   private shouldLog(level: LogLevel): boolean {
-    return (
-      this.levelPriority[level] >= this.levelPriority[this.minLevel]
-    );
+    return this.levelPriority[level] >= this.levelPriority[this.minLevel];
   }
 
   private formatLogEntry(

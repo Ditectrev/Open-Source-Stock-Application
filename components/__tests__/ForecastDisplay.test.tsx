@@ -17,8 +17,20 @@ const mockForecast: ForecastData = {
   priceTargets: { low: 120.0, average: 165.0, high: 210.0 },
   analystRatings: { strongBuy: 10, buy: 8, hold: 5, sell: 2, strongSell: 1 },
   epsForecasts: [
-    { quarter: "Q1 2024", estimate: 1.5, actual: 1.65, surprise: 0.15, surprisePercent: 10.0 },
-    { quarter: "Q2 2024", estimate: 1.6, actual: 1.45, surprise: -0.15, surprisePercent: -9.38 },
+    {
+      quarter: "Q1 2024",
+      estimate: 1.5,
+      actual: 1.65,
+      surprise: 0.15,
+      surprisePercent: 10.0,
+    },
+    {
+      quarter: "Q2 2024",
+      estimate: 1.6,
+      actual: 1.45,
+      surprise: -0.15,
+      surprisePercent: -9.38,
+    },
     { quarter: "Q3 2024", estimate: 1.7 },
   ],
   revenueForecasts: [
@@ -122,14 +134,20 @@ describe("ForecastDisplay", () => {
     render(<ForecastDisplay forecast={mockForecast} />);
     const hoverTarget = screen.getByLabelText("More info about Price Targets");
     fireEvent.mouseEnter(hoverTarget);
-    expect(screen.getByText(/Analyst price targets represent/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Analyst price targets represent/)
+    ).toBeInTheDocument();
   });
 
   it("should show tooltip on hover over Analyst Ratings heading", () => {
     render(<ForecastDisplay forecast={mockForecast} />);
-    const hoverTarget = screen.getByLabelText("More info about Analyst Ratings");
+    const hoverTarget = screen.getByLabelText(
+      "More info about Analyst Ratings"
+    );
     fireEvent.mouseEnter(hoverTarget);
-    expect(screen.getByText(/Analyst ratings show the distribution/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Analyst ratings show the distribution/)
+    ).toBeInTheDocument();
   });
 
   it("should show tooltip on hover over EPS Forecasts heading", () => {
@@ -141,18 +159,26 @@ describe("ForecastDisplay", () => {
 
   it("should show tooltip on hover over Revenue Forecasts heading", () => {
     render(<ForecastDisplay forecast={mockForecast} />);
-    const hoverTarget = screen.getByLabelText("More info about Revenue Forecasts");
+    const hoverTarget = screen.getByLabelText(
+      "More info about Revenue Forecasts"
+    );
     fireEvent.mouseEnter(hoverTarget);
-    expect(screen.getByText(/Revenue forecasts compare analyst estimates/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Revenue forecasts compare analyst estimates/)
+    ).toBeInTheDocument();
   });
 
   it("should hide tooltip on mouse leave", () => {
     render(<ForecastDisplay forecast={mockForecast} />);
     const hoverTarget = screen.getByLabelText("More info about Price Targets");
     fireEvent.mouseEnter(hoverTarget);
-    expect(screen.getByText(/Analyst price targets represent/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Analyst price targets represent/)
+    ).toBeInTheDocument();
     fireEvent.mouseLeave(hoverTarget);
-    expect(screen.queryByText(/Analyst price targets represent/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/Analyst price targets represent/)
+    ).not.toBeInTheDocument();
   });
 
   // Loading skeleton
@@ -181,7 +207,13 @@ describe("ForecastDisplay", () => {
     const noSurprise: ForecastData = {
       ...mockForecast,
       epsForecasts: [
-        { quarter: "Q1 2024", estimate: 1.5, actual: 1.5, surprise: 0, surprisePercent: 0 },
+        {
+          quarter: "Q1 2024",
+          estimate: 1.5,
+          actual: 1.5,
+          surprise: 0,
+          surprisePercent: 0,
+        },
       ],
       revenueForecasts: [
         { quarter: "Q1 2024", estimate: 50000000000, actual: 50000000000 },

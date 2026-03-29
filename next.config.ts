@@ -4,11 +4,7 @@ import withBundleAnalyzer from "@next/bundle-analyzer";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   experimental: {
-    optimizePackageImports: [
-      "lightweight-charts",
-      "swr",
-      "react-github-btn",
-    ],
+    optimizePackageImports: ["lightweight-charts", "swr", "react-github-btn"],
   },
   images: {
     formats: ["image/avif", "image/webp"],
@@ -37,8 +33,7 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source:
-          "/:path*.(ico|svg|png|jpg|jpeg|gif|webp|avif)",
+        source: "/:path*.(ico|svg|png|jpg|jpeg|gif|webp|avif)",
         headers: [
           {
             key: "Cache-Control",
