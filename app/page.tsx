@@ -1,8 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { SearchBar } from "@/components/SearchBar";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { Navigation } from "@/components/Navigation";
 import { useState, useEffect, useRef } from "react";
 import {
   SymbolData,
@@ -136,9 +135,11 @@ const Footer = dynamic(
 function LazySection({
   children,
   className,
+  id,
 }: {
   children: React.ReactNode;
   className?: string;
+  id?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -160,7 +161,7 @@ function LazySection({
   }, []);
 
   return (
-    <div ref={ref} className={className}>
+    <div ref={ref} id={id} className={className}>
       {visible ? children : <div style={{ minHeight: 200 }} />}
     </div>
   );
@@ -188,6 +189,24 @@ export default function Home() {
   const [financialData, setFinancialData] = useState<FinancialData | null>(
     null
   );
+  const [activeSection, setActiveSection] = useState("home");
+
+  const handleSectionChange = (section: string) => {
+    if (section === "home") {
+      setSelectedSymbol(null);
+      setActiveSection("home");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    // Clear symbol view when navigating to a dashboard section
+    setSelectedSymbol(null);
+    setActiveSection(section);
+    // Scroll to the section after a tick so the DOM has rendered
+    setTimeout(() => {
+      const el = document.getElementById(`section-${section}`);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
+  };
 
   // Fetch symbol data when selected
   useEffect(() => {
@@ -272,32 +291,18 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12 bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl xl:max-w-[1400px] mx-auto">
-        <div className="flex justify-between items-start gap-3">
-          <div className="min-w-0 flex-1">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100">
-              Stock Exchange Application
-            </h1>
-            <p className="mt-2 sm:mt-4 text-sm sm:text-base md:text-lg text-gray-700 dark:text-gray-300">
-              Welcome to the comprehensive web platform for individual long-term
-              investors.
-            </p>
-          </div>
-          <div className="flex-shrink-0">
-            <ThemeToggle />
-          </div>
-        </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <Navigation
+        activeSection={selectedSymbol ? undefined : activeSection}
+        onSectionChange={handleSectionChange}
+        onSymbolSelect={(symbol) => {
+          setSelectedSymbol(symbol);
+          setActiveTab("overview");
+          setActiveSection("home");
+        }}
+      />
 
-        <div className="mt-4 sm:mt-6 md:mt-8 lg:mt-10">
-          <SearchBar
-            placeholder="Search stocks by symbol (e.g., AAPL, TSLA, MSFT)..."
-            onSelect={(symbol) => {
-              setSelectedSymbol(symbol);
-              setActiveTab("overview");
-            }}
-          />
-        </div>
+      <div className="max-w-7xl xl:max-w-[1400px] mx-auto p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12">
 
         {/* Symbol Detail Section */}
         {selectedSymbol && (
@@ -376,6 +381,7 @@ export default function Home() {
               onSymbolClick={(symbol) => {
                 setSelectedSymbol(symbol);
                 setActiveTab("overview");
+                setActiveSection("home");
               }}
             />
           </div>
@@ -394,20 +400,22 @@ function DashboardContent({
 }) {
   return (
     <>
-      <FearGreedGauge />
-      <div className="mt-6 sm:mt-8 lg:mt-10">
-        <WorldMarkets />
+      <div id="section-home">
+        <FearGreedGauge />
+        <div className="mt-6 sm:mt-8 lg:mt-10">
+          <WorldMarkets />
+        </div>
       </div>
-      <div className="mt-6 sm:mt-8 lg:mt-10">
+      <div id="section-sectors" className="mt-6 sm:mt-8 lg:mt-10">
         <SectorHub />
       </div>
-      <LazySection className="mt-6 sm:mt-8 lg:mt-10">
+      <LazySection id="section-heatmaps" className="mt-6 sm:mt-8 lg:mt-10">
         <HeatmapHub refreshInterval={60000} onSymbolClick={onSymbolClick} />
       </LazySection>
-      <LazySection className="mt-6 sm:mt-8 lg:mt-10">
+      <LazySection id="section-screener" className="mt-6 sm:mt-8 lg:mt-10">
         <ScreenerHub onSymbolClick={onSymbolClick} />
       </LazySection>
-      <LazySection className="mt-6 sm:mt-8 lg:mt-10">
+      <LazySection id="section-calendars" className="mt-6 sm:mt-8 lg:mt-10">
         <CalendarHub onSymbolClick={onSymbolClick} />
       </LazySection>
     </>

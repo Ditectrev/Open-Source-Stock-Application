@@ -123,6 +123,7 @@ describe("Lazy loading behavior (Req 15.2)", () => {
     expect(staticImports).not.toBeNull();
 
     const allowedStatic = [
+      "Navigation",
       "SearchBar",
       "ThemeToggle",
       "SymbolHeader",
