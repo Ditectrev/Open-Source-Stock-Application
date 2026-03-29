@@ -27,6 +27,19 @@ jobs:
       - name: Unit tests
         run: bun run test -- --run
 
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - run: bun install
+
+      - name: Dependency vulnerability audit
+        run: bun audit --audit-level=critical
+
   accessibility:
     name: Accessibility Audit
     needs: test
@@ -107,7 +120,7 @@ jobs:
 
   deploy-preview:
     name: Deploy Preview
-    needs: [test, accessibility, e2e, lighthouse]
+    needs: [test, security, accessibility, e2e, lighthouse]
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
@@ -127,7 +140,7 @@ jobs:
 
   deploy-production:
     name: Deploy Production
-    needs: [test, accessibility, e2e, lighthouse]
+    needs: [test, security, accessibility, e2e, lighthouse]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
