@@ -27,6 +27,29 @@ jobs:
       - name: Unit tests
         run: bun run test -- --run
 
+  accessibility:
+    name: Accessibility Audit
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - run: bun install
+
+      - name: Axe WCAG 2.1 AA audit
+        run: bunx vitest --run components/__tests__/AxeAccessibilityAudit.test.tsx
+
+      - name: ARIA roles & labels
+        run: bunx vitest --run components/__tests__/Accessibility.test.tsx
+
+      - name: Color contrast
+        run: bunx vitest --run components/__tests__/ColorContrast.test.tsx
+
+      - name: Keyboard navigation
+        run: bunx vitest --run components/__tests__/KeyboardNavigation.test.tsx
+
   e2e:
     name: E2E Tests
     needs: test
@@ -84,7 +107,7 @@ jobs:
 
   deploy-preview:
     name: Deploy Preview
-    needs: [test, e2e, lighthouse]
+    needs: [test, accessibility, e2e, lighthouse]
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
@@ -104,7 +127,7 @@ jobs:
 
   deploy-production:
     name: Deploy Production
-    needs: [test, e2e, lighthouse]
+    needs: [test, accessibility, e2e, lighthouse]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
