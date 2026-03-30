@@ -1066,8 +1066,8 @@ The implementation follows an incremental approach, building core infrastructure
     - Test ErrorBoundary
     - _Requirements: 13.1, 14.2_
 
-- [ ] 43. Home page
-  - [ ] 43.1 Create home page layout
+- [x] 43. Home page
+  - [x] 43.1 Create home page layout
     - Implement / route
     - Display Fear & Greed Index
     - Display World Markets overview
@@ -1075,7 +1075,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Add quick links to major sections
     - _Requirements: 9.1, 10.1_
 
-  - [ ]\* 43.2 Write unit tests for home page
+  - [x]\* 43.2 Write unit tests for home page
     - Test component rendering
     - Test navigation links
     - _Requirements: 9.1, 10.1_
