@@ -96,7 +96,11 @@ vi.mock("@/components/TabNavigation", () => ({
     <div data-testid="tab-navigation" data-active-tab={activeTab}>
       {["overview", "financials", "technicals", "forecasts", "seasonals"].map(
         (tab) => (
-          <button key={tab} data-testid={`tab-${tab}`} onClick={() => onTabChange(tab)}>
+          <button
+            key={tab}
+            data-testid={`tab-${tab}`}
+            onClick={() => onTabChange(tab)}
+          >
             {tab}
           </button>
         )

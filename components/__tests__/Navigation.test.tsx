@@ -5,7 +5,13 @@ import { Navigation } from "@/components/Navigation";
 
 // Mock child components to keep tests focused
 vi.mock("@/components/SearchBar", () => ({
-  SearchBar: ({ onSelect, placeholder }: { onSelect?: (s: string) => void; placeholder?: string }) => (
+  SearchBar: ({
+    onSelect,
+    placeholder,
+  }: {
+    onSelect?: (s: string) => void;
+    placeholder?: string;
+  }) => (
     <input
       data-testid="search-bar"
       placeholder={placeholder}

@@ -117,9 +117,7 @@ describe("AuthPrompt", () => {
     fireEvent.submit(form);
 
     expect(screen.getByTestId("auth-error")).toBeDefined();
-    expect(
-      screen.getByText("Please enter your email address.")
-    ).toBeDefined();
+    expect(screen.getByText("Please enter your email address.")).toBeDefined();
   });
 
   it("should show error for invalid email format", () => {

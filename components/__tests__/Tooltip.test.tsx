@@ -61,7 +61,9 @@ describe("Tooltip", () => {
       </Tooltip>
     );
 
-    const trigger = screen.getByText("Focus me").closest("[tabindex]") as HTMLElement;
+    const trigger = screen
+      .getByText("Focus me")
+      .closest("[tabindex]") as HTMLElement;
     act(() => {
       trigger.focus();
     });
@@ -85,7 +87,9 @@ describe("Tooltip", () => {
     });
 
     const tooltip = screen.getByRole("tooltip");
-    const trigger = screen.getByText("Target").closest("[aria-describedby]") as HTMLElement;
+    const trigger = screen
+      .getByText("Target")
+      .closest("[aria-describedby]") as HTMLElement;
     expect(trigger).toHaveAttribute("aria-describedby", tooltip.id);
   });
 

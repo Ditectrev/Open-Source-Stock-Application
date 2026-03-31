@@ -155,7 +155,15 @@ describe("Property 1: Authentication Round Trip", () => {
         secretArb,
         urlArb,
         urlArb,
-        async (provider, userId, email, name, secret, successUrl, failureUrl) => {
+        async (
+          provider,
+          userId,
+          email,
+          name,
+          secret,
+          successUrl,
+          failureUrl
+        ) => {
           vi.clearAllMocks();
           setupMocksForSuccess({ id: userId, email, name });
 
@@ -240,7 +248,15 @@ describe("Property 1: Authentication Round Trip", () => {
         secretArb,
         urlArb,
         urlArb,
-        async (provider, userId, email, name, secret, successUrl, failureUrl) => {
+        async (
+          provider,
+          userId,
+          email,
+          name,
+          secret,
+          successUrl,
+          failureUrl
+        ) => {
           vi.clearAllMocks();
           setupMocksForSuccess({ id: userId, email, name });
 

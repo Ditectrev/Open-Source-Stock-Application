@@ -11,9 +11,7 @@ test.describe("Home Page", () => {
     await expect(nav.getByText("Stock Exchange")).toBeVisible();
   });
 
-  test("should display navigation links for all sections", async ({
-    page,
-  }) => {
+  test("should display navigation links for all sections", async ({ page }) => {
     const nav = page.locator("nav[aria-label='Main navigation']");
     await expect(nav.getByText("Home")).toBeVisible();
     await expect(nav.getByText("Sectors")).toBeVisible();
@@ -22,14 +20,10 @@ test.describe("Home Page", () => {
     await expect(nav.getByText("Screener")).toBeVisible();
   });
 
-  test("should display quick link cards on the dashboard", async ({
-    page,
-  }) => {
+  test("should display quick link cards on the dashboard", async ({ page }) => {
     const home = page.locator("#section-home");
     await expect(home).toBeVisible();
-    await expect(
-      home.getByText("Compare sector performance")
-    ).toBeVisible();
+    await expect(home.getByText("Compare sector performance")).toBeVisible();
     await expect(home.getByText("Visual market overview")).toBeVisible();
     await expect(home.getByText("Filter and find assets")).toBeVisible();
     await expect(home.getByText("Earnings, dividends & IPOs")).toBeVisible();
@@ -67,9 +61,9 @@ test.describe("Home Page", () => {
     await searchInput.press("Enter");
 
     // Dashboard quick links should disappear
-    await expect(
-      page.getByText("Compare sector performance")
-    ).not.toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("Compare sector performance")).not.toBeVisible({
+      timeout: 10000,
+    });
   });
 
   test("should display the footer", async ({ page }) => {

@@ -178,7 +178,9 @@ describe("Property 2: Authentication Error Handling", () => {
             // Property: failure throws AuthenticationError with a descriptive message
             expect(error).toBeInstanceOf(AuthenticationError);
             expect((error as AuthenticationError).message).toBeTruthy();
-            expect((error as AuthenticationError).message.length).toBeGreaterThan(0);
+            expect(
+              (error as AuthenticationError).message.length
+            ).toBeGreaterThan(0);
           }
         }
       ),
@@ -203,7 +205,9 @@ describe("Property 2: Authentication Error Handling", () => {
           } catch (error) {
             expect(error).toBeInstanceOf(AuthenticationError);
             expect((error as AuthenticationError).message).toBeTruthy();
-            expect((error as AuthenticationError).message.length).toBeGreaterThan(0);
+            expect(
+              (error as AuthenticationError).message.length
+            ).toBeGreaterThan(0);
           }
         }
       ),
@@ -214,23 +218,21 @@ describe("Property 2: Authentication Error Handling", () => {
   it("Email OTP send failure throws AuthenticationError with descriptive message", async () => {
     // Feature: stock-exchange-application, Property 2: Authentication Error Handling
     await fc.assert(
-      fc.asyncProperty(
-        errorKindArb,
-        emailArb,
-        async (errorKind, email) => {
-          vi.clearAllMocks();
-          setupMocksForFailure(errorKind);
+      fc.asyncProperty(errorKindArb, emailArb, async (errorKind, email) => {
+        vi.clearAllMocks();
+        setupMocksForFailure(errorKind);
 
-          try {
-            await service.signInWithEmail(email);
-            expect.unreachable("Expected AuthenticationError to be thrown");
-          } catch (error) {
-            expect(error).toBeInstanceOf(AuthenticationError);
-            expect((error as AuthenticationError).message).toBeTruthy();
-            expect((error as AuthenticationError).message.length).toBeGreaterThan(0);
-          }
+        try {
+          await service.signInWithEmail(email);
+          expect.unreachable("Expected AuthenticationError to be thrown");
+        } catch (error) {
+          expect(error).toBeInstanceOf(AuthenticationError);
+          expect((error as AuthenticationError).message).toBeTruthy();
+          expect((error as AuthenticationError).message.length).toBeGreaterThan(
+            0
+          );
         }
-      ),
+      }),
       { numRuns: 100 }
     );
   });
@@ -306,7 +308,15 @@ describe("Property 2: Authentication Error Handling", () => {
         secretArb,
         urlArb,
         urlArb,
-        async (provider, errorKind, userId, email, secret, successUrl, failureUrl) => {
+        async (
+          provider,
+          errorKind,
+          userId,
+          email,
+          secret,
+          successUrl,
+          failureUrl
+        ) => {
           vi.clearAllMocks();
           setupMocksForFailure(errorKind);
 
@@ -356,7 +366,9 @@ describe("Property 2: Authentication Error Handling", () => {
         } catch (error) {
           expect(error).toBeInstanceOf(AuthenticationError);
           expect((error as AuthenticationError).message).toBeTruthy();
-          expect((error as AuthenticationError).message.length).toBeGreaterThan(0);
+          expect((error as AuthenticationError).message.length).toBeGreaterThan(
+            0
+          );
         }
       }),
       { numRuns: 100 }

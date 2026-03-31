@@ -54,7 +54,9 @@ export class ErrorBoundary extends React.Component<
           aria-live="assertive"
           data-testid="error-boundary-fallback"
         >
-          <span className="text-3xl" aria-hidden="true">⚠️</span>
+          <span className="text-3xl" aria-hidden="true">
+            ⚠️
+          </span>
           <h3 className="mt-3 text-lg font-semibold text-gray-900 dark:text-gray-100">
             Something went wrong
           </h3>
