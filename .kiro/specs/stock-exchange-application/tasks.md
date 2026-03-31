@@ -41,8 +41,8 @@ The implementation follows an incremental approach, building core infrastructure
     - Define subscription types: PricingTier, Subscription, AIConfig
     - _Requirements: All requirements (foundational)_
 
-- [ ] 2. Authentication system
-  - [ ] 2.1 Implement AuthenticationService with Appwrite integration
+- [-] 2. Authentication system
+  - [x] 2.1 Implement AuthenticationService with Appwrite integration
     - Create AuthenticationService class with all authentication methods
     - Implement signInWithApple() using Appwrite OAuth
     - Implement signInWithGoogle() using Appwrite OAuth
@@ -52,28 +52,28 @@ The implementation follows an incremental approach, building core infrastructure
     - Implement onAuthStateChange() for session monitoring
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
 
-  - [ ]\* 2.2 Write property test for authentication round trip
+  - [x] 2.2 Write property test for authentication round trip
     - **Property 1: Authentication Round Trip**
     - **Validates: Requirements 1.2, 1.3, 1.4, 1.5**
 
-  - [ ]\* 2.3 Write property test for authentication error handling
+  - [x] 2.3 Write property test for authentication error handling
     - **Property 2: Authentication Error Handling**
     - **Validates: Requirements 1.6**
 
-  - [ ] 2.4 Create OAuth callback handlers
+  - [x] 2.4 Create OAuth callback handlers
     - Implement /api/auth/callback/apple route
     - Implement /api/auth/callback/google route
     - Handle OAuth errors and edge cases
     - _Requirements: 21.14, 21.15_
 
-  - [ ] 2.5 Implement authentication UI components
+  - [x] 2.5 Implement authentication UI components
     - Create AuthPrompt component with provider selection
     - Create email input form for OTP
     - Add error message display
     - Style authentication modal
     - _Requirements: 1.6, 21.13_
 
-  - [ ]\* 2.6 Write unit tests for authentication UI
+  - [x] 2.6 Write unit tests for authentication UI
     - Test provider button clicks
     - Test email form validation
     - Test error message display
