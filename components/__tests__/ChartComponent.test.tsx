@@ -96,6 +96,20 @@ describe("ChartComponent", () => {
         expect(screen.getByText("Line")).not.toHaveClass("bg-blue-600");
       });
     });
+
+    it("should render with area chart as initial type", () => {
+      render(<ChartWithTheme data={mockData} type="area" />);
+
+      expect(screen.getByText("Area")).toHaveClass("bg-blue-600");
+      expect(screen.getByText("Line")).not.toHaveClass("bg-blue-600");
+    });
+
+    it("should render with candlestick chart as initial type", () => {
+      render(<ChartWithTheme data={mockData} type="candlestick" />);
+
+      expect(screen.getByText("Candles")).toHaveClass("bg-blue-600");
+      expect(screen.getByText("Line")).not.toHaveClass("bg-blue-600");
+    });
   });
 
   describe("Time Range Changes", () => {
@@ -134,6 +148,7 @@ describe("ChartComponent", () => {
       expect(screen.getByText("3M")).toBeInTheDocument();
       expect(screen.getByText("1Y")).toBeInTheDocument();
       expect(screen.getByText("5Y")).toBeInTheDocument();
+      expect(screen.getByText("YTD")).toBeInTheDocument();
       expect(screen.getByText("Max")).toBeInTheDocument();
     });
 
@@ -184,6 +199,48 @@ describe("ChartComponent", () => {
       // Chart should render without errors
       expect(screen.getByText("Line")).toBeInTheDocument();
     });
+
+    it("should render RSI indicator without errors", () => {
+      const indicators: ChartIndicator[] = [
+        { type: "RSI", period: 14, color: "#F38181", visible: true },
+      ];
+
+      render(<ChartWithTheme data={mockData} indicators={indicators} />);
+
+      expect(screen.getByText("Line")).toBeInTheDocument();
+    });
+
+    it("should render MACD indicator without errors", () => {
+      const indicators: ChartIndicator[] = [{ type: "MACD", visible: true }];
+
+      render(<ChartWithTheme data={mockData} indicators={indicators} />);
+
+      expect(screen.getByText("Line")).toBeInTheDocument();
+    });
+
+    it("should render Bollinger Bands indicator without errors", () => {
+      const indicators: ChartIndicator[] = [
+        { type: "BB", period: 20, color: "#FCBAD3", visible: true },
+      ];
+
+      render(<ChartWithTheme data={mockData} indicators={indicators} />);
+
+      expect(screen.getByText("Line")).toBeInTheDocument();
+    });
+
+    it("should render all indicator types simultaneously", () => {
+      const indicators: ChartIndicator[] = [
+        { type: "MA", period: 50, color: "#FF6B6B", visible: true },
+        { type: "EMA", period: 20, color: "#4ECDC4", visible: true },
+        { type: "RSI", period: 14, color: "#F38181", visible: true },
+        { type: "MACD", visible: true },
+        { type: "BB", period: 20, color: "#FCBAD3", visible: true },
+      ];
+
+      render(<ChartWithTheme data={mockData} indicators={indicators} />);
+
+      expect(screen.getByText("Line")).toBeInTheDocument();
+    });
   });
 
   describe("Error Handling", () => {
@@ -215,6 +272,21 @@ describe("ChartComponent", () => {
 
       const chartWrapper = container.querySelector(".chart-wrapper");
       expect(chartWrapper).toHaveStyle({ height: "400px" });
+    });
+
+    it("should show mobile-friendly touch instructions", () => {
+      render(<ChartWithTheme data={mockData} />);
+
+      expect(
+        screen.getByText(/Pinch to zoom, swipe to pan, tap for details/)
+      ).toBeInTheDocument();
+    });
+
+    it("should render chart wrapper with full width", () => {
+      const { container } = render(<ChartWithTheme data={mockData} />);
+
+      const chartContainer = container.querySelector(".chart-container");
+      expect(chartContainer).toHaveClass("w-full");
     });
   });
 
