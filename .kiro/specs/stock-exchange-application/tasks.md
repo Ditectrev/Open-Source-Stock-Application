@@ -423,8 +423,8 @@ The implementation follows an incremental approach, building core infrastructure
     - Test regional grouping
     - _Requirements: 10.1, 10.2, 10.3_
 
-- [ ] 16. Subscription and pricing system
-  - [ ] 16.1 Implement SubscriptionService
+- [x] 16. Subscription and pricing system
+  - [x] 16.1 Implement SubscriptionService
     - Create SubscriptionService class
     - Implement getPricingTiers()
     - Implement getCurrentTier()
@@ -433,22 +433,22 @@ The implementation follows an incremental approach, building core infrastructure
     - Implement cancelSubscription()
     - _Requirements: 22.8, 22.17, 22.24, 22.26, 22.27_
 
-  - [ ]\* 16.2 Write property test for tier change immediate effect
+  - [x] 16.2 Write property test for tier change immediate effect
     - **Property 14: Tier Change Immediate Effect**
     - **Validates: Requirements 22.24, 22.26**
 
-  - [ ]\* 16.3 Write property test for downgrade grace period
+  - [x] 16.3 Write property test for downgrade grace period
     - **Property 15: Downgrade Grace Period**
     - **Validates: Requirements 22.27**
 
-  - [ ] 16.4 Create PricingPage component
+  - [x] 16.4 Create PricingPage component
     - Display all five pricing tiers in comparison format
     - Show tier name, description, features, and pricing
     - Style similar to education.ditectrev.com/pricing
     - Add tier selection and subscription buttons
     - _Requirements: 22.1, 22.2, 22.3, 22.4_
 
-  - [ ] 16.5 Implement subscription API routes
+  - [x] 16.5 Implement subscription API routes
     - Implement GET /api/subscription/tiers
     - Implement GET /api/subscription/current
     - Implement POST /api/subscription/subscribe
@@ -457,7 +457,7 @@ The implementation follows an incremental approach, building core infrastructure
     - Implement DELETE /api/subscription/cancel
     - _Requirements: 22.8, 22.17, 22.26_
 
-  - [ ]\* 16.6 Write unit tests for PricingPage
+  - [x] 16.6 Write unit tests for PricingPage
     - Test tier display
     - Test comparison layout
     - Test subscription flow

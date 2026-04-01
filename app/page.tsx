@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { Navigation } from "@/components/Navigation";
 import { useState, useEffect, useRef } from "react";
+import { subscriptionService } from "@/services/subscription.service";
 import {
   SymbolData,
   PriceData,
@@ -119,6 +120,14 @@ const CalendarHub = dynamic(
   () => import("@/components/CalendarHub").then((m) => m.CalendarHub),
   {
     loading: () => <LoadingSpinner size="md" message="Loading calendars..." />,
+    ssr: false,
+  }
+);
+
+const PricingPage = dynamic(
+  () => import("@/components/PricingPage").then((m) => m.PricingPage),
+  {
+    loading: () => <LoadingSpinner size="md" message="Loading pricing..." />,
     ssr: false,
   }
 );
@@ -527,6 +536,9 @@ function DashboardContent({
       </LazySection>
       <LazySection id="section-calendars" className="mt-6 sm:mt-8 lg:mt-10">
         <CalendarHub onSymbolClick={onSymbolClick} />
+      </LazySection>
+      <LazySection id="section-pricing" className="mt-6 sm:mt-8 lg:mt-10">
+        <PricingPage tiers={subscriptionService.getPricingTiers()} />
       </LazySection>
     </>
   );

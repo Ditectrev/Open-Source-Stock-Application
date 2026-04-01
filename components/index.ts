@@ -150,3 +150,6 @@ export type { NavigationProps } from "./Navigation";
 
 export { Layout } from "./Layout";
 export type { LayoutProps } from "./Layout";
+
+export { PricingPage } from "./PricingPage";
+export type { PricingPageProps } from "./PricingPage";
