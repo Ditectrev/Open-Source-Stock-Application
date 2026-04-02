@@ -199,7 +199,7 @@ The implementation follows an incremental approach, building core infrastructure
     - **Property 22: Symbol Data Fetching**
     - **Validates: Requirements 3.1**
 
-  - [ ] 5.9 Write property test for API error handling
+  - [x] 5.9 Write property test for API error handling
     - **Property 4: API Error Handling**
     - **Validates: Requirements 3.5, 14.2, 14.5**
 
@@ -481,19 +481,19 @@ The implementation follows an incremental approach, building core infrastructure
     - Test ads hidden for paid tiers
     - _Requirements: 22.5, 22.7_
 
-- [ ] 18. AI integration infrastructure
-  - [ ] 18.1 Implement Ollama integration for Local tier
+- [x] 18. AI integration infrastructure
+  - [x] 18.1 Implement Ollama integration for Local tier
     - Create OllamaIntegration service
     - Verify Ollama installation and accessibility
     - Implement local AI query methods
     - Ensure no data sent to external services
     - _Requirements: 22.9, 22.10, 22.11_
 
-  - [ ] 18.2 Write property test for Ollama verification
+  - [x] 18.2 Write property test for Ollama verification
     - **Property 21: Ollama Verification**
     - **Validates: Requirements 22.10**
 
-  - [ ] 18.3 Implement API key management for BYOK tier
+  - [x] 18.3 Implement API key management for BYOK tier
     - Create APIKeyManager component
     - Implement secure encrypted storage
     - Support multiple AI providers: OpenAI, Google Gemini, Mistral AI, DeepSeek
@@ -501,21 +501,21 @@ The implementation follows an incremental approach, building core infrastructure
     - Allow provider selection
     - _Requirements: 22.12, 22.13, 22.14, 22.15_
 
-  - [ ]\* 18.4 Write property test for API key encryption
+  - [x] 18.4 Write property test for API key encryption
     - **Property 12: API Key Encryption**
     - **Validates: Requirements 22.13**
 
-  - [ ]\* 18.5 Write property test for API key validation
+  - [x] 18.5 Write property test for API key validation
     - **Property 13: API Key Validation**
     - **Validates: Requirements 22.14**
 
-  - [ ] 18.6 Implement Hosted AI service integration
+  - [x] 18.6 Implement Hosted AI service integration
     - Create HostedAIService
     - Implement AI query endpoints
     - Handle subscription-based access
     - _Requirements: 22.16, 22.17_
 
-  - [ ] 18.7 Create AIIntegrationService
+  - [x] 18.7 Create AIIntegrationService
     - Implement explainMetric() with visual annotations
     - Implement analyzeChart() with key points
     - Implement answerQuestion() with context
@@ -523,14 +523,14 @@ The implementation follows an incremental approach, building core infrastructure
     - Implement setAIProvider()
     - _Requirements: 22.18, 22.19, 22.20, 22.21, 22.22, 22.23_
 
-  - [ ]\* 18.8 Write unit tests for AI integration
+  - [x] 18.8 Write unit tests for AI integration
     - Test Ollama connection
     - Test API key validation
     - Test provider switching
     - Test visual annotations
     - _Requirements: 22.10, 22.14, 22.18, 22.19_
 
-- [ ] 19. Checkpoint - Subscription and AI features
+- [x] 19. Checkpoint - Subscription and AI features
   - Ensure all tests pass, ask the user if questions arise.
 
 - [x] 20. Sectors Hub
