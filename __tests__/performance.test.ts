@@ -129,6 +129,7 @@ describe("Lazy loading behavior (Req 15.2)", () => {
       "SymbolHeader",
       "TabNavigation",
       "LoadingSpinner",
+      "AdBanner",
     ];
 
     for (const imp of staticImports!) {

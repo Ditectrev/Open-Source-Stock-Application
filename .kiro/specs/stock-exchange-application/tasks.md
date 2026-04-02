@@ -463,20 +463,20 @@ The implementation follows an incremental approach, building core infrastructure
     - Test subscription flow
     - _Requirements: 22.1, 22.2, 22.3, 22.4_
 
-- [ ] 17. Ads integration for Free tier
-  - [ ] 17.1 Implement AdsService
+- [x] 17. Ads integration for Free tier
+  - [x] 17.1 Implement AdsService
     - Create ads display logic for Free tier
     - Integrate with ad provider
     - Ensure ads only show for Free tier users
     - _Requirements: 22.5, 22.6_
 
-  - [ ] 17.2 Add ad placements in UI
+  - [x] 17.2 Add ad placements in UI
     - Place ads in appropriate locations
     - Ensure ads don't interfere with core functionality
     - Hide ads for paid tiers
     - _Requirements: 22.5, 22.7_
 
-  - [ ]\* 17.3 Write unit tests for ads display
+  - [x] 17.3 Write unit tests for ads display
     - Test ads show for Free tier
     - Test ads hidden for paid tiers
     - _Requirements: 22.5, 22.7_

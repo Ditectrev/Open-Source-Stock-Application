@@ -4,6 +4,8 @@ import dynamic from "next/dynamic";
 import { Navigation } from "@/components/Navigation";
 import { useState, useEffect, useRef } from "react";
 import { subscriptionService } from "@/services/subscription.service";
+import { AdBanner } from "@/components/AdBanner";
+import { usePricingTier } from "@/lib/use-pricing-tier";
 import {
   SymbolData,
   PriceData,
@@ -184,6 +186,7 @@ type TabType =
   | "seasonals";
 
 export default function Home() {
+  const pricingTier = usePricingTier();
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>("overview");
   const [symbolData, setSymbolData] = useState<SymbolData | null>(null);
@@ -311,6 +314,11 @@ export default function Home() {
         }}
       />
 
+      {/* Top banner ad — only visible for Free tier (Req 22.5, 22.7) */}
+      <div className="flex justify-center px-4 pt-3">
+        <AdBanner placement="banner-top" tier={pricingTier} />
+      </div>
+
       <div className="max-w-7xl xl:max-w-[1400px] mx-auto p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12">
         {/* Symbol Detail Section */}
         {selectedSymbol && (
@@ -395,6 +403,10 @@ export default function Home() {
             />
           </div>
         )}
+      </div>
+      {/* Bottom banner ad — only visible for Free tier (Req 22.5, 22.7) */}
+      <div className="flex justify-center px-4 pb-3">
+        <AdBanner placement="banner-bottom" tier={pricingTier} />
       </div>
       <Footer />
     </div>
