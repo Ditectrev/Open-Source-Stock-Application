@@ -12,13 +12,14 @@ export interface NavigationProps {
   activeSection?: string;
 }
 
-export function Navigation({ activeSection: activeSectionProp }: NavigationProps) {
+export function Navigation({
+  activeSection: activeSectionProp,
+}: NavigationProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
-  const activeSection =
-    activeSectionProp ?? pathnameToNavId(pathname ?? "/");
+  const activeSection = activeSectionProp ?? pathnameToNavId(pathname ?? "/");
 
   const handleSymbolSelect = (symbol: string) => {
     router.push(`/?symbol=${encodeURIComponent(symbol)}`);

@@ -15,9 +15,7 @@ function readMainAppSources(): string {
     "pricing/page.tsx",
   ];
   return files
-    .map((f) =>
-      fs.readFileSync(path.join(root, f), "utf-8")
-    )
+    .map((f) => fs.readFileSync(path.join(root, f), "utf-8"))
     .join("\n");
 }
 
