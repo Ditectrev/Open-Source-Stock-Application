@@ -2,6 +2,25 @@ import { describe, it, expect } from "vitest";
 import fs from "fs";
 import path from "path";
 
+function readMainAppSources(): string {
+  const root = path.resolve(__dirname, "../app/(main)");
+  const files = [
+    "home-page-client.tsx",
+    "layout.tsx",
+    "page.tsx",
+    "sectors/page.tsx",
+    "heatmaps/page.tsx",
+    "screener/page.tsx",
+    "calendars/page.tsx",
+    "pricing/page.tsx",
+  ];
+  return files
+    .map((f) =>
+      fs.readFileSync(path.join(root, f), "utf-8")
+    )
+    .join("\n");
+}
+
 describe("Bundle size limits (Req 15.5)", () => {
   it("should keep package.json dependencies count reasonable", () => {
     const pkg = JSON.parse(
@@ -56,10 +75,7 @@ describe("Lazy loading behavior (Req 15.2)", () => {
   let pageSource: string;
 
   beforeAll(() => {
-    pageSource = fs.readFileSync(
-      path.resolve(__dirname, "../app/page.tsx"),
-      "utf-8"
-    );
+    pageSource = readMainAppSources();
   });
 
   const dynamicComponents = [
@@ -74,6 +90,7 @@ describe("Lazy loading behavior (Req 15.2)", () => {
     "HeatmapHub",
     "ScreenerHub",
     "CalendarHub",
+    "PricingPage",
     "Footer",
   ];
 
@@ -130,6 +147,7 @@ describe("Lazy loading behavior (Req 15.2)", () => {
       "TabNavigation",
       "LoadingSpinner",
       "AdBanner",
+      "LazySection",
     ];
 
     for (const imp of staticImports!) {
@@ -140,8 +158,7 @@ describe("Lazy loading behavior (Req 15.2)", () => {
     }
   });
 
-  it("should defer below-the-fold sections with LazySection", () => {
-    // HeatmapHub, ScreenerHub, CalendarHub should be wrapped in LazySection
+  it("should defer heavy hubs with LazySection", () => {
     const lazySections = ["HeatmapHub", "ScreenerHub", "CalendarHub"];
     for (const component of lazySections) {
       const pattern = new RegExp(
@@ -152,8 +169,12 @@ describe("Lazy loading behavior (Req 15.2)", () => {
   });
 
   it("should use IntersectionObserver in LazySection for viewport-based loading", () => {
-    expect(pageSource).toContain("IntersectionObserver");
-    expect(pageSource).toContain("rootMargin");
+    const lazySectionSource = fs.readFileSync(
+      path.resolve(__dirname, "../components/LazySection.tsx"),
+      "utf-8"
+    );
+    expect(lazySectionSource).toContain("IntersectionObserver");
+    expect(lazySectionSource).toContain("rootMargin");
   });
 });
 

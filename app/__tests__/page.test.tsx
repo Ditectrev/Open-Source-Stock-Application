@@ -1,12 +1,35 @@
 /**
  * Home Page Unit Tests
- * Tests for component rendering and navigation links
+ * Tests for component rendering and symbol flow
  *
  * Requirements: 9.1, 10.1
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+
+const searchParamsState = { symbol: null as string | null };
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn((url: string) => {
+      try {
+        const u = new URL(url, "http://localhost");
+        searchParamsState.symbol = u.searchParams.get("symbol");
+      } catch {
+        searchParamsState.symbol = null;
+      }
+    }),
+    replace: vi.fn(() => {
+      searchParamsState.symbol = null;
+    }),
+  }),
+  usePathname: () => "/",
+  useSearchParams: () => ({
+    get: (key: string) =>
+      key === "symbol" ? searchParamsState.symbol : null,
+  }),
+}));
 
 // Mock theme context
 vi.mock("@/lib/theme-context", () => ({
@@ -28,55 +51,6 @@ vi.mock("next/dynamic", () => ({
     MockComponent.displayName = "DynamicMock";
     return MockComponent;
   },
-}));
-
-// Mock child components to isolate home page testing
-vi.mock("@/components/Navigation", () => ({
-  Navigation: ({
-    activeSection,
-    onSectionChange,
-    onSymbolSelect,
-  }: {
-    activeSection?: string;
-    onSectionChange?: (section: string) => void;
-    onSymbolSelect?: (symbol: string) => void;
-  }) => (
-    <nav data-testid="navigation" data-active-section={activeSection}>
-      <button data-testid="nav-home" onClick={() => onSectionChange?.("home")}>
-        Home
-      </button>
-      <button
-        data-testid="nav-sectors"
-        onClick={() => onSectionChange?.("sectors")}
-      >
-        Sectors
-      </button>
-      <button
-        data-testid="nav-heatmaps"
-        onClick={() => onSectionChange?.("heatmaps")}
-      >
-        Heatmaps
-      </button>
-      <button
-        data-testid="nav-screener"
-        onClick={() => onSectionChange?.("screener")}
-      >
-        Screener
-      </button>
-      <button
-        data-testid="nav-calendars"
-        onClick={() => onSectionChange?.("calendars")}
-      >
-        Calendars
-      </button>
-      <button
-        data-testid="nav-select-symbol"
-        onClick={() => onSymbolSelect?.("AAPL")}
-      >
-        Select AAPL
-      </button>
-    </nav>
-  ),
 }));
 
 vi.mock("@/components/SymbolHeader", () => ({
@@ -127,61 +101,32 @@ vi.mock("../../package.json", () => ({
   default: { version: "1.0.0" },
 }));
 
-// Mock IntersectionObserver as a proper class
-class MockIntersectionObserver {
-  callback: IntersectionObserverCallback;
-  constructor(callback: IntersectionObserverCallback) {
-    this.callback = callback;
-    // Immediately trigger as intersecting so LazySection renders children
-    setTimeout(() => {
-      this.callback(
-        [{ isIntersecting: true } as IntersectionObserverEntry],
-        this as unknown as IntersectionObserver
-      );
-    }, 0);
-  }
-  observe = vi.fn();
-  unobserve = vi.fn();
-  disconnect = vi.fn();
-}
-global.IntersectionObserver =
-  MockIntersectionObserver as unknown as typeof IntersectionObserver;
-
-// Mock scrollIntoView (not available in jsdom)
-Element.prototype.scrollIntoView = vi.fn();
-
 // Mock fetch
 global.fetch = vi.fn();
 
-import Home from "../page";
+import { HomePageClient } from "../(main)/home-page-client";
 
 describe("Home Page", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    searchParamsState.symbol = null;
     (global.fetch as any).mockResolvedValue({
       ok: true,
       json: async () => ({ success: true, data: {} }),
     });
-    window.scrollTo = vi.fn();
   });
 
   describe("Component rendering", () => {
-    it("renders the navigation component", () => {
-      render(<Home />);
-      expect(screen.getByTestId("navigation")).toBeInTheDocument();
-    });
-
     it("renders the dashboard quick links (no symbol selected)", () => {
-      render(<Home />);
-      // Quick links appear alongside nav buttons, so use getAllByText
-      expect(screen.getAllByText("Sectors").length).toBeGreaterThanOrEqual(2);
-      expect(screen.getAllByText("Heatmaps").length).toBeGreaterThanOrEqual(2);
-      expect(screen.getAllByText("Screener").length).toBeGreaterThanOrEqual(2);
-      expect(screen.getAllByText("Calendars").length).toBeGreaterThanOrEqual(2);
+      render(<HomePageClient />);
+      expect(screen.getAllByText("Sectors").length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText("Heatmaps").length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText("Screener").length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText("Calendars").length).toBeGreaterThanOrEqual(1);
     });
 
     it("renders quick link descriptions", () => {
-      render(<Home />);
+      render(<HomePageClient />);
       expect(
         screen.getByText("Compare sector performance")
       ).toBeInTheDocument();
@@ -192,106 +137,42 @@ describe("Home Page", () => {
       ).toBeInTheDocument();
     });
 
-    it("renders section containers for dashboard sections", () => {
-      render(<Home />);
+    it("renders home section container", () => {
+      render(<HomePageClient />);
       expect(document.getElementById("section-home")).toBeInTheDocument();
-      expect(document.getElementById("section-sectors")).toBeInTheDocument();
-      expect(document.getElementById("section-heatmaps")).toBeInTheDocument();
-      expect(document.getElementById("section-screener")).toBeInTheDocument();
-      expect(document.getElementById("section-calendars")).toBeInTheDocument();
     });
 
     it("does not render symbol detail view when no symbol is selected", () => {
-      render(<Home />);
+      render(<HomePageClient />);
       expect(screen.queryByTestId("symbol-header")).not.toBeInTheDocument();
       expect(screen.queryByTestId("tab-navigation")).not.toBeInTheDocument();
     });
   });
 
-  describe("Navigation links", () => {
-    it("navigates to sectors section via navigation bar", () => {
-      render(<Home />);
-      fireEvent.click(screen.getByTestId("nav-sectors"));
-      expect(screen.getByTestId("navigation")).toHaveAttribute(
-        "data-active-section",
-        "sectors"
-      );
-    });
-
-    it("navigates to heatmaps section via navigation bar", () => {
-      render(<Home />);
-      fireEvent.click(screen.getByTestId("nav-heatmaps"));
-      expect(screen.getByTestId("navigation")).toHaveAttribute(
-        "data-active-section",
-        "heatmaps"
-      );
-    });
-
-    it("navigates to screener section via navigation bar", () => {
-      render(<Home />);
-      fireEvent.click(screen.getByTestId("nav-screener"));
-      expect(screen.getByTestId("navigation")).toHaveAttribute(
-        "data-active-section",
-        "screener"
-      );
-    });
-
-    it("navigates to calendars section via navigation bar", () => {
-      render(<Home />);
-      fireEvent.click(screen.getByTestId("nav-calendars"));
-      expect(screen.getByTestId("navigation")).toHaveAttribute(
-        "data-active-section",
-        "calendars"
-      );
-    });
-
-    it("returns to home when Home nav is clicked", () => {
-      render(<Home />);
-      fireEvent.click(screen.getByTestId("nav-sectors"));
-      expect(screen.getByTestId("navigation")).toHaveAttribute(
-        "data-active-section",
-        "sectors"
-      );
-      fireEvent.click(screen.getByTestId("nav-home"));
-      expect(screen.getByTestId("navigation")).toHaveAttribute(
-        "data-active-section",
-        "home"
-      );
-    });
-
-    it("scrolls to top when Home nav is clicked", () => {
-      render(<Home />);
-      fireEvent.click(screen.getByTestId("nav-home"));
-      expect(window.scrollTo).toHaveBeenCalledWith({
-        top: 0,
-        behavior: "smooth",
-      });
-    });
-  });
-
   describe("Symbol selection", () => {
-    it("shows loading state when a symbol is selected", async () => {
+    it("shows loading state when a symbol is in the URL", async () => {
+      searchParamsState.symbol = "AAPL";
       (global.fetch as any).mockImplementation(() => new Promise(() => {}));
-      render(<Home />);
-      fireEvent.click(screen.getByTestId("nav-select-symbol"));
+      render(<HomePageClient />);
       await waitFor(() => {
         expect(screen.getByTestId("loading-spinner")).toBeInTheDocument();
       });
     });
 
     it("shows error state when symbol fetch fails", async () => {
+      searchParamsState.symbol = "AAPL";
       (global.fetch as any).mockResolvedValue({
         ok: false,
         json: async () => ({ success: false }),
       });
-      render(<Home />);
-      fireEvent.click(screen.getByTestId("nav-select-symbol"));
+      render(<HomePageClient />);
       await waitFor(() => {
         expect(screen.getByText("Error Loading Symbol")).toBeInTheDocument();
       });
     });
 
     it("shows symbol detail view when data loads successfully", async () => {
+      searchParamsState.symbol = "AAPL";
       const mockSymbolData = {
         symbol: "AAPL",
         name: "Apple Inc.",
@@ -310,8 +191,7 @@ describe("Home Page", () => {
         json: async () => ({ success: true, data: mockSymbolData }),
       });
 
-      render(<Home />);
-      fireEvent.click(screen.getByTestId("nav-select-symbol"));
+      render(<HomePageClient />);
 
       await waitFor(() => {
         expect(screen.getByTestId("symbol-header")).toBeInTheDocument();
@@ -321,13 +201,13 @@ describe("Home Page", () => {
     });
 
     it("has a Clear Selection button on error that returns to dashboard", async () => {
+      searchParamsState.symbol = "AAPL";
       (global.fetch as any).mockResolvedValue({
         ok: false,
         json: async () => ({ success: false }),
       });
 
-      render(<Home />);
-      fireEvent.click(screen.getByTestId("nav-select-symbol"));
+      render(<HomePageClient />);
 
       await waitFor(() => {
         expect(screen.getByText("Clear Selection")).toBeInTheDocument();

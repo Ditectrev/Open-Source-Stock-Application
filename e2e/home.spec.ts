@@ -43,12 +43,13 @@ test.describe("Home Page", () => {
     await expect(worldMarkets).toBeVisible({ timeout: 15000 });
   });
 
-  test("should navigate to Sectors section when Sectors nav link is clicked", async ({
+  test("should navigate to the Sectors page when Sectors nav link is clicked", async ({
     page,
   }) => {
     const nav = page.locator("nav[aria-label='Main navigation']");
     await nav.getByText("Sectors").click();
 
+    await expect(page).toHaveURL(/\/sectors$/);
     const sectorHub = page.getByTestId("sector-hub");
     await expect(sectorHub).toBeVisible({ timeout: 15000 });
   });

@@ -2,36 +2,26 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { SearchBar } from "@/components/SearchBar";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { MAIN_NAV, pathnameToNavId } from "@/lib/nav-routes";
 
 export interface NavigationProps {
-  /** Callback when a symbol is selected from search */
-  onSymbolSelect?: (symbol: string) => void;
-  /** Currently active section for highlighting */
+  /** Override active section (e.g. tests); default: derived from URL */
   activeSection?: string;
-  /** Callback when a nav section is clicked */
-  onSectionChange?: (section: string) => void;
 }
 
-const NAV_LINKS = [
-  { id: "home", label: "Home" },
-  { id: "sectors", label: "Sectors" },
-  { id: "calendars", label: "Calendars" },
-  { id: "heatmaps", label: "Heatmaps" },
-  { id: "screener", label: "Screener" },
-  { id: "pricing", label: "Pricing" },
-] as const;
-
-export function Navigation({
-  onSymbolSelect,
-  activeSection = "home",
-  onSectionChange,
-}: NavigationProps) {
+export function Navigation({ activeSection: activeSectionProp }: NavigationProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
 
-  const handleNavClick = (sectionId: string) => {
-    onSectionChange?.(sectionId);
+  const activeSection =
+    activeSectionProp ?? pathnameToNavId(pathname ?? "/");
+
+  const handleSymbolSelect = (symbol: string) => {
+    router.push(`/?symbol=${encodeURIComponent(symbol)}`);
     setMobileMenuOpen(false);
   };
 
@@ -39,10 +29,11 @@ export function Navigation({
     <nav
       className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
       aria-label="Main navigation"
+      data-testid="navigation"
+      data-active-section={activeSection}
     >
       <div className="max-w-7xl xl:max-w-[1400px] mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16 gap-4">
-          {/* Logo / Brand */}
           <Link
             href="/"
             className="flex-shrink-0 text-lg font-bold text-gray-900 dark:text-gray-100"
@@ -52,12 +43,11 @@ export function Navigation({
             <span className="sm:hidden">SE</span>
           </Link>
 
-          {/* Desktop nav links */}
           <div className="hidden md:flex items-center gap-1">
-            {NAV_LINKS.map((link) => (
-              <button
+            {MAIN_NAV.map((link) => (
+              <Link
                 key={link.id}
-                onClick={() => handleNavClick(link.id)}
+                href={link.href}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors
                   ${
                     activeSection === link.id
@@ -67,20 +57,18 @@ export function Navigation({
                 aria-current={activeSection === link.id ? "page" : undefined}
               >
                 {link.label}
-              </button>
+              </Link>
             ))}
           </div>
 
-          {/* Search bar (desktop) */}
           <div className="hidden md:block flex-1 max-w-sm">
             <SearchBar
               placeholder="Search symbols..."
-              onSelect={onSymbolSelect}
+              onSelect={handleSymbolSelect}
               className="w-full"
             />
           </div>
 
-          {/* Theme toggle + mobile menu button */}
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <button
@@ -127,7 +115,6 @@ export function Navigation({
         </div>
       </div>
 
-      {/* Mobile menu */}
       {mobileMenuOpen && (
         <div
           id="mobile-nav-menu"
@@ -136,17 +123,15 @@ export function Navigation({
           <div className="px-4 py-3">
             <SearchBar
               placeholder="Search symbols..."
-              onSelect={(symbol) => {
-                onSymbolSelect?.(symbol);
-                setMobileMenuOpen(false);
-              }}
+              onSelect={handleSymbolSelect}
             />
           </div>
           <div className="px-2 pb-3 space-y-1">
-            {NAV_LINKS.map((link) => (
-              <button
+            {MAIN_NAV.map((link) => (
+              <Link
                 key={link.id}
-                onClick={() => handleNavClick(link.id)}
+                href={link.href}
+                onClick={() => setMobileMenuOpen(false)}
                 className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-colors
                   ${
                     activeSection === link.id
@@ -156,7 +141,7 @@ export function Navigation({
                 aria-current={activeSection === link.id ? "page" : undefined}
               >
                 {link.label}
-              </button>
+              </Link>
             ))}
           </div>
         </div>
