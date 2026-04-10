@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Gloock, Ibarra_Real_Nova } from "next/font/google";
+import { Ibarra_Real_Nova, Merriweather } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
-const headingFont = Gloock({
+const headingFont = Merriweather({
   variable: "--font-heading",
   subsets: ["latin"],
-  weight: ["400"],
+  weight: ["300", "400", "700"],
   display: "swap",
 });
 
