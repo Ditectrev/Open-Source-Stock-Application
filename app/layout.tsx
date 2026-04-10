@@ -1,6 +1,21 @@
 import type { Metadata } from "next";
+import { Gloock, Ibarra_Real_Nova } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
+
+const headingFont = Gloock({
+  variable: "--font-heading",
+  subsets: ["latin"],
+  weight: ["400"],
+  display: "swap",
+});
+
+const bodyFont = Ibarra_Real_Nova({
+  variable: "--font-body",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Stock Exchange Application",
@@ -28,7 +43,7 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://production.dataviz.cnn.io" />
         <link rel="dns-prefetch" href="https://query1.finance.yahoo.com" />
       </head>
-      <body className="antialiased">
+      <body className={`${headingFont.variable} ${bodyFont.variable} antialiased`}>
         <Providers>{children}</Providers>
       </body>
     </html>
