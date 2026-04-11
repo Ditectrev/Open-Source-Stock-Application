@@ -3,10 +3,13 @@
 /**
  * AuthPrompt Component
  * Modal dialog for user authentication with Apple SSO, Google SSO, and Email OTP.
+ * OAuth uses real <a href> links so navigation works even if JS handlers fail.
+ * Rendered via portal to document.body with high z-index so nothing covers the modal.
  * Requirements: 1.6, 21.13
  */
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 
 export type AuthView = "providers" | "email";
 
@@ -15,14 +18,25 @@ export interface AuthPromptProps {
   open: boolean;
   /** Called when the user dismisses the modal */
   onClose: () => void;
-  /** Called when Apple sign-in is selected */
-  onAppleSignIn: () => void;
-  /** Called when Google sign-in is selected */
-  onGoogleSignIn: () => void;
-  /** Called when the user submits their email for OTP */
-  onEmailSubmit: (email: string) => void;
+  /** Optional — Apple uses /api/auth/oauth/apple unless you override behavior */
+  onAppleSignIn?: () => void;
+  /** Optional — Google uses /api/auth/oauth/google unless you override behavior */
+  onGoogleSignIn?: () => void;
+  /** Send OTP email; return userId on success so the user can enter the code */
+  onEmailSubmit: (email: string) => Promise<{
+    ok: boolean;
+    userId?: string;
+    error?: string;
+  }>;
+  /** Submit the code from the email (Appwrite createSession) */
+  onEmailVerify: (userId: string, secret: string) => Promise<{
+    ok: boolean;
+    error?: string;
+  }>;
   /** External error message to display (Req 1.6) */
   error?: string | null;
+  /** Success or informational message (e.g. email sent) */
+  infoMessage?: string | null;
   /** Whether an auth action is in progress */
   loading?: boolean;
 }
@@ -33,19 +47,52 @@ export function AuthPrompt({
   onAppleSignIn,
   onGoogleSignIn,
   onEmailSubmit,
+  onEmailVerify,
   error,
+  infoMessage,
   loading = false,
 }: AuthPromptProps) {
   const [view, setView] = useState<AuthView>("providers");
+  const [emailSubStep, setEmailSubStep] = useState<"request" | "verify">(
+    "request"
+  );
   const [email, setEmail] = useState("");
+  const [pendingUserId, setPendingUserId] = useState<string | null>(null);
+  const [otp, setOtp] = useState("");
   const [emailError, setEmailError] = useState<string | null>(null);
+  const prevOpenRef = useRef(open);
+
+  useEffect(() => {
+    const becameVisible = open && !prevOpenRef.current;
+    prevOpenRef.current = open;
+    if (becameVisible) {
+      setView("providers");
+      setEmailSubStep("request");
+      setEmail("");
+      setPendingUserId(null);
+      setOtp("");
+      setEmailError(null);
+    }
+  }, [open]);
 
   const handleEmailSubmit = useCallback(
-    (e: React.FormEvent) => {
+    async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       setEmailError(null);
 
-      const trimmed = email.trim();
+      // Read live DOM value — password-manager / autofill often never fires React onChange,
+      // so controlled `email` state stays "" while the field looks filled (submit was a no-op).
+      const named = e.currentTarget.elements.namedItem("email");
+      const fromInput =
+        named instanceof HTMLInputElement ? named.value.trim() : "";
+      const fromFormData = String(
+        new FormData(e.currentTarget).get("email") ?? ""
+      ).trim();
+      const trimmed = fromInput || fromFormData || email.trim();
+      if (trimmed) {
+        setEmail(trimmed);
+      }
+
       if (!trimmed) {
         setEmailError("Please enter your email address.");
         return;
@@ -55,18 +102,69 @@ export function AuthPrompt({
         return;
       }
 
-      onEmailSubmit(trimmed);
+      try {
+        const result = await onEmailSubmit(trimmed);
+        if (result.ok && result.userId) {
+          setPendingUserId(result.userId);
+          setEmailSubStep("verify");
+          setOtp("");
+        } else if (result.ok && !result.userId) {
+          setEmailError("Could not start verification. Please try again.");
+        } else if (!result.ok && result.error) {
+          setEmailError(result.error);
+        }
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Something went wrong. Please try again.";
+        setEmailError(message);
+      }
     },
     [email, onEmailSubmit]
+  );
+
+  const handleVerifySubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      setEmailError(null);
+
+      const named = e.currentTarget.elements.namedItem("otp");
+      const fromInput =
+        named instanceof HTMLInputElement ? named.value : "";
+      const fromFormData = String(
+        new FormData(e.currentTarget).get("otp") ?? ""
+      );
+      const digits = (fromInput || fromFormData || otp).replace(/\D/g, "");
+
+      if (!pendingUserId) {
+        setEmailError("Session expired. Go back and request a new code.");
+        return;
+      }
+      if (digits.length < 6) {
+        setEmailError("Enter the 6-digit code from your email.");
+        return;
+      }
+
+      try {
+        await onEmailVerify(pendingUserId, digits);
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Something went wrong. Please try again.";
+        setEmailError(message);
+      }
+    },
+    [otp, pendingUserId, onEmailVerify]
   );
 
   if (!open) return null;
 
   const displayError = error || emailError;
 
-  return (
+  const oauthLinkClass =
+    "flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition-colors no-underline";
+
+  const modal = (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 p-4"
       role="dialog"
       aria-modal="true"
       aria-label="Sign in"
@@ -113,31 +211,58 @@ export function AuthPrompt({
           </div>
         )}
 
+        {infoMessage && (
+          <div
+            className="mb-4 rounded-md bg-green-50 p-3 text-sm text-green-800 dark:bg-green-900/30 dark:text-green-200"
+            role="status"
+            aria-live="polite"
+            data-testid="auth-info"
+          >
+            {infoMessage}
+          </div>
+        )}
+
         {view === "providers" ? (
           <div className="space-y-3">
-            {/* Apple SSO */}
-            <button
-              type="button"
-              onClick={onAppleSignIn}
-              disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-black px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-gray-800 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-gray-200"
+            {/* Apple SSO — real link so the browser always navigates (then server redirects to Appwrite) */}
+            <a
+              href="/api/auth/oauth/apple"
+              className={`${oauthLinkClass} bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200 ${
+                loading ? "pointer-events-none opacity-50" : ""
+              }`}
               data-testid="auth-apple"
+              aria-disabled={loading}
+              onClick={(e) => {
+                if (loading) {
+                  e.preventDefault();
+                  return;
+                }
+                onAppleSignIn?.();
+              }}
             >
               <AppleIcon />
               Continue with Apple
-            </button>
+            </a>
 
             {/* Google SSO */}
-            <button
-              type="button"
-              onClick={onGoogleSignIn}
-              disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+            <a
+              href="/api/auth/oauth/google"
+              className={`${oauthLinkClass} border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 ${
+                loading ? "pointer-events-none opacity-50" : ""
+              }`}
               data-testid="auth-google"
+              aria-disabled={loading}
+              onClick={(e) => {
+                if (loading) {
+                  e.preventDefault();
+                  return;
+                }
+                onGoogleSignIn?.();
+              }}
             >
               <GoogleIcon />
               Continue with Google
-            </button>
+            </a>
 
             {/* Divider */}
             <div className="flex items-center gap-3">
@@ -160,8 +285,12 @@ export function AuthPrompt({
               Continue with Email
             </button>
           </div>
-        ) : (
-          <form onSubmit={handleEmailSubmit} className="space-y-4">
+        ) : emailSubStep === "request" ? (
+          <form
+            onSubmit={handleEmailSubmit}
+            className="space-y-4"
+            noValidate
+          >
             <button
               type="button"
               onClick={() => {
@@ -182,9 +311,9 @@ export function AuthPrompt({
             </label>
             <input
               id="auth-email"
+              name="email"
               type="email"
               autoComplete="email"
-              required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
@@ -201,6 +330,92 @@ export function AuthPrompt({
               {loading ? "Sending…" : "Send verification code"}
             </button>
           </form>
+        ) : (
+          <form
+            onSubmit={handleVerifySubmit}
+            className="space-y-4"
+            noValidate
+          >
+            <button
+              type="button"
+              onClick={() => {
+                setEmailSubStep("request");
+                setPendingUserId(null);
+                setOtp("");
+              }}
+              className="mb-2 text-sm text-blue-600 hover:underline dark:text-blue-400"
+              data-testid="auth-verify-back"
+            >
+              ← Change email
+            </button>
+
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Enter the 6-digit code sent to{" "}
+              <span className="font-medium text-gray-900 dark:text-gray-100">
+                {email}
+              </span>
+              .
+            </p>
+
+            <label
+              htmlFor="auth-otp"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              Verification code
+            </label>
+            <input
+              id="auth-otp"
+              name="otp"
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              maxLength={32}
+              value={otp}
+              onChange={(e) =>
+                setOtp(e.target.value.replace(/[^\d\s]/g, ""))
+              }
+              placeholder="e.g. 512646"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-center font-mono text-lg tracking-widest text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+              data-testid="auth-otp-input"
+            />
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+              data-testid="auth-verify-submit"
+            >
+              {loading ? "Verifying…" : "Verify and sign in"}
+            </button>
+
+            <button
+              type="button"
+              disabled={loading}
+              onClick={async () => {
+                setEmailError(null);
+                if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                  setEmailError("Invalid email. Go back and re-enter it.");
+                  return;
+                }
+                try {
+                  const result = await onEmailSubmit(email);
+                  if (result.ok && result.userId) {
+                    setPendingUserId(result.userId);
+                  }
+                } catch (err) {
+                  setEmailError(
+                    err instanceof Error
+                      ? err.message
+                      : "Could not resend. Try again."
+                  );
+                }
+              }}
+              className="w-full text-sm text-blue-600 hover:underline disabled:opacity-50 dark:text-blue-400"
+              data-testid="auth-resend-code"
+            >
+              Resend code
+            </button>
+          </form>
         )}
 
         {loading && (
@@ -214,6 +429,11 @@ export function AuthPrompt({
       </div>
     </div>
   );
+
+  if (typeof document !== "undefined") {
+    return createPortal(modal, document.body);
+  }
+  return modal;
 }
 
 /* ------------------------------------------------------------------ */
