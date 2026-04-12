@@ -146,10 +146,6 @@ jobs:
     needs: [lint, format, test, security, accessibility, e2e, lighthouse]
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    env:
-      NEXT_PUBLIC_APPWRITE_ENDPOINT: ${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}
-      NEXT_PUBLIC_APPWRITE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}
-      APPWRITE_API_KEY: ${{ secrets.APPWRITE_API_KEY }}
     steps:
       - uses: actions/checkout@v4
 
@@ -159,21 +155,33 @@ jobs:
 
       - run: bun install -g vercel
 
-      - run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Sync environment variables to Vercel
+        run: |
+          vercel env add NEXT_PUBLIC_APPWRITE_ENDPOINT preview --value "${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
+          vercel env add NEXT_PUBLIC_APPWRITE_PROJECT_ID preview --value "${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
+          vercel env add APPWRITE_API_KEY preview --value "${{ secrets.APPWRITE_API_KEY }}" --yes --force --sensitive --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-      - run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Pull Vercel environment
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
 
-      - run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Build
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          NEXT_PUBLIC_APPWRITE_ENDPOINT: ${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}
+          NEXT_PUBLIC_APPWRITE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}
+          APPWRITE_API_KEY: ${{ secrets.APPWRITE_API_KEY }}
+
+      - name: Deploy
+        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
 
   deploy-production:
     name: Deploy Production
     needs: [lint, format, test, security, accessibility, e2e, lighthouse]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    env:
-      NEXT_PUBLIC_APPWRITE_ENDPOINT: ${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}
-      NEXT_PUBLIC_APPWRITE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}
-      APPWRITE_API_KEY: ${{ secrets.APPWRITE_API_KEY }}
     steps:
       - uses: actions/checkout@v4
 
@@ -183,8 +191,24 @@ jobs:
 
       - run: bun install -g vercel
 
-      - run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Sync environment variables to Vercel
+        run: |
+          vercel env add NEXT_PUBLIC_APPWRITE_ENDPOINT production --value "${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
+          vercel env add NEXT_PUBLIC_APPWRITE_PROJECT_ID production --value "${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
+          vercel env add APPWRITE_API_KEY production --value "${{ secrets.APPWRITE_API_KEY }}" --yes --force --sensitive --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-      - run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Pull Vercel environment
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
 
-      - run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Build
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          NEXT_PUBLIC_APPWRITE_ENDPOINT: ${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}
+          NEXT_PUBLIC_APPWRITE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}
+          APPWRITE_API_KEY: ${{ secrets.APPWRITE_API_KEY }}
+
+      - name: Deploy
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
