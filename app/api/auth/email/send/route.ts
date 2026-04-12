@@ -5,7 +5,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AppwriteException, ID } from "node-appwrite";
 import { createServerClient } from "@/lib/appwrite";
-import { env } from "@/lib/env";
+import { getAppwriteServerEnv } from "@/lib/appwrite-server-env";
 import { logger } from "@/lib/logger";
 
 export async function POST(request: NextRequest) {
@@ -31,16 +31,17 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const appwrite = getAppwriteServerEnv();
   if (
-    !env.appwrite.endpoint ||
-    !env.appwrite.projectId ||
-    !env.appwrite.apiKey
+    !appwrite.endpoint ||
+    !appwrite.projectId ||
+    !appwrite.apiKey
   ) {
     logger.warn("Email OTP: Appwrite not fully configured");
     return NextResponse.json(
       {
         error:
-          "Email sign-in is not configured on this server. Set NEXT_PUBLIC_APPWRITE_ENDPOINT, NEXT_PUBLIC_APPWRITE_PROJECT_ID, and APPWRITE_API_KEY (with sessions.write scope).",
+          "Email sign-in is not configured on this server. Set APPWRITE_ENDPOINT, APPWRITE_PROJECT_ID, and APPWRITE_API_KEY (with sessions.write scope), or duplicate the public Appwrite URL and project id into those names on the host.",
       },
       { status: 503 }
     );

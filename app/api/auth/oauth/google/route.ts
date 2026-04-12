@@ -6,13 +6,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AppwriteException, OAuthProvider } from "node-appwrite";
 import { createServerClient } from "@/lib/appwrite";
-import { env } from "@/lib/env";
+import { getAppwriteServerEnv } from "@/lib/appwrite-server-env";
 import { logger } from "@/lib/logger";
 
 export async function GET(request: NextRequest) {
   const origin = new URL(request.url).origin;
 
-  if (!env.appwrite.endpoint || !env.appwrite.projectId || !env.appwrite.apiKey) {
+  const appwrite = getAppwriteServerEnv();
+  if (!appwrite.endpoint || !appwrite.projectId || !appwrite.apiKey) {
     logger.warn("Google OAuth: Appwrite not fully configured");
     return NextResponse.redirect(
       new URL("/?auth_error=appwrite_not_configured", request.url)

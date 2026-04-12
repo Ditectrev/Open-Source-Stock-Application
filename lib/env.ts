@@ -5,11 +5,6 @@
  */
 
 interface EnvConfig {
-  appwrite: {
-    endpoint: string;
-    projectId: string;
-    apiKey: string;
-  };
   apis: {
     cnnDatavizUrl: string;
     yahooFinanceUrl: string;
@@ -34,11 +29,6 @@ interface EnvConfig {
 }
 
 export const env: EnvConfig = {
-  appwrite: {
-    endpoint: process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT || "",
-    projectId: process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID || "",
-    apiKey: process.env.APPWRITE_API_KEY || "",
-  },
   apis: {
     cnnDatavizUrl: "https://production.dataviz.cnn.io",
     yahooFinanceUrl: "https://query1.finance.yahoo.com",

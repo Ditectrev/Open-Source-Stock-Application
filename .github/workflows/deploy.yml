@@ -159,6 +159,8 @@ jobs:
         run: |
           vercel env add NEXT_PUBLIC_APPWRITE_ENDPOINT preview --value "${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
           vercel env add NEXT_PUBLIC_APPWRITE_PROJECT_ID preview --value "${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
+          vercel env add APPWRITE_ENDPOINT preview --value "${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
+          vercel env add APPWRITE_PROJECT_ID preview --value "${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
           vercel env add APPWRITE_API_KEY preview --value "${{ secrets.APPWRITE_API_KEY }}" --yes --force --sensitive --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -172,6 +174,8 @@ jobs:
         env:
           NEXT_PUBLIC_APPWRITE_ENDPOINT: ${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}
           NEXT_PUBLIC_APPWRITE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}
+          APPWRITE_ENDPOINT: ${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}
+          APPWRITE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}
           APPWRITE_API_KEY: ${{ secrets.APPWRITE_API_KEY }}
 
       - name: Deploy
@@ -195,6 +199,8 @@ jobs:
         run: |
           vercel env add NEXT_PUBLIC_APPWRITE_ENDPOINT production --value "${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
           vercel env add NEXT_PUBLIC_APPWRITE_PROJECT_ID production --value "${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
+          vercel env add APPWRITE_ENDPOINT production --value "${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
+          vercel env add APPWRITE_PROJECT_ID production --value "${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
           vercel env add APPWRITE_API_KEY production --value "${{ secrets.APPWRITE_API_KEY }}" --yes --force --sensitive --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -208,6 +214,8 @@ jobs:
         env:
           NEXT_PUBLIC_APPWRITE_ENDPOINT: ${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}
           NEXT_PUBLIC_APPWRITE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}
+          APPWRITE_ENDPOINT: ${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}
+          APPWRITE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}
           APPWRITE_API_KEY: ${{ secrets.APPWRITE_API_KEY }}
 
       - name: Deploy

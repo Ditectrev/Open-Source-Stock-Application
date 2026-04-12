@@ -5,7 +5,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AppwriteException } from "node-appwrite";
 import { createServerClient } from "@/lib/appwrite";
-import { env } from "@/lib/env";
+import { getAppwriteServerEnv } from "@/lib/appwrite-server-env";
 import { logger } from "@/lib/logger";
 
 export async function POST(request: NextRequest) {
@@ -36,15 +36,16 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const appwrite = getAppwriteServerEnv();
   if (
-    !env.appwrite.endpoint ||
-    !env.appwrite.projectId ||
-    !env.appwrite.apiKey
+    !appwrite.endpoint ||
+    !appwrite.projectId ||
+    !appwrite.apiKey
   ) {
     return NextResponse.json(
       {
         error:
-          "Sign-in is not configured on this server. Set Appwrite environment variables.",
+          "Sign-in is not configured on this server. Set APPWRITE_ENDPOINT, APPWRITE_PROJECT_ID, and APPWRITE_API_KEY on the server.",
       },
       { status: 503 }
     );
