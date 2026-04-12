@@ -146,6 +146,10 @@ jobs:
     needs: [lint, format, test, security, accessibility, e2e, lighthouse]
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_APPWRITE_ENDPOINT: ${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}
+      NEXT_PUBLIC_APPWRITE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}
+      APPWRITE_API_KEY: ${{ secrets.APPWRITE_API_KEY }}
     steps:
       - uses: actions/checkout@v4
 
@@ -166,6 +170,10 @@ jobs:
     needs: [lint, format, test, security, accessibility, e2e, lighthouse]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_APPWRITE_ENDPOINT: ${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}
+      NEXT_PUBLIC_APPWRITE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}
+      APPWRITE_API_KEY: ${{ secrets.APPWRITE_API_KEY }}
     steps:
       - uses: actions/checkout@v4
 
