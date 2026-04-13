@@ -29,7 +29,10 @@ export interface AuthPromptProps {
     error?: string;
   }>;
   /** Submit the code from the email (Appwrite createSession) */
-  onEmailVerify: (userId: string, secret: string) => Promise<{
+  onEmailVerify: (
+    userId: string,
+    secret: string
+  ) => Promise<{
     ok: boolean;
     error?: string;
   }>;
@@ -80,50 +83,50 @@ export function AuthPrompt({
   }, [open]);
 
   const submitEmailRequest = useCallback(async () => {
-      setEmailError(null);
-      setLocalSubmitting(true);
-      try {
-        // Read live DOM value — password-manager / autofill often never fires
-        // React onChange, so controlled state can remain empty.
-        const fromInput = emailInputRef.current?.value.trim() ?? "";
-        const trimmed = fromInput || email.trim();
-        if (trimmed) {
-          setEmail(trimmed);
-        }
-
-        if (!trimmed) {
-          setEmailError("Please enter your email address.");
-          return;
-        }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
-          setEmailError("Please enter a valid email address.");
-          return;
-        }
-
-        const result = await onEmailSubmit(trimmed);
-        if (!result || typeof result.ok !== "boolean") {
-          setEmailError("Could not start verification. Please try again.");
-          return;
-        }
-        if (result.ok && result.userId) {
-          setPendingUserId(result.userId);
-          setEmailSubStep("verify");
-          setOtp("");
-        } else if (result.ok && !result.userId) {
-          setEmailError("Could not start verification. Please try again.");
-        } else if (!result.ok && result.error) {
-          setEmailError(result.error);
-        }
-      } catch (err) {
-        const message =
-          err instanceof Error ? err.message : "Something went wrong. Please try again.";
-        setEmailError(message);
-      } finally {
-        setLocalSubmitting(false);
+    setEmailError(null);
+    setLocalSubmitting(true);
+    try {
+      // Read live DOM value — password-manager / autofill often never fires
+      // React onChange, so controlled state can remain empty.
+      const fromInput = emailInputRef.current?.value.trim() ?? "";
+      const trimmed = fromInput || email.trim();
+      if (trimmed) {
+        setEmail(trimmed);
       }
-    },
-    [email, onEmailSubmit]
-  );
+
+      if (!trimmed) {
+        setEmailError("Please enter your email address.");
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+        setEmailError("Please enter a valid email address.");
+        return;
+      }
+
+      const result = await onEmailSubmit(trimmed);
+      if (!result || typeof result.ok !== "boolean") {
+        setEmailError("Could not start verification. Please try again.");
+        return;
+      }
+      if (result.ok && result.userId) {
+        setPendingUserId(result.userId);
+        setEmailSubStep("verify");
+        setOtp("");
+      } else if (result.ok && !result.userId) {
+        setEmailError("Could not start verification. Please try again.");
+      } else if (!result.ok && result.error) {
+        setEmailError(result.error);
+      }
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.";
+      setEmailError(message);
+    } finally {
+      setLocalSubmitting(false);
+    }
+  }, [email, onEmailSubmit]);
 
   const handleEmailSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -139,8 +142,7 @@ export function AuthPrompt({
       setEmailError(null);
 
       const named = e.currentTarget.elements.namedItem("otp");
-      const fromInput =
-        named instanceof HTMLInputElement ? named.value : "";
+      const fromInput = named instanceof HTMLInputElement ? named.value : "";
       const fromFormData = String(
         new FormData(e.currentTarget).get("otp") ?? ""
       );
@@ -162,11 +164,15 @@ export function AuthPrompt({
           return;
         }
         if (!result.ok) {
-          setEmailError(result.error ?? "Invalid or expired code. Please try again.");
+          setEmailError(
+            result.error ?? "Invalid or expired code. Please try again."
+          );
         }
       } catch (err) {
         const message =
-          err instanceof Error ? err.message : "Something went wrong. Please try again.";
+          err instanceof Error
+            ? err.message
+            : "Something went wrong. Please try again.";
         setEmailError(message);
       }
     },
@@ -356,11 +362,7 @@ export function AuthPrompt({
             </button>
           </form>
         ) : (
-          <form
-            onSubmit={handleVerifySubmit}
-            className="space-y-4"
-            noValidate
-          >
+          <form onSubmit={handleVerifySubmit} className="space-y-4" noValidate>
             <button
               type="button"
               onClick={() => {
@@ -396,9 +398,7 @@ export function AuthPrompt({
               autoComplete="one-time-code"
               maxLength={32}
               value={otp}
-              onChange={(e) =>
-                setOtp(e.target.value.replace(/[^\d\s]/g, ""))
-              }
+              onChange={(e) => setOtp(e.target.value.replace(/[^\d\s]/g, ""))}
               placeholder="e.g. 512646"
               className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-center font-mono text-lg tracking-widest text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
               data-testid="auth-otp-input"

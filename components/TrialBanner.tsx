@@ -85,8 +85,7 @@ export function TrialBanner({ onAuthenticated }: TrialBannerProps) {
     try {
       const result = await postEmailOtpSend(email);
       if (!result.ok) {
-        const err =
-          result.error ?? "Something went wrong. Please try again.";
+        const err = result.error ?? "Something went wrong. Please try again.";
         setAuthError(err);
         return { ok: false as const, error: err };
       }

@@ -19,10 +19,7 @@ export function getBrowserAccount(): Account | null {
   if (cachedAccount !== undefined) {
     return cachedAccount;
   }
-  if (
-    !appwritePublicEndpoint.length ||
-    !appwritePublicProjectId.length
-  ) {
+  if (!appwritePublicEndpoint.length || !appwritePublicProjectId.length) {
     cachedAccount = null;
     return null;
   }

@@ -36,8 +36,7 @@ export async function GET(request: NextRequest) {
       err instanceof Error ? err : new Error(String(err))
     );
     const isInvalidRedirect =
-      err instanceof AppwriteException &&
-      /invalid redirect/i.test(err.message);
+      err instanceof AppwriteException && /invalid redirect/i.test(err.message);
     return NextResponse.redirect(
       new URL(
         isInvalidRedirect

@@ -24,8 +24,7 @@ export async function POST(request: NextRequest) {
       ? (body as { userId: unknown; secret: unknown })
       : null;
 
-  const userId =
-    raw && typeof raw.userId === "string" ? raw.userId.trim() : "";
+  const userId = raw && typeof raw.userId === "string" ? raw.userId.trim() : "";
   const secretRaw = raw && typeof raw.secret === "string" ? raw.secret : "";
   const secret = secretRaw.replace(/\D/g, "");
 
@@ -37,11 +36,7 @@ export async function POST(request: NextRequest) {
   }
 
   const appwrite = getAppwriteServerEnv();
-  if (
-    !appwrite.endpoint ||
-    !appwrite.projectId ||
-    !appwrite.apiKey
-  ) {
+  if (!appwrite.endpoint || !appwrite.projectId || !appwrite.apiKey) {
     return NextResponse.json(
       {
         error:

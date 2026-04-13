@@ -43,7 +43,9 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://production.dataviz.cnn.io" />
         <link rel="dns-prefetch" href="https://query1.finance.yahoo.com" />
       </head>
-      <body className={`${headingFont.variable} ${bodyFont.variable} antialiased`}>
+      <body
+        className={`${headingFont.variable} ${bodyFont.variable} antialiased`}
+      >
         <Providers>{children}</Providers>
       </body>
     </html>

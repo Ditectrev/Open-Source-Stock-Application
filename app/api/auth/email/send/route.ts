@@ -32,11 +32,7 @@ export async function POST(request: NextRequest) {
   }
 
   const appwrite = getAppwriteServerEnv();
-  if (
-    !appwrite.endpoint ||
-    !appwrite.projectId ||
-    !appwrite.apiKey
-  ) {
+  if (!appwrite.endpoint || !appwrite.projectId || !appwrite.apiKey) {
     logger.warn("Email OTP: Appwrite not fully configured");
     return NextResponse.json(
       {
@@ -64,10 +60,7 @@ export async function POST(request: NextRequest) {
         : err instanceof Error
           ? err.message
           : "Failed to send verification email.";
-    if (
-      typeof message === "string" &&
-      message.includes("sessions.write")
-    ) {
+    if (typeof message === "string" && message.includes("sessions.write")) {
       message =
         "Appwrite API key must include the sessions.write scope. In Appwrite Console: Project → API keys → your key → Scopes → enable Sessions (write).";
     }

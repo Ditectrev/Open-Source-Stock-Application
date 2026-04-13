@@ -41,9 +41,7 @@ export function startGoogleOAuth():
  * Redirects the browser to Apple OAuth. Apple does not support localhost redirects.
  * Callback: /api/auth/callback/apple
  */
-export function startAppleOAuth():
-  | { ok: true }
-  | { ok: false; error: string } {
+export function startAppleOAuth(): { ok: true } | { ok: false; error: string } {
   if (typeof window !== "undefined") {
     const { hostname, protocol } = window.location;
     const isLocalDev =

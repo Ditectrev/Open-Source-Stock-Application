@@ -5,7 +5,10 @@
 
 import { Client, Account, Databases } from "node-appwrite";
 import { getAppwriteServerEnv } from "./appwrite-server-env";
-import { appwritePublicEndpoint, appwritePublicProjectId } from "./appwrite/browser-env";
+import {
+  appwritePublicEndpoint,
+  appwritePublicProjectId,
+} from "./appwrite/browser-env";
 
 /**
  * Server-side Appwrite client

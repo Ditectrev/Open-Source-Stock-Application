@@ -26,9 +26,7 @@ const { postEmailOtpSendMock, postEmailOtpVerifyMock } = vi.hoisted(() => ({
   postEmailOtpSendMock: vi.fn(() =>
     Promise.resolve({ ok: true as const, userId: "test_user_id" })
   ),
-  postEmailOtpVerifyMock: vi.fn(() =>
-    Promise.resolve({ ok: true as const })
-  ),
+  postEmailOtpVerifyMock: vi.fn(() => Promise.resolve({ ok: true as const })),
 }));
 
 vi.mock("@/lib/auth/trial-auth-navigation", () => ({
