@@ -5,7 +5,7 @@
  */
 
 import { Client, Account, OAuthProvider, ID } from "node-appwrite";
-import { env } from "@/lib/env";
+import { getAppwriteServerEnv } from "@/lib/appwrite-server-env";
 import { logger } from "@/lib/logger";
 import { AuthResult } from "@/types";
 
@@ -14,9 +14,8 @@ export class AuthenticationService {
   private account: Account;
 
   constructor() {
-    this.client = new Client()
-      .setEndpoint(env.appwrite.endpoint)
-      .setProject(env.appwrite.projectId);
+    const { endpoint, projectId } = getAppwriteServerEnv();
+    this.client = new Client().setEndpoint(endpoint).setProject(projectId);
 
     this.account = new Account(this.client);
   }

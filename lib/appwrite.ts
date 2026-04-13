@@ -4,19 +4,21 @@
  */
 
 import { Client, Account, Databases } from "node-appwrite";
-import { env } from "./env";
+import { getAppwriteServerEnv } from "./appwrite-server-env";
+import {
+  appwritePublicEndpoint,
+  appwritePublicProjectId,
+} from "./appwrite/browser-env";
 
 /**
  * Server-side Appwrite client
  * Used in API routes and server components
  */
 export function createServerClient() {
+  const { endpoint, projectId, apiKey } = getAppwriteServerEnv();
   const client = new Client();
 
-  client
-    .setEndpoint(env.appwrite.endpoint)
-    .setProject(env.appwrite.projectId)
-    .setKey(env.appwrite.apiKey);
+  client.setEndpoint(endpoint).setProject(projectId).setKey(apiKey);
 
   return {
     client,
@@ -30,8 +32,8 @@ export function createServerClient() {
  * Used in client components and browser context
  */
 export const appwriteConfig = {
-  endpoint: env.appwrite.endpoint,
-  projectId: env.appwrite.projectId,
+  endpoint: appwritePublicEndpoint,
+  projectId: appwritePublicProjectId,
 };
 
 /**

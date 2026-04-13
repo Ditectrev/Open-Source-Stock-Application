@@ -141,10 +141,15 @@ jobs:
           path: .lighthouseci/
           retention-days: 14
 
-  deploy-preview:
-    name: Deploy Preview
-    needs: [lint, format, test, security, accessibility, e2e, lighthouse]
-    if: github.event_name == 'pull_request'
+  # Mirrors Ditectrev/Practice-Tests-Exams-Platform/.github/workflows/vercel-deploy.yml:
+  # - repository secrets as single source of truth
+  # - echo | vercel env add … || true
+  # - main: vercel deploy --prod (no --prebuilt) so Vercel builds production with synced env
+  # - PRs: vercel deploy --prebuilt after local vercel build
+  deploy:
+    name: Deploy to Vercel
+    needs: [lint, format, test, security, accessibility]
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -153,30 +158,65 @@ jobs:
 
       - run: bun install
 
-      - run: bun install -g vercel
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
 
-      - run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Sync Environment Variables to Vercel
+        run: |
+          ENV_TYPE=${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
+          vercel env add NEXT_PUBLIC_APPWRITE_ENDPOINT $ENV_TYPE "" --value "${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
+          vercel env add NEXT_PUBLIC_APPWRITE_PROJECT_ID $ENV_TYPE "" --value "${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
+          vercel env add APPWRITE_API_KEY $ENV_TYPE "" --value "${{ secrets.APPWRITE_API_KEY }}" --yes --force --sensitive --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-      - run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Pull Vercel Environment Information
+        id: vercel-pull
+        run: vercel pull --yes --environment=${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }} --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-      - run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Build Project Artifacts
+        run: vercel build ${{ github.ref == 'refs/heads/main' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          NEXT_PUBLIC_APPWRITE_ENDPOINT: ${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}
+          NEXT_PUBLIC_APPWRITE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}
+          APPWRITE_API_KEY: ${{ secrets.APPWRITE_API_KEY }}
 
-  deploy-production:
-    name: Deploy Production
-    needs: [lint, format, test, security, accessibility, e2e, lighthouse]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+      - name: Deploy Project Artifacts to Vercel
+        id: vercel-deploy
+        run: |
+          DEPLOYMENT_OUTPUT=$(vercel deploy ${{ github.ref == 'refs/heads/main' && '--prod' || '--prebuilt' }} --token=${{ secrets.VERCEL_TOKEN }} --yes 2>&1)
+          echo "$DEPLOYMENT_OUTPUT"
+          DEPLOYMENT_URL=$(echo "$DEPLOYMENT_OUTPUT" | grep -o 'https://[^[:space:]]*\.vercel\.app' | head -1)
+          if [ -z "$DEPLOYMENT_URL" ]; then
+            DEPLOYMENT_URL=$(echo "$DEPLOYMENT_OUTPUT" | tail -1 | grep -o 'https://[^[:space:]]*' | head -1)
+          fi
+          echo "deployment_url=$DEPLOYMENT_URL" >> $GITHUB_OUTPUT
+          echo "Deployment URL: $DEPLOYMENT_URL"
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-      - uses: oven-sh/setup-bun@v2
+      - name: Comment PR with deployment URL
+        if: github.event_name == 'pull_request' && steps.vercel-deploy.outcome == 'success' && steps.vercel-deploy.outputs.deployment_url != ''
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const deploymentUrl = '${{ steps.vercel-deploy.outputs.deployment_url }}';
+            const comment = `🚀 **Vercel Preview Deployment Ready!**
 
-      - run: bun install
+            Preview: ${deploymentUrl}
 
-      - run: bun install -g vercel
+            ---
+            *Automated deploy (same pattern as Practice-Tests-Exams-Platform)*`;
 
-      - run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-
-      - run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-
-      - run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });

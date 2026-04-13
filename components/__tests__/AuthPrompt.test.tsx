@@ -11,9 +11,8 @@ import { AuthPrompt, AuthPromptProps } from "../AuthPrompt";
 const defaultProps: AuthPromptProps = {
   open: true,
   onClose: vi.fn(),
-  onAppleSignIn: vi.fn(),
-  onGoogleSignIn: vi.fn(),
-  onEmailSubmit: vi.fn(),
+  onEmailSubmit: vi.fn().mockResolvedValue({ ok: false }),
+  onEmailVerify: vi.fn().mockResolvedValue({ ok: true }),
 };
 
 function renderAuthPrompt(overrides: Partial<AuthPromptProps> = {}) {
@@ -41,7 +40,25 @@ describe("AuthPrompt", () => {
 
   // --- Provider button clicks ---
 
-  it("should call onAppleSignIn when Apple button is clicked", () => {
+  it("should link Apple OAuth to the API starter route", () => {
+    renderAuthPrompt();
+
+    expect(screen.getByTestId("auth-apple")).toHaveAttribute(
+      "href",
+      "/api/auth/oauth/apple"
+    );
+  });
+
+  it("should link Google OAuth to the API starter route", () => {
+    renderAuthPrompt();
+
+    expect(screen.getByTestId("auth-google")).toHaveAttribute(
+      "href",
+      "/api/auth/oauth/google"
+    );
+  });
+
+  it("should call optional onAppleSignIn when Apple link is clicked", () => {
     const onAppleSignIn = vi.fn();
     renderAuthPrompt({ onAppleSignIn });
 
@@ -49,7 +66,7 @@ describe("AuthPrompt", () => {
     expect(onAppleSignIn).toHaveBeenCalledOnce();
   });
 
-  it("should call onGoogleSignIn when Google button is clicked", () => {
+  it("should call optional onGoogleSignIn when Google link is clicked", () => {
     const onGoogleSignIn = vi.fn();
     renderAuthPrompt({ onGoogleSignIn });
 
@@ -57,15 +74,18 @@ describe("AuthPrompt", () => {
     expect(onGoogleSignIn).toHaveBeenCalledOnce();
   });
 
-  it("should disable provider buttons when loading", () => {
+  it("should disable provider controls when loading", () => {
     renderAuthPrompt({ loading: true });
 
-    const appleBtn = screen.getByTestId("auth-apple") as HTMLButtonElement;
-    const googleBtn = screen.getByTestId("auth-google") as HTMLButtonElement;
+    expect(screen.getByTestId("auth-apple")).toHaveAttribute(
+      "aria-disabled",
+      "true"
+    );
+    expect(screen.getByTestId("auth-google")).toHaveAttribute(
+      "aria-disabled",
+      "true"
+    );
     const emailBtn = screen.getByTestId("auth-email-btn") as HTMLButtonElement;
-
-    expect(appleBtn.disabled).toBe(true);
-    expect(googleBtn.disabled).toBe(true);
     expect(emailBtn.disabled).toBe(true);
   });
 

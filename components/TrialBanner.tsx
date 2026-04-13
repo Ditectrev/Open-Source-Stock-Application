@@ -7,10 +7,14 @@
  * Requirements: 21.12, 21.13
  */
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { TrialTimer } from "@/components/TrialTimer";
 import { AuthPrompt } from "@/components/AuthPrompt";
 import { trialManagementService } from "@/services/trial-management.service";
+import {
+  postEmailOtpSend,
+  postEmailOtpVerify,
+} from "@/lib/auth/trial-auth-navigation";
 
 export interface TrialBannerProps {
   /** Called when user successfully authenticates */
@@ -21,7 +25,9 @@ export function TrialBanner({ onAuthenticated }: TrialBannerProps) {
   const [remainingSeconds, setRemainingSeconds] = useState<number>(0);
   const [isActive, setIsActive] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
-  const [initialized, setInitialized] = useState(false);
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [authInfo, setAuthInfo] = useState<string | null>(null);
 
   useEffect(() => {
     const init = async () => {
@@ -43,11 +49,21 @@ export function TrialBanner({ onAuthenticated }: TrialBannerProps) {
       if (!finalStatus.isActive && finalStatus.hasUsedTrial) {
         setShowAuth(true);
       }
-      setInitialized(true);
     };
 
     init();
   }, []);
+
+  const prevShowAuthRef = useRef(showAuth);
+  useEffect(() => {
+    const opening = showAuth && !prevShowAuthRef.current;
+    prevShowAuthRef.current = showAuth;
+    if (opening) {
+      setAuthLoading(false);
+      setAuthError(null);
+      setAuthInfo(null);
+    }
+  }, [showAuth]);
 
   const handleExpired = useCallback(() => {
     setIsActive(false);
@@ -57,24 +73,70 @@ export function TrialBanner({ onAuthenticated }: TrialBannerProps) {
 
   const handleAuthClose = useCallback(() => {
     setShowAuth(false);
+    setAuthError(null);
+    setAuthInfo(null);
+    setAuthLoading(false);
   }, []);
 
-  const handleAppleSignIn = useCallback(() => {
-    onAuthenticated?.();
-  }, [onAuthenticated]);
+  const handleEmailSubmit = useCallback(async (email: string) => {
+    setAuthError(null);
+    setAuthInfo(null);
+    setAuthLoading(true);
+    try {
+      const result = await postEmailOtpSend(email);
+      if (!result.ok) {
+        const err = result.error ?? "Something went wrong. Please try again.";
+        setAuthError(err);
+        return { ok: false as const, error: err };
+      }
+      if (!result.userId) {
+        const err = "Could not start verification. Please try again.";
+        setAuthError(err);
+        return { ok: false as const, error: err };
+      }
+      setAuthInfo(
+        "We sent a verification email. Check your inbox (and spam) for the 6-digit code."
+      );
+      return { ok: true as const, userId: result.userId };
+    } catch {
+      setAuthError("Network error. Please try again.");
+      return {
+        ok: false as const,
+        error: "Network error. Please try again.",
+      };
+    } finally {
+      setAuthLoading(false);
+    }
+  }, []);
 
-  const handleGoogleSignIn = useCallback(() => {
-    onAuthenticated?.();
-  }, [onAuthenticated]);
-
-  const handleEmailSubmit = useCallback(
-    (_email: string) => {
-      onAuthenticated?.();
+  const handleEmailVerify = useCallback(
+    async (userId: string, secret: string) => {
+      setAuthError(null);
+      setAuthLoading(true);
+      try {
+        const result = await postEmailOtpVerify(userId, secret);
+        if (!result.ok) {
+          const err =
+            result.error ?? "Invalid or expired code. Please try again.";
+          setAuthError(err);
+          return { ok: false as const, error: err };
+        }
+        setAuthInfo(null);
+        onAuthenticated?.();
+        setShowAuth(false);
+        return { ok: true as const };
+      } catch {
+        setAuthError("Network error. Please try again.");
+        return {
+          ok: false as const,
+          error: "Network error. Please try again.",
+        };
+      } finally {
+        setAuthLoading(false);
+      }
     },
     [onAuthenticated]
   );
-
-  if (!initialized) return null;
 
   return (
     <>
@@ -129,9 +191,11 @@ export function TrialBanner({ onAuthenticated }: TrialBannerProps) {
       <AuthPrompt
         open={showAuth}
         onClose={handleAuthClose}
-        onAppleSignIn={handleAppleSignIn}
-        onGoogleSignIn={handleGoogleSignIn}
         onEmailSubmit={handleEmailSubmit}
+        onEmailVerify={handleEmailVerify}
+        loading={authLoading}
+        error={authError}
+        infoMessage={authInfo}
       />
     </>
   );

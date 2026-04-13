@@ -22,6 +22,18 @@ vi.mock("@/services/trial-management.service", () => ({
   },
 }));
 
+const { postEmailOtpSendMock, postEmailOtpVerifyMock } = vi.hoisted(() => ({
+  postEmailOtpSendMock: vi.fn(() =>
+    Promise.resolve({ ok: true as const, userId: "test_user_id" })
+  ),
+  postEmailOtpVerifyMock: vi.fn(() => Promise.resolve({ ok: true as const })),
+}));
+
+vi.mock("@/lib/auth/trial-auth-navigation", () => ({
+  postEmailOtpSend: postEmailOtpSendMock,
+  postEmailOtpVerify: postEmailOtpVerifyMock,
+}));
+
 import { trialManagementService } from "@/services/trial-management.service";
 
 const mockGetTrialStatus = trialManagementService.getTrialStatus as ReturnType<
@@ -205,37 +217,46 @@ describe("TrialBanner", () => {
 
   // --- onAuthenticated callback ---
 
-  it("should call onAuthenticated when Apple sign-in is used", () => {
-    const onAuthenticated = vi.fn();
+  it("should expose Apple OAuth link to the API starter route", () => {
     mockGetTrialStatus.mockReturnValue({
       isActive: true,
       remainingSeconds: 600,
       hasUsedTrial: true,
     });
 
-    renderBanner({ onAuthenticated });
+    renderBanner();
     fireEvent.click(screen.getByTestId("trial-sign-in-btn"));
-    fireEvent.click(screen.getByTestId("auth-apple"));
-
-    expect(onAuthenticated).toHaveBeenCalledOnce();
+    expect(screen.getByTestId("auth-apple")).toHaveAttribute(
+      "href",
+      "/api/auth/oauth/apple"
+    );
   });
 
-  it("should call onAuthenticated when Google sign-in is used", () => {
-    const onAuthenticated = vi.fn();
+  it("should expose Google OAuth link to the API starter route", () => {
     mockGetTrialStatus.mockReturnValue({
       isActive: true,
       remainingSeconds: 600,
       hasUsedTrial: true,
     });
 
-    renderBanner({ onAuthenticated });
+    renderBanner();
     fireEvent.click(screen.getByTestId("trial-sign-in-btn"));
-    fireEvent.click(screen.getByTestId("auth-google"));
-
-    expect(onAuthenticated).toHaveBeenCalledOnce();
+    expect(screen.getByTestId("auth-google")).toHaveAttribute(
+      "href",
+      "/api/auth/oauth/google"
+    );
   });
 
-  it("should call onAuthenticated when email is submitted", () => {
+  it("should call onAuthenticated after the email verification code is submitted", async () => {
+    vi.useRealTimers();
+    postEmailOtpSendMock.mockClear();
+    postEmailOtpVerifyMock.mockClear();
+    postEmailOtpSendMock.mockResolvedValueOnce({
+      ok: true,
+      userId: "uid_otp_test",
+    });
+    postEmailOtpVerifyMock.mockResolvedValueOnce({ ok: true });
+
     const onAuthenticated = vi.fn();
     mockGetTrialStatus.mockReturnValue({
       isActive: true,
@@ -251,7 +272,25 @@ describe("TrialBanner", () => {
     });
     fireEvent.click(screen.getByTestId("auth-email-submit"));
 
-    expect(onAuthenticated).toHaveBeenCalledOnce();
+    await waitFor(() => {
+      expect(screen.getByTestId("auth-otp-input")).toBeDefined();
+    });
+
+    fireEvent.change(screen.getByTestId("auth-otp-input"), {
+      target: { value: "512646" },
+    });
+    fireEvent.click(screen.getByTestId("auth-verify-submit"));
+
+    await waitFor(() => {
+      expect(onAuthenticated).toHaveBeenCalledOnce();
+    });
+    expect(postEmailOtpSendMock).toHaveBeenCalledWith("user@example.com");
+    expect(postEmailOtpVerifyMock).toHaveBeenCalledWith(
+      "uid_otp_test",
+      "512646"
+    );
+
+    vi.useFakeTimers();
   });
 
   // --- Accessibility ---
