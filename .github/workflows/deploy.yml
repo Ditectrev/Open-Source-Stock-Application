@@ -164,9 +164,9 @@ jobs:
       - name: Sync Environment Variables to Vercel
         run: |
           ENV_TYPE=${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
-          vercel env add NEXT_PUBLIC_APPWRITE_ENDPOINT $ENV_TYPE --value "${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
-          vercel env add NEXT_PUBLIC_APPWRITE_PROJECT_ID $ENV_TYPE --value "${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
-          vercel env add APPWRITE_API_KEY $ENV_TYPE --value "${{ secrets.APPWRITE_API_KEY }}" --yes --force --sensitive --token=${{ secrets.VERCEL_TOKEN }}
+          vercel env add NEXT_PUBLIC_APPWRITE_ENDPOINT $ENV_TYPE "" --value "${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
+          vercel env add NEXT_PUBLIC_APPWRITE_PROJECT_ID $ENV_TYPE "" --value "${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
+          vercel env add APPWRITE_API_KEY $ENV_TYPE "" --value "${{ secrets.APPWRITE_API_KEY }}" --yes --force --sensitive --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
