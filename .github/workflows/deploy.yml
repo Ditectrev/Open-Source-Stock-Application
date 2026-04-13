@@ -142,7 +142,7 @@ jobs:
           retention-days: 14
 
   # Mirrors Ditectrev/Practice-Tests-Exams-Platform/.github/workflows/vercel-deploy.yml:
-  # - GitHub Environments (Production / Staging) for optional environment-scoped secrets
+  # - repository secrets as single source of truth
   # - echo | vercel env add … || true
   # - main: vercel deploy --prod (no --prebuilt) so Vercel builds production with synced env
   # - PRs: vercel deploy --prebuilt after local vercel build
@@ -151,7 +151,6 @@ jobs:
     needs: [lint, format, test, security, accessibility, e2e, lighthouse]
     if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
-    environment: ${{ github.ref == 'refs/heads/main' && 'Production' || 'Staging' }}
     steps:
       - uses: actions/checkout@v4
 
