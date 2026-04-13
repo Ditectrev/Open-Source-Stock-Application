@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         error:
-          "Email sign-in is not configured on this server. In the Vercel project (or .env.local), set APPWRITE_API_KEY and either APPWRITE_ENDPOINT / APPWRITE_PROJECT_ID or NEXT_PUBLIC_APPWRITE_ENDPOINT / NEXT_PUBLIC_APPWRITE_PROJECT_ID to the same Appwrite values. The API key needs sessions.write scope.",
+          "Email sign-in is not configured on this server. Set NEXT_PUBLIC_APPWRITE_ENDPOINT, NEXT_PUBLIC_APPWRITE_PROJECT_ID, and APPWRITE_API_KEY (with sessions.write scope).",
       },
       { status: 503 }
     );

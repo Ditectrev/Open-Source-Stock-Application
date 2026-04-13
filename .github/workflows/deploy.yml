@@ -164,11 +164,9 @@ jobs:
       - name: Sync Environment Variables to Vercel
         run: |
           ENV_TYPE=${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
-          echo "${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}" | vercel env add NEXT_PUBLIC_APPWRITE_ENDPOINT $ENV_TYPE --token=${{ secrets.VERCEL_TOKEN }} || true
-          echo "${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}" | vercel env add NEXT_PUBLIC_APPWRITE_PROJECT_ID $ENV_TYPE --token=${{ secrets.VERCEL_TOKEN }} || true
-          echo "${{ secrets.APPWRITE_API_KEY }}" | vercel env add APPWRITE_API_KEY $ENV_TYPE --token=${{ secrets.VERCEL_TOKEN }} || true
-          echo "${{ secrets.APPWRITE_ENDPOINT != '' && secrets.APPWRITE_ENDPOINT || secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}" | vercel env add APPWRITE_ENDPOINT $ENV_TYPE --token=${{ secrets.VERCEL_TOKEN }} || true
-          echo "${{ secrets.APPWRITE_PROJECT_ID != '' && secrets.APPWRITE_PROJECT_ID || secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}" | vercel env add APPWRITE_PROJECT_ID $ENV_TYPE --token=${{ secrets.VERCEL_TOKEN }} || true
+          vercel env add NEXT_PUBLIC_APPWRITE_ENDPOINT $ENV_TYPE --value "${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
+          vercel env add NEXT_PUBLIC_APPWRITE_PROJECT_ID $ENV_TYPE --value "${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
+          vercel env add APPWRITE_API_KEY $ENV_TYPE --value "${{ secrets.APPWRITE_API_KEY }}" --yes --force --sensitive --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -185,8 +183,6 @@ jobs:
         env:
           NEXT_PUBLIC_APPWRITE_ENDPOINT: ${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}
           NEXT_PUBLIC_APPWRITE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}
-          APPWRITE_ENDPOINT: ${{ secrets.APPWRITE_ENDPOINT != '' && secrets.APPWRITE_ENDPOINT || secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}
-          APPWRITE_PROJECT_ID: ${{ secrets.APPWRITE_PROJECT_ID != '' && secrets.APPWRITE_PROJECT_ID || secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}
           APPWRITE_API_KEY: ${{ secrets.APPWRITE_API_KEY }}
 
       - name: Deploy Project Artifacts to Vercel

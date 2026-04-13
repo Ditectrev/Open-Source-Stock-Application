@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         error:
-          "Sign-in is not configured on this server. Set APPWRITE_ENDPOINT, APPWRITE_PROJECT_ID, and APPWRITE_API_KEY on the server.",
+          "Sign-in is not configured on this server. Set NEXT_PUBLIC_APPWRITE_ENDPOINT, NEXT_PUBLIC_APPWRITE_PROJECT_ID, and APPWRITE_API_KEY on the server.",
       },
       { status: 503 }
     );

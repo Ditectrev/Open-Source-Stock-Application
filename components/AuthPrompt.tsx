@@ -60,7 +60,10 @@ export function AuthPrompt({
   const [pendingUserId, setPendingUserId] = useState<string | null>(null);
   const [otp, setOtp] = useState("");
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [localSubmitting, setLocalSubmitting] = useState(false);
   const prevOpenRef = useRef(open);
+  const emailInputRef = useRef<HTMLInputElement | null>(null);
+  const emailFormRef = useRef<HTMLFormElement | null>(null);
 
   useEffect(() => {
     const becameVisible = open && !prevOpenRef.current;
@@ -72,38 +75,36 @@ export function AuthPrompt({
       setPendingUserId(null);
       setOtp("");
       setEmailError(null);
+      setLocalSubmitting(false);
     }
   }, [open]);
 
-  const handleEmailSubmit = useCallback(
-    async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
+  const submitEmailRequest = useCallback(async () => {
       setEmailError(null);
-
-      // Read live DOM value — password-manager / autofill often never fires React onChange,
-      // so controlled `email` state stays "" while the field looks filled (submit was a no-op).
-      const named = e.currentTarget.elements.namedItem("email");
-      const fromInput =
-        named instanceof HTMLInputElement ? named.value.trim() : "";
-      const fromFormData = String(
-        new FormData(e.currentTarget).get("email") ?? ""
-      ).trim();
-      const trimmed = fromInput || fromFormData || email.trim();
-      if (trimmed) {
-        setEmail(trimmed);
-      }
-
-      if (!trimmed) {
-        setEmailError("Please enter your email address.");
-        return;
-      }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
-        setEmailError("Please enter a valid email address.");
-        return;
-      }
-
+      setLocalSubmitting(true);
       try {
+        // Read live DOM value — password-manager / autofill often never fires
+        // React onChange, so controlled state can remain empty.
+        const fromInput = emailInputRef.current?.value.trim() ?? "";
+        const trimmed = fromInput || email.trim();
+        if (trimmed) {
+          setEmail(trimmed);
+        }
+
+        if (!trimmed) {
+          setEmailError("Please enter your email address.");
+          return;
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+          setEmailError("Please enter a valid email address.");
+          return;
+        }
+
         const result = await onEmailSubmit(trimmed);
+        if (!result || typeof result.ok !== "boolean") {
+          setEmailError("Could not start verification. Please try again.");
+          return;
+        }
         if (result.ok && result.userId) {
           setPendingUserId(result.userId);
           setEmailSubStep("verify");
@@ -117,9 +118,19 @@ export function AuthPrompt({
         const message =
           err instanceof Error ? err.message : "Something went wrong. Please try again.";
         setEmailError(message);
+      } finally {
+        setLocalSubmitting(false);
       }
     },
     [email, onEmailSubmit]
+  );
+
+  const handleEmailSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      await submitEmailRequest();
+    },
+    [submitEmailRequest]
   );
 
   const handleVerifySubmit = useCallback(
@@ -145,7 +156,14 @@ export function AuthPrompt({
       }
 
       try {
-        await onEmailVerify(pendingUserId, digits);
+        const result = await onEmailVerify(pendingUserId, digits);
+        if (!result || typeof result.ok !== "boolean") {
+          setEmailError("Verification failed. Please try again.");
+          return;
+        }
+        if (!result.ok) {
+          setEmailError(result.error ?? "Invalid or expired code. Please try again.");
+        }
       } catch (err) {
         const message =
           err instanceof Error ? err.message : "Something went wrong. Please try again.";
@@ -158,6 +176,8 @@ export function AuthPrompt({
   if (!open) return null;
 
   const displayError = error || emailError;
+
+  const isBusy = loading || localSubmitting;
 
   const oauthLinkClass =
     "flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition-colors no-underline";
@@ -287,6 +307,7 @@ export function AuthPrompt({
           </div>
         ) : emailSubStep === "request" ? (
           <form
+            ref={emailFormRef}
             onSubmit={handleEmailSubmit}
             className="space-y-4"
             noValidate
@@ -310,6 +331,7 @@ export function AuthPrompt({
               Email address
             </label>
             <input
+              ref={emailInputRef}
               id="auth-email"
               name="email"
               type="email"
@@ -322,12 +344,15 @@ export function AuthPrompt({
             />
 
             <button
-              type="submit"
-              disabled={loading}
+              type="button"
+              onClick={() => {
+                void submitEmailRequest();
+              }}
+              disabled={isBusy}
               className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
               data-testid="auth-email-submit"
             >
-              {loading ? "Sending…" : "Send verification code"}
+              {isBusy ? "Sending…" : "Send verification code"}
             </button>
           </form>
         ) : (
