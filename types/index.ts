@@ -44,6 +44,7 @@ export interface AuthResult {
     email: string;
     name?: string;
   };
+  sessionSecret?: string;
   error?: string;
 }
 

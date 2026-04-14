@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { SearchBar } from "@/components/SearchBar";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { UserProfileMenu } from "@/components/UserProfileMenu";
 import { MAIN_NAV, pathnameToNavId } from "@/lib/nav-routes";
 
 export interface NavigationProps {
@@ -71,6 +72,7 @@ export function Navigation({
           </div>
 
           <div className="flex items-center gap-2">
+            <UserProfileMenu />
             <ThemeToggle />
             <button
               type="button"

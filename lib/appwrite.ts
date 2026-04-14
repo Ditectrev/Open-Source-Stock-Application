@@ -28,6 +28,22 @@ export function createServerClient() {
 }
 
 /**
+ * Server-side Appwrite client authenticated as a specific user session.
+ * Used for /api/auth/me and /api/auth/signout so UI can reflect login state.
+ */
+export function createServerSessionClient(sessionSecret: string) {
+  const { endpoint, projectId } = getAppwriteServerEnv();
+  const client = new Client();
+  client.setEndpoint(endpoint).setProject(projectId).setSession(sessionSecret);
+
+  return {
+    client,
+    account: new Account(client),
+    databases: new Databases(client),
+  };
+}
+
+/**
  * Client-side Appwrite configuration
  * Used in client components and browser context
  */

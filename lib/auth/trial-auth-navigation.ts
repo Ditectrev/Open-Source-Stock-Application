@@ -33,7 +33,11 @@ export async function postEmailOtpSend(email: string): Promise<{
 export async function postEmailOtpVerify(
   userId: string,
   secret: string
-): Promise<{ ok: boolean; error?: string }> {
+): Promise<{
+  ok: boolean;
+  error?: string;
+  user?: { id: string; email: string; name?: string };
+}> {
   const url =
     typeof window !== "undefined"
       ? new URL("/api/auth/email/verify", window.location.origin).toString()
@@ -43,12 +47,15 @@ export async function postEmailOtpVerify(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ userId, secret }),
   });
-  const data = (await res.json().catch(() => ({}))) as { error?: string };
+  const data = (await res.json().catch(() => ({}))) as {
+    error?: string;
+    user?: { id: string; email: string; name?: string };
+  };
   if (!res.ok) {
     return {
       ok: false,
       error: data.error ?? `Request failed (${res.status})`,
     };
   }
-  return { ok: true };
+  return { ok: true, user: data.user };
 }
