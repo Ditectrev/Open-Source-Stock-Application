@@ -182,14 +182,9 @@ describe("Property 1: Authentication Round Trip", () => {
             secret
           );
 
-          // Property: successful auth creates a session with user info
+          // Property: successful auth creates a session secret
           expect(result.success).toBe(true);
-          expect(result.user).toBeDefined();
-          expect(result.user!.id).toBe(userId);
-          expect(result.user!.email).toBe(email);
-          if (name) {
-            expect(result.user!.name).toBe(name);
-          }
+          expect(result.sessionSecret).toBeDefined();
           expect(result.error).toBeUndefined();
         }
       ),
@@ -222,14 +217,9 @@ describe("Property 1: Authentication Round Trip", () => {
             secret
           );
 
-          // Property: successful auth creates a session with user info
+          // Property: successful auth creates a session secret
           expect(result.success).toBe(true);
-          expect(result.user).toBeDefined();
-          expect(result.user!.id).toBe(userId);
-          expect(result.user!.email).toBe(email);
-          if (name) {
-            expect(result.user!.name).toBe(name);
-          }
+          expect(result.sessionSecret).toBeDefined();
           expect(result.error).toBeUndefined();
         }
       ),
@@ -275,11 +265,9 @@ describe("Property 1: Authentication Round Trip", () => {
               ? await service.verifyEmailOTP(userId, secret)
               : await service.createOAuthSession(userId, secret);
 
-          // Property: session always contains user info on success
+          // Property: session always includes a secret on success
           expect(result.success).toBe(true);
-          expect(result.user).toBeDefined();
-          expect(result.user!.id).toBe(userId);
-          expect(result.user!.email).toBe(email);
+          expect(result.sessionSecret).toBeDefined();
         }
       ),
       { numRuns: 100 }

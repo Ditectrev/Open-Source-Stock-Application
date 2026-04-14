@@ -24,6 +24,7 @@ export interface TrialBannerProps {
 export function TrialBanner({ onAuthenticated }: TrialBannerProps) {
   const [remainingSeconds, setRemainingSeconds] = useState<number>(0);
   const [isActive, setIsActive] = useState(false);
+  const [hasUsedTrial, setHasUsedTrial] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
@@ -47,10 +48,7 @@ export function TrialBanner({ onAuthenticated }: TrialBannerProps) {
       const finalStatus = trialManagementService.getTrialStatus();
       setRemainingSeconds(finalStatus.remainingSeconds);
       setIsActive(finalStatus.isActive);
-
-      if (!finalStatus.isActive && finalStatus.hasUsedTrial) {
-        setShowAuth(true);
-      }
+      setHasUsedTrial(finalStatus.hasUsedTrial);
     };
 
     init();
@@ -106,6 +104,12 @@ export function TrialBanner({ onAuthenticated }: TrialBannerProps) {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (authChecked && !isAuthenticated && !isActive && hasUsedTrial) {
+      setShowAuth(true);
+    }
+  }, [authChecked, isAuthenticated, isActive, hasUsedTrial]);
 
   const prevShowAuthRef = useRef(showAuth);
   useEffect(() => {
@@ -196,7 +200,7 @@ export function TrialBanner({ onAuthenticated }: TrialBannerProps) {
 
   return (
     <>
-      {authChecked && isActive && !isAuthenticated && (
+      {isActive && !isAuthenticated && (
         <div
           className="flex items-center justify-between border-b border-yellow-200 bg-yellow-50 px-4 py-2 dark:border-yellow-800 dark:bg-yellow-900/30"
           role="status"
@@ -223,7 +227,7 @@ export function TrialBanner({ onAuthenticated }: TrialBannerProps) {
         </div>
       )}
 
-      {authChecked && !isActive && showAuth && !isAuthenticated && (
+      {!isActive && hasUsedTrial && !isAuthenticated && (
         <div
           className="flex items-center justify-center border-b border-red-200 bg-red-50 px-4 py-2 dark:border-red-800 dark:bg-red-900/30"
           role="alert"
