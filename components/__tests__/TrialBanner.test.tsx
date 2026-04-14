@@ -185,7 +185,7 @@ describe("TrialBanner", () => {
     expect(screen.getByTestId("auth-prompt")).toBeDefined();
   });
 
-  it("should show auth prompt with all three providers", () => {
+  it("should show auth prompt with email provider", () => {
     mockGetTrialStatus.mockReturnValue({
       isActive: true,
       remainingSeconds: 600,
@@ -195,8 +195,7 @@ describe("TrialBanner", () => {
     renderBanner();
     fireEvent.click(screen.getByTestId("trial-sign-in-btn"));
 
-    expect(screen.getByTestId("auth-apple")).toBeDefined();
-    expect(screen.getByTestId("auth-google")).toBeDefined();
+    expect(screen.getByTestId("auth-sso-disabled-note")).toBeDefined();
     expect(screen.getByTestId("auth-email-btn")).toBeDefined();
   });
 
@@ -217,7 +216,7 @@ describe("TrialBanner", () => {
 
   // --- onAuthenticated callback ---
 
-  it("should expose Apple OAuth link to the API starter route", () => {
+  it("should hide Apple OAuth when SSO is disabled", () => {
     mockGetTrialStatus.mockReturnValue({
       isActive: true,
       remainingSeconds: 600,
@@ -226,13 +225,10 @@ describe("TrialBanner", () => {
 
     renderBanner();
     fireEvent.click(screen.getByTestId("trial-sign-in-btn"));
-    expect(screen.getByTestId("auth-apple")).toHaveAttribute(
-      "href",
-      "/api/auth/oauth/apple"
-    );
+    expect(screen.queryByTestId("auth-apple")).toBeNull();
   });
 
-  it("should expose Google OAuth link to the API starter route", () => {
+  it("should hide Google OAuth when SSO is disabled", () => {
     mockGetTrialStatus.mockReturnValue({
       isActive: true,
       remainingSeconds: 600,
@@ -241,10 +237,7 @@ describe("TrialBanner", () => {
 
     renderBanner();
     fireEvent.click(screen.getByTestId("trial-sign-in-btn"));
-    expect(screen.getByTestId("auth-google")).toHaveAttribute(
-      "href",
-      "/api/auth/oauth/google"
-    );
+    expect(screen.queryByTestId("auth-google")).toBeNull();
   });
 
   it("should call onAuthenticated after the email verification code is submitted", async () => {
