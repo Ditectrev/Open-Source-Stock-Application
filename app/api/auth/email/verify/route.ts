@@ -48,9 +48,19 @@ export async function POST(request: NextRequest) {
 
   try {
     const { account } = createServerClient();
-    await account.createSession(userId, secret);
+    const session = await account.createSession(userId, secret);
     logger.info("Email OTP session created", { userId });
-    return NextResponse.json({ ok: true });
+    const response = NextResponse.json({ ok: true });
+    if (session.secret) {
+      response.cookies.set("appwrite_session", session.secret, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7,
+      });
+    }
+    return response;
   } catch (err) {
     logger.error(
       "Email OTP verify failed",

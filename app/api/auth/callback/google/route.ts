@@ -51,7 +51,19 @@ export async function GET(request: NextRequest) {
       userId: result.user?.id,
     });
 
-    return NextResponse.redirect(new URL("/?auth_success=true", request.url));
+    const response = NextResponse.redirect(
+      new URL("/?auth_success=true", request.url)
+    );
+    if (result.sessionSecret) {
+      response.cookies.set("appwrite_session", result.sessionSecret, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7,
+      });
+    }
+    return response;
   } catch (err) {
     logger.error(
       "Google OAuth callback error",

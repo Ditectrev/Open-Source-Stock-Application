@@ -112,22 +112,11 @@ export class AuthenticationService {
     try {
       logger.info("Verifying email OTP", { userId });
       const session = await this.account.createSession(userId, secret);
-
-      // Retrieve user info after session creation
-      this.client.setJWT(session.secret ?? "");
-      const user = await this.account.get();
-
-      logger.info("Email OTP verified, session created", {
-        userId: user.$id,
-      });
+      logger.info("Email OTP verified, session created", { userId });
 
       return {
         success: true,
-        user: {
-          id: user.$id,
-          email: user.email,
-          name: user.name || undefined,
-        },
+        sessionSecret: session.secret ?? undefined,
       };
     } catch (error) {
       logger.error(
@@ -153,19 +142,11 @@ export class AuthenticationService {
     try {
       logger.info("Creating OAuth session", { userId });
       const session = await this.account.createSession(userId, secret);
-
-      this.client.setJWT(session.secret ?? "");
-      const user = await this.account.get();
-
-      logger.info("OAuth session created", { userId: user.$id });
+      logger.info("OAuth session created", { userId });
 
       return {
         success: true,
-        user: {
-          id: user.$id,
-          email: user.email,
-          name: user.name || undefined,
-        },
+        sessionSecret: session.secret ?? undefined,
       };
     } catch (error) {
       logger.error(

@@ -24,6 +24,8 @@ export interface TrialBannerProps {
 export function TrialBanner({ onAuthenticated }: TrialBannerProps) {
   const [remainingSeconds, setRemainingSeconds] = useState<number>(0);
   const [isActive, setIsActive] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
@@ -52,6 +54,57 @@ export function TrialBanner({ onAuthenticated }: TrialBannerProps) {
     };
 
     init();
+  }, []);
+
+  useEffect(() => {
+    const openAuth = () => setShowAuth(true);
+    if (typeof window !== "undefined") {
+      window.addEventListener("open-auth-prompt", openAuth);
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("open-auth-prompt", openAuth);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("signin") === "1") {
+      setShowAuth(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    const syncAuth = async () => {
+      try {
+        const res = await fetch("/api/auth/me", {
+          method: "GET",
+          credentials: "include",
+        });
+        setIsAuthenticated(res.ok);
+        if (res.ok) {
+          // User is signed in; hide trial auth prompts.
+          setShowAuth(false);
+        }
+      } catch {
+        setIsAuthenticated(false);
+      } finally {
+        setAuthChecked(true);
+      }
+    };
+
+    void syncAuth();
+    const onAuthChanged = () => void syncAuth();
+    if (typeof window !== "undefined") {
+      window.addEventListener("auth-state-changed", onAuthChanged);
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("auth-state-changed", onAuthChanged);
+      }
+    };
   }, []);
 
   const prevShowAuthRef = useRef(showAuth);
@@ -121,6 +174,9 @@ export function TrialBanner({ onAuthenticated }: TrialBannerProps) {
           setAuthError(err);
           return { ok: false as const, error: err };
         }
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("auth-state-changed"));
+        }
         setAuthInfo(null);
         onAuthenticated?.();
         setShowAuth(false);
@@ -140,7 +196,7 @@ export function TrialBanner({ onAuthenticated }: TrialBannerProps) {
 
   return (
     <>
-      {isActive && (
+      {authChecked && isActive && !isAuthenticated && (
         <div
           className="flex items-center justify-between border-b border-yellow-200 bg-yellow-50 px-4 py-2 dark:border-yellow-800 dark:bg-yellow-900/30"
           role="status"
@@ -167,7 +223,7 @@ export function TrialBanner({ onAuthenticated }: TrialBannerProps) {
         </div>
       )}
 
-      {!isActive && showAuth && (
+      {authChecked && !isActive && showAuth && !isAuthenticated && (
         <div
           className="flex items-center justify-center border-b border-red-200 bg-red-50 px-4 py-2 dark:border-red-800 dark:bg-red-900/30"
           role="alert"
