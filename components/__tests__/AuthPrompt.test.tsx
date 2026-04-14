@@ -38,53 +38,19 @@ describe("AuthPrompt", () => {
     expect(screen.getByText("Sign in to continue")).toBeDefined();
   });
 
-  // --- Provider button clicks ---
+  // --- Provider rendering ---
 
-  it("should link Apple OAuth to the API starter route", () => {
+  it("should hide social OAuth options when SSO is disabled", () => {
     renderAuthPrompt();
 
-    expect(screen.getByTestId("auth-apple")).toHaveAttribute(
-      "href",
-      "/api/auth/oauth/apple"
-    );
-  });
-
-  it("should link Google OAuth to the API starter route", () => {
-    renderAuthPrompt();
-
-    expect(screen.getByTestId("auth-google")).toHaveAttribute(
-      "href",
-      "/api/auth/oauth/google"
-    );
-  });
-
-  it("should call optional onAppleSignIn when Apple link is clicked", () => {
-    const onAppleSignIn = vi.fn();
-    renderAuthPrompt({ onAppleSignIn });
-
-    fireEvent.click(screen.getByTestId("auth-apple"));
-    expect(onAppleSignIn).toHaveBeenCalledOnce();
-  });
-
-  it("should call optional onGoogleSignIn when Google link is clicked", () => {
-    const onGoogleSignIn = vi.fn();
-    renderAuthPrompt({ onGoogleSignIn });
-
-    fireEvent.click(screen.getByTestId("auth-google"));
-    expect(onGoogleSignIn).toHaveBeenCalledOnce();
+    expect(screen.queryByTestId("auth-apple")).toBeNull();
+    expect(screen.queryByTestId("auth-google")).toBeNull();
+    expect(screen.getByTestId("auth-sso-disabled-note")).toBeDefined();
   });
 
   it("should disable provider controls when loading", () => {
     renderAuthPrompt({ loading: true });
 
-    expect(screen.getByTestId("auth-apple")).toHaveAttribute(
-      "aria-disabled",
-      "true"
-    );
-    expect(screen.getByTestId("auth-google")).toHaveAttribute(
-      "aria-disabled",
-      "true"
-    );
     const emailBtn = screen.getByTestId("auth-email-btn") as HTMLButtonElement;
     expect(emailBtn.disabled).toBe(true);
   });
@@ -121,8 +87,7 @@ describe("AuthPrompt", () => {
     fireEvent.click(screen.getByTestId("auth-email-btn"));
     fireEvent.click(screen.getByTestId("auth-back"));
 
-    expect(screen.getByTestId("auth-apple")).toBeDefined();
-    expect(screen.getByTestId("auth-google")).toBeDefined();
+    expect(screen.getByTestId("auth-sso-disabled-note")).toBeDefined();
   });
 
   // --- Email form validation ---
