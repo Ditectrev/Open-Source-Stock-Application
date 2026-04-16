@@ -17,7 +17,9 @@ export function StockOfTheDayPanel({
   return (
     <section className="mt-6 sm:mt-8 lg:mt-10">
       <div className="p-4 sm:p-6 rounded-lg shadow-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 relative overflow-hidden">
-        <div className={locked ? "blur-sm select-none pointer-events-none" : ""}>
+        <div
+          className={locked ? "blur-sm select-none pointer-events-none" : ""}
+        >
           <div className="flex items-center justify-between gap-3 mb-4">
             <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
               Stock of the day
@@ -42,7 +44,9 @@ export function StockOfTheDayPanel({
               </p>
               <p className="text-sm text-gray-600 dark:text-gray-300">
                 Recommendation:{" "}
-                <span className="font-semibold uppercase">{item.recommendation}</span>
+                <span className="font-semibold uppercase">
+                  {item.recommendation}
+                </span>
               </p>
               <ul className="space-y-1 text-sm text-gray-600 dark:text-gray-300">
                 {item.rationale.map((reason) => (
@@ -56,8 +60,8 @@ export function StockOfTheDayPanel({
         {locked && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/70 dark:bg-gray-900/70 px-6 text-center">
             <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100">
-              AI section locked. Enable any AI subscription to reveal today&apos;s
-              pick.
+              AI section locked. Enable any AI subscription to reveal
+              today&apos;s pick.
             </p>
             <Link
               href="/pricing"

@@ -192,7 +192,9 @@ export function HomePageClient() {
   const pricingTier = usePricingTier();
   const symbolFromUrl = searchParams.get("symbol");
   const hasAIAccess =
-    pricingTier === "LOCAL" || pricingTier === "BYOK" || pricingTier === "HOSTED_AI";
+    pricingTier === "LOCAL" ||
+    pricingTier === "BYOK" ||
+    pricingTier === "HOSTED_AI";
 
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>("overview");
@@ -208,9 +210,13 @@ export function HomePageClient() {
   const [financialData, setFinancialData] = useState<FinancialData | null>(
     null
   );
-  const [aiPrediction, setAIPrediction] = useState<AIPredictionReport | null>(null);
+  const [aiPrediction, setAIPrediction] = useState<AIPredictionReport | null>(
+    null
+  );
   const [aiPredictionLoading, setAIPredictionLoading] = useState(false);
-  const [stockOfTheDay, setStockOfTheDay] = useState<StockOfTheDay | null>(null);
+  const [stockOfTheDay, setStockOfTheDay] = useState<StockOfTheDay | null>(
+    null
+  );
   const [stockOfTheDayLoading, setStockOfTheDayLoading] = useState(false);
 
   useEffect(() => {
@@ -305,7 +311,9 @@ export function HomePageClient() {
 
       setAIPredictionLoading(true);
       try {
-        const response = await fetch(`/api/market/ai-prediction/${selectedSymbol}`);
+        const response = await fetch(
+          `/api/market/ai-prediction/${selectedSymbol}`
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch AI prediction");
         }

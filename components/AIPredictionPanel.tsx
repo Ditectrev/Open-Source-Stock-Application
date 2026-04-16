@@ -22,7 +22,9 @@ function RecommendationBadge({
         : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300";
 
   return (
-    <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${styles}`}>
+    <span
+      className={`px-2.5 py-1 rounded-full text-xs font-semibold ${styles}`}
+    >
       {recommendation.toUpperCase()}
     </span>
   );
@@ -36,14 +38,18 @@ export function AIPredictionPanel({
   return (
     <section className="mt-6">
       <div className="p-4 sm:p-6 rounded-lg shadow-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 relative overflow-hidden">
-        <div className={locked ? "blur-sm select-none pointer-events-none" : ""}>
+        <div
+          className={locked ? "blur-sm select-none pointer-events-none" : ""}
+        >
           <div className="flex items-center justify-between gap-4 mb-4">
             <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
               AI Prediction
             </h2>
             {prediction && (
               <div className="flex items-center gap-2">
-                <RecommendationBadge recommendation={prediction.recommendation} />
+                <RecommendationBadge
+                  recommendation={prediction.recommendation}
+                />
                 <span className="text-xs text-gray-500 dark:text-gray-400">
                   Confidence {Math.round(prediction.confidence * 100)}%
                 </span>
@@ -59,7 +65,9 @@ export function AIPredictionPanel({
 
           {!loading && prediction && (
             <div className="space-y-4 text-sm">
-              <p className="text-gray-700 dark:text-gray-200">{prediction.summary}</p>
+              <p className="text-gray-700 dark:text-gray-200">
+                {prediction.summary}
+              </p>
 
               <div>
                 <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-1">

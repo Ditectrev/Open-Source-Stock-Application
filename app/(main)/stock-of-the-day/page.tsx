@@ -8,7 +8,9 @@ import type { StockOfTheDay } from "@/types";
 export default function StockOfTheDayPage() {
   const pricingTier = usePricingTier();
   const hasAIAccess =
-    pricingTier === "LOCAL" || pricingTier === "BYOK" || pricingTier === "HOSTED_AI";
+    pricingTier === "LOCAL" ||
+    pricingTier === "BYOK" ||
+    pricingTier === "HOSTED_AI";
 
   const [item, setItem] = useState<StockOfTheDay | null>(null);
   const [loading, setLoading] = useState(false);

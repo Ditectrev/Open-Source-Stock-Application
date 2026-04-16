@@ -19,7 +19,10 @@ function toRecommendation(score: number): Recommendation {
 }
 
 function boundedConfidence(score: number): number {
-  const normalized = Math.min(0.95, Math.max(0.55, 0.65 + Math.abs(score) * 0.2));
+  const normalized = Math.min(
+    0.95,
+    Math.max(0.55, 0.65 + Math.abs(score) * 0.2)
+  );
   return Number(normalized.toFixed(2));
 }
 
@@ -99,7 +102,11 @@ export class AIMarketInsightsService {
       symbol: item.symbol,
       name: item.name,
       assetType: "stock" as const,
-      score: this.scoreCandidate(item.changePercent, item.volume, item.marketCap),
+      score: this.scoreCandidate(
+        item.changePercent,
+        item.volume,
+        item.marketCap
+      ),
     }));
 
     const cryptoCandidates = crypto.slice(0, 10).map((item) => ({

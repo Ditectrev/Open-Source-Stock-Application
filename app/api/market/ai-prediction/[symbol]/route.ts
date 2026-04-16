@@ -25,7 +25,9 @@ export async function GET(
     });
   } catch (error) {
     const { symbol } = await params;
-    logger.error("Failed to generate AI prediction", error as Error, { symbol });
+    logger.error("Failed to generate AI prediction", error as Error, {
+      symbol,
+    });
 
     return NextResponse.json(
       {
