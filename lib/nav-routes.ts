@@ -3,6 +3,7 @@
  */
 export const MAIN_NAV = [
   { id: "home", label: "Home", href: "/" },
+  { id: "stock-of-the-day", label: "Stock of the day", href: "/stock-of-the-day" },
   { id: "sectors", label: "Sectors", href: "/sectors" },
   { id: "calendars", label: "Calendars", href: "/calendars" },
   { id: "heatmaps", label: "Heatmaps", href: "/heatmaps" },
@@ -17,6 +18,7 @@ export function pathnameToNavId(pathname: string): MainNavId | string {
   if (normalized === "/") return "home";
   const first = normalized.slice(1).split("/")[0];
   if (
+    first === "stock-of-the-day" ||
     first === "sectors" ||
     first === "calendars" ||
     first === "heatmaps" ||

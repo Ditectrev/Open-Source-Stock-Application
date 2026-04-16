@@ -430,3 +430,26 @@ export interface CachedData<T> {
   cachedAt: Date;
   expiresAt: Date;
 }
+
+export interface AIPredictionReport {
+  symbol: string;
+  assetType: "stock" | "crypto" | "commodity" | "forex" | "etf" | "unknown";
+  generatedAt: Date;
+  recommendation: "buy" | "hold" | "sell";
+  confidence: number;
+  summary: string;
+  politicalFactors: string[];
+  financialTrendFactors: string[];
+  geopoliticalFactors: string[];
+  riskFactors: string[];
+}
+
+export interface StockOfTheDay {
+  generatedAt: Date;
+  symbol: string;
+  name: string;
+  assetType: "stock" | "crypto" | "commodity" | "forex" | "etf" | "unknown";
+  recommendation: "buy" | "hold" | "sell";
+  confidence: number;
+  rationale: string[];
+}

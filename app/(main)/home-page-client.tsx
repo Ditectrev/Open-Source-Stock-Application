@@ -12,10 +12,15 @@ import {
   SeasonalData,
   FinancialData,
   TimeRange,
+  AIPredictionReport,
+  StockOfTheDay,
 } from "@/types";
 import { SymbolHeader } from "@/components/SymbolHeader";
 import { TabNavigation } from "@/components/TabNavigation";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { usePricingTier } from "@/lib/use-pricing-tier";
+import { AIPredictionPanel } from "@/components/AIPredictionPanel";
+import { StockOfTheDayPanel } from "@/components/StockOfTheDayPanel";
 const OverviewTab = dynamic(
   () => import("@/components/OverviewTab").then((m) => m.OverviewTab),
   {
@@ -184,7 +189,10 @@ const QUICK_LINKS = [
 export function HomePageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pricingTier = usePricingTier();
   const symbolFromUrl = searchParams.get("symbol");
+  const hasAIAccess =
+    pricingTier === "LOCAL" || pricingTier === "BYOK" || pricingTier === "HOSTED_AI";
 
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>("overview");
@@ -200,6 +208,10 @@ export function HomePageClient() {
   const [financialData, setFinancialData] = useState<FinancialData | null>(
     null
   );
+  const [aiPrediction, setAIPrediction] = useState<AIPredictionReport | null>(null);
+  const [aiPredictionLoading, setAIPredictionLoading] = useState(false);
+  const [stockOfTheDay, setStockOfTheDay] = useState<StockOfTheDay | null>(null);
+  const [stockOfTheDayLoading, setStockOfTheDayLoading] = useState(false);
 
   useEffect(() => {
     if (symbolFromUrl && symbolFromUrl.trim()) {
@@ -284,6 +296,58 @@ export function HomePageClient() {
     fetchSymbolData();
   }, [selectedSymbol, timeRange]);
 
+  useEffect(() => {
+    const fetchAIPrediction = async () => {
+      if (!selectedSymbol || !hasAIAccess) {
+        setAIPrediction(null);
+        return;
+      }
+
+      setAIPredictionLoading(true);
+      try {
+        const response = await fetch(`/api/market/ai-prediction/${selectedSymbol}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch AI prediction");
+        }
+
+        const result = await response.json();
+        setAIPrediction(result.data ?? null);
+      } catch {
+        setAIPrediction(null);
+      } finally {
+        setAIPredictionLoading(false);
+      }
+    };
+
+    fetchAIPrediction();
+  }, [selectedSymbol, hasAIAccess]);
+
+  useEffect(() => {
+    const fetchStockOfTheDay = async () => {
+      if (!hasAIAccess || selectedSymbol) {
+        setStockOfTheDay(null);
+        return;
+      }
+
+      setStockOfTheDayLoading(true);
+      try {
+        const response = await fetch("/api/market/stock-of-the-day");
+        if (!response.ok) {
+          throw new Error("Failed to fetch stock of the day");
+        }
+
+        const result = await response.json();
+        setStockOfTheDay(result.data ?? null);
+      } catch {
+        setStockOfTheDay(null);
+      } finally {
+        setStockOfTheDayLoading(false);
+      }
+    };
+
+    fetchStockOfTheDay();
+  }, [hasAIAccess, selectedSymbol]);
+
   const handleTimeRangeChange = (range: TimeRange) => {
     setTimeRange(range);
   };
@@ -348,6 +412,12 @@ export function HomePageClient() {
                   <SeasonalHeatmap data={seasonalData} />
                 )}
               </div>
+
+              <AIPredictionPanel
+                prediction={aiPrediction}
+                loading={aiPredictionLoading}
+                locked={!hasAIAccess}
+              />
             </>
           )}
         </div>
@@ -380,6 +450,11 @@ export function HomePageClient() {
             <div className="mt-6 sm:mt-8 lg:mt-10">
               <WorldMarkets />
             </div>
+            <StockOfTheDayPanel
+              item={stockOfTheDay}
+              loading={stockOfTheDayLoading}
+              locked={!hasAIAccess}
+            />
           </div>
         </div>
       )}
