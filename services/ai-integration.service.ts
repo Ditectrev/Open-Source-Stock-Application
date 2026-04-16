@@ -315,6 +315,14 @@ Answer in 2-4 sentences. Do not use "buy" or "sell" language.`;
     }
   }
 
+  /**
+   * Runs an arbitrary prompt and returns the raw model output text.
+   * This is intended for backend features that need to parse structured output.
+   */
+  async runRawPrompt(prompt: string): Promise<string> {
+    return await this.runPrompt(prompt);
+  }
+
   private getRelatedMetrics(metric: string): string[] {
     const relations: Record<string, string[]> = {
       rsi: ["macd", "bollingerBands", "overallSentiment"],
