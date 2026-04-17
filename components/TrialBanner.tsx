@@ -10,7 +10,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { TrialTimer } from "@/components/TrialTimer";
 import { AuthPrompt } from "@/components/AuthPrompt";
-import { trialManagementService } from "@/services/trial-management.service";
+import { trialApiService } from "@/services/trial-api.service";
 import {
   postEmailOtpSend,
   postEmailOtpVerify,
@@ -31,24 +31,38 @@ export function TrialBanner({ onAuthenticated }: TrialBannerProps) {
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [authInfo, setAuthInfo] = useState<string | null>(null);
+  const requiresAuthLock = !isActive && hasUsedTrial && !isAuthenticated;
 
   useEffect(() => {
     const init = async () => {
-      // Auto-start trial if this is a first-time visitor
-      const status = trialManagementService.getTrialStatus();
-      if (!status.isActive && !status.hasUsedTrial) {
-        try {
-          await trialManagementService.startTrial();
-        } catch {
-          // Already used or storage unavailable — fall through to show auth
+      try {
+        // Auto-start trial if this is a first-time visitor
+        const status = await trialApiService.getTrialStatus();
+        if (!status.isActive && !status.hasUsedTrial) {
+          try {
+            await trialApiService.startTrial();
+          } catch (err) {
+            // Already used, Appwrite misconfig, or network — check devtools / server logs.
+            if (process.env.NODE_ENV === "development") {
+              console.warn("[trial] startTrial failed:", err);
+            }
+          }
         }
-      }
 
-      // Read final status after potential startTrial()
-      const finalStatus = trialManagementService.getTrialStatus();
-      setRemainingSeconds(finalStatus.remainingSeconds);
-      setIsActive(finalStatus.isActive);
-      setHasUsedTrial(finalStatus.hasUsedTrial);
+        // Read final status after potential startTrial()
+        const finalStatus = await trialApiService.getTrialStatus();
+        setRemainingSeconds(finalStatus.remainingSeconds);
+        setIsActive(finalStatus.isActive);
+        setHasUsedTrial(finalStatus.hasUsedTrial);
+      } catch (err) {
+        if (process.env.NODE_ENV === "development") {
+          console.warn("[trial] getTrialStatus / init failed:", err);
+        }
+        // Fail closed if trial status cannot be loaded from the server.
+        setRemainingSeconds(0);
+        setIsActive(false);
+        setHasUsedTrial(true);
+      }
     };
 
     init();
@@ -124,16 +138,19 @@ export function TrialBanner({ onAuthenticated }: TrialBannerProps) {
 
   const handleExpired = useCallback(() => {
     setIsActive(false);
-    trialManagementService.endTrial();
+    void trialApiService.endTrial();
     setShowAuth(true);
   }, []);
 
   const handleAuthClose = useCallback(() => {
+    if (requiresAuthLock) {
+      return;
+    }
     setShowAuth(false);
     setAuthError(null);
     setAuthInfo(null);
     setAuthLoading(false);
-  }, []);
+  }, [requiresAuthLock]);
 
   const handleEmailSubmit = useCallback(async (email: string) => {
     setAuthError(null);
@@ -251,6 +268,7 @@ export function TrialBanner({ onAuthenticated }: TrialBannerProps) {
       <AuthPrompt
         open={showAuth}
         onClose={handleAuthClose}
+        dismissible={!requiresAuthLock}
         onEmailSubmit={handleEmailSubmit}
         onEmailVerify={handleEmailVerify}
         loading={authLoading}

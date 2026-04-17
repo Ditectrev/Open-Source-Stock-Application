@@ -4,13 +4,21 @@
  * Requirements: 21.1, 21.12
  */
 
-import { NextResponse } from "next/server";
-import { trialManagementService } from "@/services/trial-management.service";
+import { NextRequest, NextResponse } from "next/server";
+import { parseTrialIdentity } from "@/lib/trial-request-identity";
+import { serverTrialManagementService } from "@/services/server-trial-management.service";
 import { logger } from "@/lib/logger";
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
-    trialManagementService.endTrial();
+    const body = (await request.json().catch(() => ({}))) as {
+      fingerprint?: string;
+      userAgent?: string;
+      screenResolution?: string;
+      timezone?: string;
+    };
+    const identity = parseTrialIdentity(request, body);
+    await serverTrialManagementService.endTrial(identity);
 
     return NextResponse.json({
       success: true,
