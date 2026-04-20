@@ -142,15 +142,21 @@ jobs:
           retention-days: 14
 
   # Mirrors Ditectrev/Practice-Tests-Exams-Platform/.github/workflows/vercel-deploy.yml:
-  # - repository secrets as single source of truth
-  # - echo | vercel env add … || true
-  # - main: vercel deploy --prod (no --prebuilt) so Vercel builds production with synced env
-  # - PRs: vercel deploy --prebuilt after local vercel build
+  # - vercel env add … then vercel build / deploy
+  # - main: production on Vercel; PRs: preview on Vercel
+  #
+  # Environment secrets (GitHub "Production" vs "Preview"): only trial Appwrite targets differ per env:
+  #   APPWRITE_TRIAL_DATABASE_ID, APPWRITE_TRIAL_SESSIONS_COLLECTION_ID
+  # All other deploy secrets stay repository-wide: VERCEL_*, NEXT_PUBLIC_APPWRITE_*, APPWRITE_API_KEY.
+  # With `environment:` set, GitHub still exposes repository secrets to the job; environment adds/overrides
+  # only the names defined on that environment (here: the two APPWRITE_TRIAL_* ids).
   deploy:
     name: Deploy to Vercel
     needs: [lint, format, test, security, accessibility]
     if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref == 'refs/heads/main' && 'Production' || 'Preview' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -167,6 +173,8 @@ jobs:
           vercel env add NEXT_PUBLIC_APPWRITE_ENDPOINT $ENV_TYPE "" --value "${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
           vercel env add NEXT_PUBLIC_APPWRITE_PROJECT_ID $ENV_TYPE "" --value "${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
           vercel env add APPWRITE_API_KEY $ENV_TYPE "" --value "${{ secrets.APPWRITE_API_KEY }}" --yes --force --sensitive --token=${{ secrets.VERCEL_TOKEN }}
+          vercel env add APPWRITE_TRIAL_DATABASE_ID $ENV_TYPE "" --value "${{ secrets.APPWRITE_TRIAL_DATABASE_ID }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
+          vercel env add APPWRITE_TRIAL_SESSIONS_COLLECTION_ID $ENV_TYPE "" --value "${{ secrets.APPWRITE_TRIAL_SESSIONS_COLLECTION_ID }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -184,6 +192,8 @@ jobs:
           NEXT_PUBLIC_APPWRITE_ENDPOINT: ${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}
           NEXT_PUBLIC_APPWRITE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}
           APPWRITE_API_KEY: ${{ secrets.APPWRITE_API_KEY }}
+          APPWRITE_TRIAL_DATABASE_ID: ${{ secrets.APPWRITE_TRIAL_DATABASE_ID }}
+          APPWRITE_TRIAL_SESSIONS_COLLECTION_ID: ${{ secrets.APPWRITE_TRIAL_SESSIONS_COLLECTION_ID }}
 
       - name: Deploy Project Artifacts to Vercel
         id: vercel-deploy

@@ -14,10 +14,11 @@ import {
 } from "@testing-library/react";
 import { TrialBanner, TrialBannerProps } from "../TrialBanner";
 
-// Mock the trial management service
-vi.mock("@/services/trial-management.service", () => ({
-  trialManagementService: {
+// Mock the trial API service
+vi.mock("@/services/trial-api.service", () => ({
+  trialApiService: {
     getTrialStatus: vi.fn(),
+    startTrial: vi.fn(),
     endTrial: vi.fn(),
   },
 }));
@@ -34,18 +35,20 @@ vi.mock("@/lib/auth/trial-auth-navigation", () => ({
   postEmailOtpVerify: postEmailOtpVerifyMock,
 }));
 
-import { trialManagementService } from "@/services/trial-management.service";
+import { trialApiService } from "@/services/trial-api.service";
 
-const mockGetTrialStatus = trialManagementService.getTrialStatus as ReturnType<
+const mockGetTrialStatus = trialApiService.getTrialStatus as ReturnType<
   typeof vi.fn
 >;
-const mockEndTrial = trialManagementService.endTrial as ReturnType<
-  typeof vi.fn
->;
+const mockEndTrial = trialApiService.endTrial as ReturnType<typeof vi.fn>;
 
-function renderBanner(overrides: Partial<TrialBannerProps> = {}) {
+async function renderBanner(overrides: Partial<TrialBannerProps> = {}) {
   const props: TrialBannerProps = { ...overrides };
-  return render(<TrialBanner {...props} />);
+  const view = render(<TrialBanner {...props} />);
+  await act(async () => {
+    await Promise.resolve();
+  });
+  return view;
 }
 
 describe("TrialBanner", () => {
@@ -60,77 +63,77 @@ describe("TrialBanner", () => {
 
   // --- Active trial display ---
 
-  it("should display trial banner when trial is active", () => {
+  it("should display trial banner when trial is active", async () => {
     mockGetTrialStatus.mockReturnValue({
       isActive: true,
       remainingSeconds: 600,
       hasUsedTrial: true,
     });
 
-    renderBanner();
+    await renderBanner();
     expect(screen.getByTestId("trial-banner")).toBeDefined();
     expect(screen.getByText("Trial session")).toBeDefined();
   });
 
-  it("should display the countdown timer when active (Req 21.9)", () => {
+  it("should display the countdown timer when active (Req 21.9)", async () => {
     mockGetTrialStatus.mockReturnValue({
       isActive: true,
       remainingSeconds: 300,
       hasUsedTrial: true,
     });
 
-    renderBanner();
+    await renderBanner();
     expect(screen.getByTestId("trial-timer")).toBeDefined();
     expect(screen.getByTestId("trial-timer-display").textContent).toBe("5:00");
   });
 
-  it("should show sign-in button during active trial", () => {
+  it("should show sign-in button during active trial", async () => {
     mockGetTrialStatus.mockReturnValue({
       isActive: true,
       remainingSeconds: 900,
       hasUsedTrial: true,
     });
 
-    renderBanner();
+    await renderBanner();
     expect(screen.getByTestId("trial-sign-in-btn")).toBeDefined();
   });
 
   // --- Trial not active / no trial ---
 
-  it("should not display banner when trial is inactive and not used", () => {
+  it("should not display banner when trial is inactive and not used", async () => {
     mockGetTrialStatus.mockReturnValue({
       isActive: false,
       remainingSeconds: 0,
       hasUsedTrial: false,
     });
 
-    renderBanner();
+    await renderBanner();
     expect(screen.queryByTestId("trial-banner")).toBeNull();
     expect(screen.queryByTestId("trial-expired-banner")).toBeNull();
   });
 
   // --- Expiration prompt (Req 21.12) ---
 
-  it("should show expired banner when trial was used and is inactive", () => {
+  it("should show expired banner when trial was used and is inactive", async () => {
     mockGetTrialStatus.mockReturnValue({
       isActive: false,
       remainingSeconds: 0,
       hasUsedTrial: true,
     });
 
-    renderBanner();
+    await renderBanner();
     expect(screen.getByTestId("trial-expired-banner")).toBeDefined();
     expect(screen.getByText(/Trial expired/)).toBeDefined();
   });
 
-  it("should show expired banner with sign-in link after timer expires", () => {
+  it("should show expired banner with sign-in link after timer expires", async () => {
     mockGetTrialStatus.mockReturnValue({
       isActive: true,
       remainingSeconds: 2,
       hasUsedTrial: true,
     });
 
-    renderBanner();
+    await renderBanner();
 
     // Advance past expiration
     act(() => {
@@ -141,14 +144,14 @@ describe("TrialBanner", () => {
     expect(screen.getByTestId("trial-expired-sign-in")).toBeDefined();
   });
 
-  it("should call endTrial on the service when timer expires", () => {
+  it("should call endTrial on the service when timer expires", async () => {
     mockGetTrialStatus.mockReturnValue({
       isActive: true,
       remainingSeconds: 1,
       hasUsedTrial: true,
     });
 
-    renderBanner();
+    await renderBanner();
 
     act(() => {
       vi.advanceTimersByTime(1000);
@@ -159,54 +162,54 @@ describe("TrialBanner", () => {
 
   // --- Authentication flow trigger ---
 
-  it("should open auth prompt when sign-in button is clicked during trial", () => {
+  it("should open auth prompt when sign-in button is clicked during trial", async () => {
     mockGetTrialStatus.mockReturnValue({
       isActive: true,
       remainingSeconds: 600,
       hasUsedTrial: true,
     });
 
-    renderBanner();
+    await renderBanner();
     fireEvent.click(screen.getByTestId("trial-sign-in-btn"));
 
     expect(screen.getByTestId("auth-prompt")).toBeDefined();
   });
 
-  it("should open auth prompt when expired sign-in link is clicked", () => {
+  it("should open auth prompt when expired sign-in link is clicked", async () => {
     mockGetTrialStatus.mockReturnValue({
       isActive: false,
       remainingSeconds: 0,
       hasUsedTrial: true,
     });
 
-    renderBanner();
+    await renderBanner();
     fireEvent.click(screen.getByTestId("trial-expired-sign-in"));
 
     expect(screen.getByTestId("auth-prompt")).toBeDefined();
   });
 
-  it("should show auth prompt with email provider", () => {
+  it("should show auth prompt with email provider", async () => {
     mockGetTrialStatus.mockReturnValue({
       isActive: true,
       remainingSeconds: 600,
       hasUsedTrial: true,
     });
 
-    renderBanner();
+    await renderBanner();
     fireEvent.click(screen.getByTestId("trial-sign-in-btn"));
 
     expect(screen.getByTestId("auth-sso-disabled-note")).toBeDefined();
     expect(screen.getByTestId("auth-email-btn")).toBeDefined();
   });
 
-  it("should close auth prompt when close button is clicked", () => {
+  it("should close auth prompt when close button is clicked", async () => {
     mockGetTrialStatus.mockReturnValue({
       isActive: true,
       remainingSeconds: 600,
       hasUsedTrial: true,
     });
 
-    renderBanner();
+    await renderBanner();
     fireEvent.click(screen.getByTestId("trial-sign-in-btn"));
     expect(screen.getByTestId("auth-prompt")).toBeDefined();
 
@@ -214,28 +217,41 @@ describe("TrialBanner", () => {
     expect(screen.queryByTestId("auth-prompt")).toBeNull();
   });
 
+  it("should require sign-in after trial expires (no close button)", async () => {
+    mockGetTrialStatus.mockReturnValue({
+      isActive: false,
+      remainingSeconds: 0,
+      hasUsedTrial: true,
+    });
+
+    await renderBanner();
+    fireEvent.click(screen.getByTestId("trial-expired-sign-in"));
+    expect(screen.getByTestId("auth-prompt")).toBeDefined();
+    expect(screen.queryByTestId("auth-close")).toBeNull();
+  });
+
   // --- onAuthenticated callback ---
 
-  it("should hide Apple OAuth when SSO is disabled", () => {
+  it("should hide Apple OAuth when SSO is disabled", async () => {
     mockGetTrialStatus.mockReturnValue({
       isActive: true,
       remainingSeconds: 600,
       hasUsedTrial: true,
     });
 
-    renderBanner();
+    await renderBanner();
     fireEvent.click(screen.getByTestId("trial-sign-in-btn"));
     expect(screen.queryByTestId("auth-apple")).toBeNull();
   });
 
-  it("should hide Google OAuth when SSO is disabled", () => {
+  it("should hide Google OAuth when SSO is disabled", async () => {
     mockGetTrialStatus.mockReturnValue({
       isActive: true,
       remainingSeconds: 600,
       hasUsedTrial: true,
     });
 
-    renderBanner();
+    await renderBanner();
     fireEvent.click(screen.getByTestId("trial-sign-in-btn"));
     expect(screen.queryByTestId("auth-google")).toBeNull();
   });
@@ -257,7 +273,7 @@ describe("TrialBanner", () => {
       hasUsedTrial: true,
     });
 
-    renderBanner({ onAuthenticated });
+    await renderBanner({ onAuthenticated });
     fireEvent.click(screen.getByTestId("trial-sign-in-btn"));
     fireEvent.click(screen.getByTestId("auth-email-btn"));
     fireEvent.change(screen.getByTestId("auth-email-input"), {
@@ -288,27 +304,27 @@ describe("TrialBanner", () => {
 
   // --- Accessibility ---
 
-  it("should have role=status on active trial banner", () => {
+  it("should have role=status on active trial banner", async () => {
     mockGetTrialStatus.mockReturnValue({
       isActive: true,
       remainingSeconds: 600,
       hasUsedTrial: true,
     });
 
-    renderBanner();
+    await renderBanner();
     expect(screen.getByTestId("trial-banner").getAttribute("role")).toBe(
       "status"
     );
   });
 
-  it("should have role=alert on expired banner", () => {
+  it("should have role=alert on expired banner", async () => {
     mockGetTrialStatus.mockReturnValue({
       isActive: false,
       remainingSeconds: 0,
       hasUsedTrial: true,
     });
 
-    renderBanner();
+    await renderBanner();
     expect(
       screen.getByTestId("trial-expired-banner").getAttribute("role")
     ).toBe("alert");

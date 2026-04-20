@@ -4,13 +4,16 @@
  * Requirements: 21.1, 21.12
  */
 
-import { NextResponse } from "next/server";
-import { trialManagementService } from "@/services/trial-management.service";
+import { NextRequest, NextResponse } from "next/server";
+import { parseTrialIdentity } from "@/lib/trial-request-identity";
+import { serverTrialManagementService } from "@/services/server-trial-management.service";
 import { logger } from "@/lib/logger";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const eligible = await trialManagementService.checkTrialEligibility();
+    const identity = parseTrialIdentity(request, {});
+    const eligible =
+      await serverTrialManagementService.checkTrialEligibility(identity);
 
     return NextResponse.json({
       success: true,

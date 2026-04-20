@@ -70,6 +70,11 @@ describe("AuthPrompt", () => {
     expect(onClose).toHaveBeenCalledOnce();
   });
 
+  it("should hide close button when modal is not dismissible", () => {
+    renderAuthPrompt({ dismissible: false });
+    expect(screen.queryByTestId("auth-close")).toBeNull();
+  });
+
   // --- Email form navigation ---
 
   it("should switch to email view when email button is clicked", () => {

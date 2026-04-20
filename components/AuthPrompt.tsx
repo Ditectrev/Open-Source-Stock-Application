@@ -18,6 +18,8 @@ export interface AuthPromptProps {
   open: boolean;
   /** Called when the user dismisses the modal */
   onClose: () => void;
+  /** Whether the modal can be dismissed */
+  dismissible?: boolean;
   /** Optional — Apple uses /api/auth/oauth/apple unless you override behavior */
   onAppleSignIn?: () => void;
   /** Optional — Google uses /api/auth/oauth/google unless you override behavior */
@@ -49,6 +51,7 @@ const SOCIAL_SSO_ENABLED = false;
 export function AuthPrompt({
   open,
   onClose,
+  dismissible = true,
   onAppleSignIn,
   onGoogleSignIn,
   onEmailSubmit,
@@ -200,28 +203,30 @@ export function AuthPrompt({
     >
       <div className="relative w-full max-w-sm rounded-xl bg-white p-6 shadow-xl dark:bg-gray-800">
         {/* Close button */}
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute right-3 top-3 rounded-md p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-          aria-label="Close"
-          data-testid="auth-close"
-        >
-          <svg
-            className="h-5 w-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
+        {dismissible && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="absolute right-3 top-3 rounded-md p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+            aria-label="Close"
+            data-testid="auth-close"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        )}
 
         <h2 className="mb-4 text-center text-xl font-semibold text-gray-900 dark:text-gray-100">
           Sign in to continue
