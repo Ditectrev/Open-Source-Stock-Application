@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import type { AIPredictionReport } from "@/types";
+import { isMissingByokApiKeyMessage } from "@/lib/missing-byok-api-key";
 
 interface AIPredictionPanelProps {
   prediction: AIPredictionReport | null;
   loading: boolean;
   locked: boolean;
+  error?: string | null;
 }
 
 function RecommendationBadge({
@@ -34,6 +36,7 @@ export function AIPredictionPanel({
   prediction,
   loading,
   locked,
+  error,
 }: AIPredictionPanelProps) {
   return (
     <section className="mt-6">
@@ -102,6 +105,43 @@ export function AIPredictionPanel({
                 </ul>
               </div>
             </div>
+          )}
+
+          {!loading && !prediction && !locked && error && (
+            <div
+              className={`rounded-md border px-3 py-3 text-sm ${
+                isMissingByokApiKeyMessage(error)
+                  ? "border-blue-300 bg-blue-50 text-blue-900 dark:border-blue-600 dark:bg-blue-950/50 dark:text-blue-100"
+                  : "border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-700 dark:bg-amber-950/30 dark:text-amber-200"
+              }`}
+            >
+              <p className="font-medium">{error}</p>
+              {isMissingByokApiKeyMessage(error) && (
+                <div className="mt-3 space-y-2">
+                  <p className="text-xs opacity-90">
+                    Add your API key under the avatar menu → profile → API keys,
+                    then pick the same provider as your explanation model.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (typeof window !== "undefined") {
+                        window.dispatchEvent(new Event("open-user-profile-menu"));
+                      }
+                    }}
+                    className="inline-flex items-center rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700"
+                  >
+                    Open profile menu
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {!loading && !prediction && !locked && !error && (
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              No AI prediction returned yet. Try another symbol or refresh.
+            </p>
           )}
         </div>
 

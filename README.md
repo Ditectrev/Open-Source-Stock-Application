@@ -71,27 +71,43 @@ Open [http://localhost:3000](http://localhost:3000) to view the application.
 
 ### Required
 
-| Variable                          | Description                  |
-| --------------------------------- | ---------------------------- |
-| `NEXT_PUBLIC_APPWRITE_ENDPOINT`   | Appwrite API endpoint        |
-| `NEXT_PUBLIC_APPWRITE_PROJECT_ID` | Appwrite project ID          |
-| `APPWRITE_API_KEY`                | Appwrite server-side API key |
+| Variable                               | Description                             |
+| -------------------------------------- | --------------------------------------- |
+| `NEXT_PUBLIC_APPWRITE_ENDPOINT`        | Appwrite API endpoint                   |
+| `NEXT_PUBLIC_APPWRITE_PROJECT_ID`      | Appwrite project ID                     |
+| `APPWRITE_API_KEY`                     | Appwrite server-side API key            |
+| `APPWRITE_DATABASE_ID`                 | Appwrite DB for app data                |
+| `APPWRITE_COLLECTION_ID_AI_KEYS`       | Appwrite collection for keys            |
+
+Also required for trial features: `APPWRITE_COLLECTION_ID_TRIAL_SESSIONS`.
 
 ### Optional
 
-| Variable                    | Description                  | Default                            |
-| --------------------------- | ---------------------------- | ---------------------------------- |
-| `YAHOO_FINANCE_API_URL`     | Yahoo Finance API base URL   | `https://query1.finance.yahoo.com` |
-| `CACHE_TTL_SECONDS`         | Cache TTL in seconds         | `300`                              |
-| `RATE_LIMIT_MAX_REQUESTS`   | Max API requests per window  | `100`                              |
-| `RATE_LIMIT_WINDOW_SECONDS` | Rate limit window in seconds | `60`                               |
-| `LOG_LEVEL`                 | Logging level                | `info`                             |
+| Variable                             | Description                                                                     | Default                            |
+| ------------------------------------ | ------------------------------------------------------------------------------- | ---------------------------------- |
+| `YAHOO_FINANCE_API_URL`              | Yahoo Finance API base URL                                                      | `https://query1.finance.yahoo.com` |
+| `CACHE_TTL_SECONDS`                  | Cache TTL in seconds                                                            | `300`                              |
+| `RATE_LIMIT_MAX_REQUESTS`            | Max API requests per window                                                     | `100`                              |
+| `RATE_LIMIT_WINDOW_SECONDS`          | Rate limit window in seconds                                                    | `60`                               |
+| `LOG_LEVEL`                          | Logging level                                                                   | `info`                             |
+| `DEV_OVERRIDE_PRICING_TIER`          | Temporary non-prod tier override (`FREE`,`ADS_FREE`,`LOCAL`,`BYOK`,`HOSTED_AI`) | unset                              |
+| `DEV_OVERRIDE_PRICING_TIER_USER_IDS` | Optional comma-separated user IDs for scoped override                           | unset                              |
 
 See `.env.example` for the full list.
 
+### Appwrite AI Keys Database Setup
+
+After setting the required environment variables, run:
+
+```bash
+bun run setup:appwrite:ai-keys
+```
+
+This uses your existing `APPWRITE_DATABASE_ID` and creates (or reuses) the BYOK keys collection in that database.
+
 ## Project Structure
 
-```
+```text
 ├── app/            # Next.js App Router pages and API routes
 ├── components/     # React components
 ├── lib/            # Utilities, caching, rate limiting

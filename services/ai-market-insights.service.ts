@@ -24,6 +24,11 @@ type StockEnhancement = Pick<StockOfTheDay, "rationale">;
 
 type AssetType = AIPredictionReport["assetType"];
 type Recommendation = AIPredictionReport["recommendation"];
+type LLMConfig = {
+  provider: AIProvider;
+  apiKey?: string;
+  model?: string;
+};
 
 function detectAssetType(symbol: string): AssetType {
   if (symbol.includes("-USD")) return "crypto";
@@ -110,7 +115,10 @@ function extractFirstJsonObject(text: string): Record<string, unknown> | null {
 }
 
 export class AIMarketInsightsService {
-  async generatePrediction(symbol: string): Promise<AIPredictionReport> {
+  async generatePrediction(
+    symbol: string,
+    llmConfig?: LLMConfig
+  ): Promise<AIPredictionReport> {
     const quote = await marketDataService
       .getSymbolData(symbol)
       .catch((error) => {
@@ -253,7 +261,8 @@ export class AIMarketInsightsService {
       ],
     };
 
-    const enhanced = await this.maybeEnhancePrediction({
+    const enhanced = await this.maybeEnhancePrediction(
+      {
       symbol,
       assetType,
       recommendation,
@@ -265,14 +274,16 @@ export class AIMarketInsightsService {
       strongestRegion,
       weakestRegion,
       targetUpside,
-    });
+      },
+      llmConfig
+    );
 
     return enhanced
       ? { ...heuristic, ...enhanced, generatedAt: new Date() }
       : heuristic;
   }
 
-  async getStockOfTheDay(): Promise<StockOfTheDay> {
+  async getStockOfTheDay(llmConfig?: LLMConfig): Promise<StockOfTheDay> {
     const [stocks, crypto] = await Promise.all([
       marketDataService.getStockPerformance("1d"),
       marketDataService.getCryptoPerformance("1d"),
@@ -316,20 +327,23 @@ export class AIMarketInsightsService {
       ],
     };
 
-    const enhanced = await this.maybeEnhanceStockOfTheDay({
-      symbol: heuristic.symbol,
-      name: heuristic.name,
-      assetType: heuristic.assetType,
-      recommendation,
-      confidence: heuristic.confidence,
-      score: top?.score ?? 0.1,
-      recommendationStance:
-        recommendation === "buy"
-          ? "bullish"
-          : recommendation === "sell"
-            ? "bearish"
-            : "neutral",
-    });
+    const enhanced = await this.maybeEnhanceStockOfTheDay(
+      {
+        symbol: heuristic.symbol,
+        name: heuristic.name,
+        assetType: heuristic.assetType,
+        recommendation,
+        confidence: heuristic.confidence,
+        score: top?.score ?? 0.1,
+        recommendationStance:
+          recommendation === "buy"
+            ? "bullish"
+            : recommendation === "sell"
+              ? "bearish"
+              : "neutral",
+      },
+      llmConfig
+    );
 
     return enhanced
       ? { ...heuristic, ...enhanced, generatedAt: new Date() }
@@ -348,8 +362,9 @@ export class AIMarketInsightsService {
     strongestRegion?: MarketIndex;
     weakestRegion?: MarketIndex;
     targetUpside: number;
-  }): Promise<PredictionEnhancement | null> {
-    const llm = getLLMConfigFromEnv();
+  },
+  llmConfig?: LLMConfig): Promise<PredictionEnhancement | null> {
+    const llm = llmConfig ?? getLLMConfigFromEnv();
     if (!llm) return null;
 
     const stance =
@@ -476,8 +491,9 @@ targetUpsidePercent: ${(args.targetUpside * 100).toFixed(1)}
     confidence: number;
     score: number;
     recommendationStance: "bullish" | "bearish" | "neutral";
-  }): Promise<StockEnhancement | null> {
-    const llm = getLLMConfigFromEnv();
+  },
+  llmConfig?: LLMConfig): Promise<StockEnhancement | null> {
+    const llm = llmConfig ?? getLLMConfigFromEnv();
     if (!llm) return null;
 
     const prompt = `You are a financial analyst.

@@ -8,8 +8,8 @@ export function getAppwriteTrialEnv(): {
   sessionsCollectionId: string;
 } {
   return {
-    databaseId: readEnv("APPWRITE_TRIAL_DATABASE_ID"),
-    sessionsCollectionId: readEnv("APPWRITE_TRIAL_SESSIONS_COLLECTION_ID"),
+    databaseId: readEnv("APPWRITE_DATABASE_ID"),
+    sessionsCollectionId: readEnv("APPWRITE_COLLECTION_ID_TRIAL_SESSIONS"),
   };
 }
 
@@ -20,7 +20,7 @@ export function assertAppwriteTrialEnv(): {
   const env = getAppwriteTrialEnv();
   if (!env.databaseId || !env.sessionsCollectionId) {
     throw new Error(
-      "Missing APPWRITE_TRIAL_DATABASE_ID or APPWRITE_TRIAL_SESSIONS_COLLECTION_ID."
+      "Missing APPWRITE_DATABASE_ID or APPWRITE_COLLECTION_ID_TRIAL_SESSIONS."
     );
   }
   return env;

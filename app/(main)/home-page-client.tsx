@@ -190,11 +190,18 @@ export function HomePageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pricingTier = usePricingTier();
+  const [serverTier, setServerTier] = useState<
+    "FREE" | "ADS_FREE" | "LOCAL" | "BYOK" | "HOSTED_AI" | null
+  >(null);
+  const [serverBYOKAccess, setServerBYOKAccess] = useState<boolean | null>(null);
   const symbolFromUrl = searchParams.get("symbol");
+  const effectiveTier = serverTier ?? pricingTier;
+  const hasTierAccess =
+    effectiveTier === "LOCAL" ||
+    effectiveTier === "BYOK" ||
+    effectiveTier === "HOSTED_AI";
   const hasAIAccess =
-    pricingTier === "LOCAL" ||
-    pricingTier === "BYOK" ||
-    pricingTier === "HOSTED_AI";
+    hasTierAccess || serverBYOKAccess === true;
 
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>("overview");
@@ -214,10 +221,16 @@ export function HomePageClient() {
     null
   );
   const [aiPredictionLoading, setAIPredictionLoading] = useState(false);
+  const [aiPredictionError, setAIPredictionError] = useState<string | null>(
+    null
+  );
   const [stockOfTheDay, setStockOfTheDay] = useState<StockOfTheDay | null>(
     null
   );
   const [stockOfTheDayLoading, setStockOfTheDayLoading] = useState(false);
+  const [stockOfTheDayError, setStockOfTheDayError] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     if (symbolFromUrl && symbolFromUrl.trim()) {
@@ -303,25 +316,101 @@ export function HomePageClient() {
   }, [selectedSymbol, timeRange]);
 
   useEffect(() => {
+    const loadTier = async () => {
+      try {
+        const response = await fetch("/api/subscription/current", {
+          method: "GET",
+          credentials: "include",
+          cache: "no-store",
+        });
+        if (!response.ok) {
+          setServerTier("FREE");
+          return;
+        }
+        const data = (await response.json()) as {
+          data?: {
+            tier?: "FREE" | "ADS_FREE" | "LOCAL" | "BYOK" | "HOSTED_AI";
+          };
+        };
+        setServerTier(data.data?.tier ?? "FREE");
+      } catch {
+        setServerTier("FREE");
+      }
+    };
+
+    void loadTier();
+    const onAuthChanged = () => void loadTier();
+    if (typeof window !== "undefined") {
+      window.addEventListener("auth-state-changed", onAuthChanged);
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("auth-state-changed", onAuthChanged);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const loadBYOKAccess = async () => {
+      try {
+        const response = await fetch("/api/ai/keys", {
+          method: "GET",
+          credentials: "include",
+          cache: "no-store",
+        });
+        setServerBYOKAccess(response.ok);
+      } catch {
+        setServerBYOKAccess(false);
+      }
+    };
+    void loadBYOKAccess();
+    const onAuthChanged = () => void loadBYOKAccess();
+    if (typeof window !== "undefined") {
+      window.addEventListener("auth-state-changed", onAuthChanged);
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("auth-state-changed", onAuthChanged);
+      }
+    };
+  }, []);
+
+  const getAIProviderHeader = (): HeadersInit => {
+    if (typeof window === "undefined") return {};
+    const provider = localStorage.getItem("explanations_provider");
+    if (!provider) return {};
+    return { "x-ai-provider": provider };
+  };
+
+  useEffect(() => {
     const fetchAIPrediction = async () => {
       if (!selectedSymbol || !hasAIAccess) {
         setAIPrediction(null);
+        setAIPredictionError(null);
         return;
       }
 
       setAIPredictionLoading(true);
       try {
         const response = await fetch(
-          `/api/market/ai-prediction/${selectedSymbol}`
+          `/api/market/ai-prediction/${selectedSymbol}`,
+          { headers: getAIProviderHeader(), credentials: "include" }
         );
         if (!response.ok) {
-          throw new Error("Failed to fetch AI prediction");
+          const body = (await response.json().catch(() => ({}))) as {
+            error?: string;
+          };
+          throw new Error(body.error ?? "Failed to fetch AI prediction");
         }
 
         const result = await response.json();
         setAIPrediction(result.data ?? null);
-      } catch {
+        setAIPredictionError(null);
+      } catch (error) {
         setAIPrediction(null);
+        setAIPredictionError(
+          error instanceof Error ? error.message : "Failed to fetch AI prediction"
+        );
       } finally {
         setAIPredictionLoading(false);
       }
@@ -334,20 +423,31 @@ export function HomePageClient() {
     const fetchStockOfTheDay = async () => {
       if (!hasAIAccess || selectedSymbol) {
         setStockOfTheDay(null);
+        setStockOfTheDayError(null);
         return;
       }
 
       setStockOfTheDayLoading(true);
       try {
-        const response = await fetch("/api/market/stock-of-the-day");
+        const response = await fetch("/api/market/stock-of-the-day", {
+          headers: getAIProviderHeader(),
+          credentials: "include",
+        });
         if (!response.ok) {
-          throw new Error("Failed to fetch stock of the day");
+          const body = (await response.json().catch(() => ({}))) as {
+            error?: string;
+          };
+          throw new Error(body.error ?? "Failed to fetch stock of the day");
         }
 
         const result = await response.json();
         setStockOfTheDay(result.data ?? null);
-      } catch {
+        setStockOfTheDayError(null);
+      } catch (error) {
         setStockOfTheDay(null);
+        setStockOfTheDayError(
+          error instanceof Error ? error.message : "Failed to fetch stock of the day"
+        );
       } finally {
         setStockOfTheDayLoading(false);
       }
@@ -425,6 +525,7 @@ export function HomePageClient() {
                 prediction={aiPrediction}
                 loading={aiPredictionLoading}
                 locked={!hasAIAccess}
+                error={aiPredictionError}
               />
             </>
           )}
@@ -462,6 +563,7 @@ export function HomePageClient() {
               item={stockOfTheDay}
               loading={stockOfTheDayLoading}
               locked={!hasAIAccess}
+              error={stockOfTheDayError}
             />
           </div>
         </div>

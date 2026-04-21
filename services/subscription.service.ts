@@ -104,6 +104,46 @@ const PRICING_TIERS: PricingTierInfo[] = [
   },
 ];
 
+const VALID_TIERS: PricingTier[] = [
+  "FREE",
+  "ADS_FREE",
+  "LOCAL",
+  "BYOK",
+  "HOSTED_AI",
+];
+
+function parseTier(value?: string): PricingTier | null {
+  const normalized = value?.trim().toUpperCase();
+  if (!normalized) return null;
+  return VALID_TIERS.includes(normalized as PricingTier)
+    ? (normalized as PricingTier)
+    : null;
+}
+
+function parseCsv(value?: string): string[] {
+  if (!value) return [];
+  return value
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+/**
+ * When `DEV_OVERRIDE_PRICING_TIER` is set, it may apply only in these cases:
+ * - `next dev` / tests (`NODE_ENV !== "production"`)
+ * - Vercel preview (`VERCEL_ENV === "preview"`)
+ * - Local `next start` if you set `ALLOW_LOCAL_PRICING_TIER_OVERRIDE=true`
+ *
+ * Production (`VERCEL_ENV === "production"`) never uses the override unless
+ * you are not on Vercel (then rely on NODE_ENV).
+ */
+function isPricingTierOverrideEnvironment(): boolean {
+  if (process.env.NODE_ENV !== "production") return true;
+  if (process.env.VERCEL_ENV === "preview") return true;
+  if (process.env.ALLOW_LOCAL_PRICING_TIER_OVERRIDE === "true") return true;
+  return false;
+}
+
 export class SubscriptionService {
   /**
    * Returns all available pricing tiers.
@@ -120,6 +160,27 @@ export class SubscriptionService {
    */
   async getCurrentTier(userId: string): Promise<PricingTier> {
     try {
+      const devOverrideTier = parseTier(process.env.DEV_OVERRIDE_PRICING_TIER);
+      const devOverrideUserIds = parseCsv(
+        process.env.DEV_OVERRIDE_PRICING_TIER_USER_IDS
+      );
+
+      // Optional tier override (dev / preview / explicit local prod):
+      // Set `DEV_OVERRIDE_PRICING_TIER=BYOK` (see `.env.example`).
+      // Not triggered by unrelated env names (e.g. `BYOK=1`).
+      if (isPricingTierOverrideEnvironment() && devOverrideTier) {
+        const appliesToAll = devOverrideUserIds.length === 0;
+        const appliesToUser = devOverrideUserIds.includes(userId);
+        if (appliesToAll || appliesToUser) {
+          logger.warn("Using pricing tier override from environment", {
+            userId,
+            tier: devOverrideTier,
+            scoped: !appliesToAll,
+          });
+          return devOverrideTier;
+        }
+      }
+
       // In a full implementation this would query Appwrite for the user's subscription.
       // For now we return FREE as the default tier.
       logger.info("Getting current tier for user", { userId });

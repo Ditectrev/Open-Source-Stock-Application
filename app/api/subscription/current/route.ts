@@ -7,12 +7,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { subscriptionService } from "@/services/subscription.service";
 import { logger } from "@/lib/logger";
+import { getAuthenticatedUser } from "@/lib/server-auth";
 
 export async function GET(request: NextRequest) {
   try {
-    const userId = request.headers.get("x-user-id");
-
-    if (!userId) {
+    const auth = await getAuthenticatedUser(request);
+    if (!auth) {
       return NextResponse.json(
         {
           success: false,
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const tier = await subscriptionService.getCurrentTier(userId);
+    const tier = await subscriptionService.getCurrentTier(auth.id);
 
     return NextResponse.json({
       success: true,

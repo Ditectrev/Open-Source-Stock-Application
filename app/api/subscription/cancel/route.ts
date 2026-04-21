@@ -7,12 +7,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { subscriptionService } from "@/services/subscription.service";
 import { logger } from "@/lib/logger";
+import { getAuthenticatedUser } from "@/lib/server-auth";
 
 export async function DELETE(request: NextRequest) {
   try {
-    const userId = request.headers.get("x-user-id");
-
-    if (!userId) {
+    const auth = await getAuthenticatedUser(request);
+    if (!auth) {
       return NextResponse.json(
         {
           success: false,
@@ -23,7 +23,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const result = await subscriptionService.cancelSubscription(userId);
+    const result = await subscriptionService.cancelSubscription(auth.id);
 
     if (!result.success) {
       return NextResponse.json(
