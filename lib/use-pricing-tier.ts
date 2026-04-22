@@ -8,21 +8,56 @@
 import { useState, useEffect } from "react";
 import { PricingTier } from "@/types";
 
-const STORAGE_KEY = "pricing_tier";
-
 export function usePricingTier(): PricingTier {
   const [tier, setTier] = useState<PricingTier>("FREE");
 
   useEffect(() => {
-    // In a full implementation this would read from the authenticated user's
-    // session / Appwrite profile. For now we read from localStorage so that
-    // the PricingPage can persist a selection for demo purposes.
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY) as PricingTier | null;
-      if (stored) setTier(stored);
-    } catch {
-      // localStorage unavailable — default to FREE
+    const loadTier = async () => {
+      try {
+        const response = await fetch("/api/subscription/current", {
+          method: "GET",
+          credentials: "include",
+          cache: "no-store",
+        });
+        if (!response.ok) {
+          setTier("FREE");
+          return;
+        }
+        const data = (await response.json()) as {
+          data?: { tier?: PricingTier };
+        };
+        setTier(data.data?.tier ?? "FREE");
+      } catch {
+        setTier("FREE");
+      }
+    };
+
+    void loadTier();
+    const onAuthChanged = () => void loadTier();
+    const onFocus = () => void loadTier();
+    const onVisibility = () => {
+      if (
+        typeof document !== "undefined" &&
+        document.visibilityState === "visible"
+      ) {
+        void loadTier();
+      }
+    };
+    const intervalId = window.setInterval(() => void loadTier(), 15000);
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("auth-state-changed", onAuthChanged);
+      window.addEventListener("focus", onFocus);
+      document.addEventListener("visibilitychange", onVisibility);
     }
+    return () => {
+      window.clearInterval(intervalId);
+      if (typeof window !== "undefined") {
+        window.removeEventListener("auth-state-changed", onAuthChanged);
+        window.removeEventListener("focus", onFocus);
+        document.removeEventListener("visibilitychange", onVisibility);
+      }
+    };
   }, []);
 
   return tier;

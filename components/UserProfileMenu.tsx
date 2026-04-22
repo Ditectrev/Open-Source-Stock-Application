@@ -106,7 +106,6 @@ export function UserProfileMenu() {
       const tierRes = await fetch("/api/subscription/current", {
         method: "GET",
         credentials: "include",
-        headers: { "x-user-id": authData.user.id },
       });
       if (tierRes.ok) {
         const tierData = (await tierRes.json()) as {
@@ -137,6 +136,14 @@ export function UserProfileMenu() {
         window.removeEventListener("auth-state-changed", onAuthChanged);
       }
     };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const onOpenProfile = () => setOpen(true);
+    window.addEventListener("open-user-profile-menu", onOpenProfile);
+    return () =>
+      window.removeEventListener("open-user-profile-menu", onOpenProfile);
   }, []);
 
   useEffect(() => {
@@ -208,7 +215,6 @@ export function UserProfileMenu() {
       const res = await fetch("/api/subscription/cancel", {
         method: "DELETE",
         credentials: "include",
-        headers: { "x-user-id": user.id },
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {

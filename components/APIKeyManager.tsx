@@ -81,9 +81,10 @@ export default function APIKeyManager({
 
   // Load stored key metadata on mount
   useEffect(() => {
-    PROVIDERS.forEach((p) => {
-      const info = apiKeyManagerService.getStoredKeyInfo(p.id);
-      if (info) {
+    const load = async () => {
+      for (const p of PROVIDERS) {
+        const info = await apiKeyManagerService.getStoredKeyInfo(p.id);
+        if (!info) continue;
         setRows((prev) => ({
           ...prev,
           [p.id]: {
@@ -94,7 +95,8 @@ export default function APIKeyManager({
           },
         }));
       }
-    });
+    };
+    void load();
   }, []);
 
   const updateRow = useCallback(
@@ -133,8 +135,8 @@ export default function APIKeyManager({
     }
   };
 
-  const handleRemove = (provider: BYOKProvider) => {
-    apiKeyManagerService.removeKey(provider);
+  const handleRemove = async (provider: BYOKProvider) => {
+    await apiKeyManagerService.removeKey(provider);
     updateRow(provider, {
       isStored: false,
       inputValue: "",
@@ -161,8 +163,8 @@ export default function APIKeyManager({
           AI Provider API Keys
         </h3>
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          Keys are encrypted and stored locally on your device. They are never
-          sent to our servers.
+          Keys are encrypted and stored in your Appwrite account scope for
+          server-side BYOK usage.
         </p>
       </div>
 

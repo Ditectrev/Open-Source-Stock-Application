@@ -1,6 +1,6 @@
 {
   "name": "stock-exchange-app",
-  "version": "0.52.0",
+  "version": "0.53.0",
   "private": true,
   "scripts": {
     "dev": "bun --bun next dev",
@@ -14,6 +14,7 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:market-data": "bun run scripts/test-market-data.ts",
+    "setup:appwrite:ai-keys": "bun run scripts/setup-ai-keys-appwrite.ts",
     "analyze": "ANALYZE=true bun run build",
     "lighthouse": "lhci autorun"
   },
