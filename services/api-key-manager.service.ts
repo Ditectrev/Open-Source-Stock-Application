@@ -39,8 +39,12 @@ export class APIKeyManagerService {
     return Buffer.from(bytes).toString("base64");
   }
 
-  private base64Decode(value: string): Uint8Array {
-    return Uint8Array.from(Buffer.from(value, "base64"));
+  private base64DecodeToArrayBuffer(value: string): ArrayBuffer {
+    const bytes = Uint8Array.from(Buffer.from(value, "base64"));
+    return bytes.buffer.slice(
+      bytes.byteOffset,
+      bytes.byteOffset + bytes.byteLength
+    ) as ArrayBuffer;
   }
 
   private async deriveEncryptionKey(
@@ -94,10 +98,12 @@ export class APIKeyManagerService {
     provider: BYOKProvider = "OPENAI"
   ): Promise<string> {
     const key = await this.deriveEncryptionKey(provider);
+    const ivBuffer = this.base64DecodeToArrayBuffer(iv);
+    const encryptedBuffer = this.base64DecodeToArrayBuffer(encryptedKey);
     const decrypted = await crypto.subtle.decrypt(
-      { name: "AES-GCM", iv: this.base64Decode(iv) },
+      { name: "AES-GCM", iv: ivBuffer },
       key,
-      this.base64Decode(encryptedKey)
+      encryptedBuffer
     );
 
     return new TextDecoder().decode(decrypted);
