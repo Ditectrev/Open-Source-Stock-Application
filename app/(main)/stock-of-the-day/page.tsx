@@ -7,13 +7,14 @@ import type { StockOfTheDay } from "@/types";
 
 export default function StockOfTheDayPage() {
   const pricingTier = usePricingTier();
-  const [serverBYOKAccess, setServerBYOKAccess] = useState<boolean | null>(null);
+  const [serverBYOKAccess, setServerBYOKAccess] = useState<boolean | null>(
+    null
+  );
   const hasTierAccess =
     pricingTier === "LOCAL" ||
     pricingTier === "BYOK" ||
     pricingTier === "HOSTED_AI";
-  const hasAIAccess =
-    hasTierAccess || serverBYOKAccess === true;
+  const hasAIAccess = hasTierAccess || serverBYOKAccess === true;
 
   const [item, setItem] = useState<StockOfTheDay | null>(null);
   const [loading, setLoading] = useState(false);

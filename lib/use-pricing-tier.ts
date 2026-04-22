@@ -36,7 +36,10 @@ export function usePricingTier(): PricingTier {
     const onAuthChanged = () => void loadTier();
     const onFocus = () => void loadTier();
     const onVisibility = () => {
-      if (typeof document !== "undefined" && document.visibilityState === "visible") {
+      if (
+        typeof document !== "undefined" &&
+        document.visibilityState === "visible"
+      ) {
         void loadTier();
       }
     };

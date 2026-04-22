@@ -91,7 +91,10 @@ export async function GET(
       llmConfig = { provider, apiKey, model };
     }
 
-    const data = await aiMarketInsightsService.generatePrediction(symbol, llmConfig);
+    const data = await aiMarketInsightsService.generatePrediction(
+      symbol,
+      llmConfig
+    );
 
     return NextResponse.json({
       success: true,

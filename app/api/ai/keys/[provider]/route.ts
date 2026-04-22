@@ -15,7 +15,11 @@ export async function DELETE(
   const auth = await getAuthenticatedUser(request);
   if (!auth) {
     return NextResponse.json(
-      { success: false, error: "Authentication required", timestamp: new Date() },
+      {
+        success: false,
+        error: "Authentication required",
+        timestamp: new Date(),
+      },
       { status: 401 }
     );
   }

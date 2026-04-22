@@ -71,13 +71,13 @@ Open [http://localhost:3000](http://localhost:3000) to view the application.
 
 ### Required
 
-| Variable                               | Description                             |
-| -------------------------------------- | --------------------------------------- |
-| `NEXT_PUBLIC_APPWRITE_ENDPOINT`        | Appwrite API endpoint                   |
-| `NEXT_PUBLIC_APPWRITE_PROJECT_ID`      | Appwrite project ID                     |
-| `APPWRITE_API_KEY`                     | Appwrite server-side API key            |
-| `APPWRITE_DATABASE_ID`                 | Appwrite DB for app data                |
-| `APPWRITE_COLLECTION_ID_AI_KEYS`       | Appwrite collection for keys            |
+| Variable                          | Description                  |
+| --------------------------------- | ---------------------------- |
+| `NEXT_PUBLIC_APPWRITE_ENDPOINT`   | Appwrite API endpoint        |
+| `NEXT_PUBLIC_APPWRITE_PROJECT_ID` | Appwrite project ID          |
+| `APPWRITE_API_KEY`                | Appwrite server-side API key |
+| `APPWRITE_DATABASE_ID`            | Appwrite DB for app data     |
+| `APPWRITE_COLLECTION_ID_AI_KEYS`  | Appwrite collection for keys |
 
 Also required for trial features: `APPWRITE_COLLECTION_ID_TRIAL_SESSIONS`.
 

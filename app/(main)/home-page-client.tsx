@@ -193,15 +193,16 @@ export function HomePageClient() {
   const [serverTier, setServerTier] = useState<
     "FREE" | "ADS_FREE" | "LOCAL" | "BYOK" | "HOSTED_AI" | null
   >(null);
-  const [serverBYOKAccess, setServerBYOKAccess] = useState<boolean | null>(null);
+  const [serverBYOKAccess, setServerBYOKAccess] = useState<boolean | null>(
+    null
+  );
   const symbolFromUrl = searchParams.get("symbol");
   const effectiveTier = serverTier ?? pricingTier;
   const hasTierAccess =
     effectiveTier === "LOCAL" ||
     effectiveTier === "BYOK" ||
     effectiveTier === "HOSTED_AI";
-  const hasAIAccess =
-    hasTierAccess || serverBYOKAccess === true;
+  const hasAIAccess = hasTierAccess || serverBYOKAccess === true;
 
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>("overview");
@@ -409,7 +410,9 @@ export function HomePageClient() {
       } catch (error) {
         setAIPrediction(null);
         setAIPredictionError(
-          error instanceof Error ? error.message : "Failed to fetch AI prediction"
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch AI prediction"
         );
       } finally {
         setAIPredictionLoading(false);
@@ -446,7 +449,9 @@ export function HomePageClient() {
       } catch (error) {
         setStockOfTheDay(null);
         setStockOfTheDayError(
-          error instanceof Error ? error.message : "Failed to fetch stock of the day"
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch stock of the day"
         );
       } finally {
         setStockOfTheDayLoading(false);

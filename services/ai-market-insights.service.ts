@@ -263,17 +263,17 @@ export class AIMarketInsightsService {
 
     const enhanced = await this.maybeEnhancePrediction(
       {
-      symbol,
-      assetType,
-      recommendation,
-      confidence,
-      quote,
-      indicators,
-      forecast,
-      fearGreed,
-      strongestRegion,
-      weakestRegion,
-      targetUpside,
+        symbol,
+        assetType,
+        recommendation,
+        confidence,
+        quote,
+        indicators,
+        forecast,
+        fearGreed,
+        strongestRegion,
+        weakestRegion,
+        targetUpside,
       },
       llmConfig
     );
@@ -350,20 +350,22 @@ export class AIMarketInsightsService {
       : heuristic;
   }
 
-  private async maybeEnhancePrediction(args: {
-    symbol: string;
-    assetType: AssetType;
-    recommendation: Recommendation;
-    confidence: number;
-    quote: { price: number; changePercent: number };
-    indicators: TechnicalIndicators;
-    forecast: ForecastData;
-    fearGreed: FearGreedData;
-    strongestRegion?: MarketIndex;
-    weakestRegion?: MarketIndex;
-    targetUpside: number;
-  },
-  llmConfig?: LLMConfig): Promise<PredictionEnhancement | null> {
+  private async maybeEnhancePrediction(
+    args: {
+      symbol: string;
+      assetType: AssetType;
+      recommendation: Recommendation;
+      confidence: number;
+      quote: { price: number; changePercent: number };
+      indicators: TechnicalIndicators;
+      forecast: ForecastData;
+      fearGreed: FearGreedData;
+      strongestRegion?: MarketIndex;
+      weakestRegion?: MarketIndex;
+      targetUpside: number;
+    },
+    llmConfig?: LLMConfig
+  ): Promise<PredictionEnhancement | null> {
     const llm = llmConfig ?? getLLMConfigFromEnv();
     if (!llm) return null;
 
@@ -483,16 +485,18 @@ targetUpsidePercent: ${(args.targetUpside * 100).toFixed(1)}
     }
   }
 
-  private async maybeEnhanceStockOfTheDay(args: {
-    symbol: string;
-    name: string;
-    assetType: StockOfTheDay["assetType"];
-    recommendation: Recommendation;
-    confidence: number;
-    score: number;
-    recommendationStance: "bullish" | "bearish" | "neutral";
-  },
-  llmConfig?: LLMConfig): Promise<StockEnhancement | null> {
+  private async maybeEnhanceStockOfTheDay(
+    args: {
+      symbol: string;
+      name: string;
+      assetType: StockOfTheDay["assetType"];
+      recommendation: Recommendation;
+      confidence: number;
+      score: number;
+      recommendationStance: "bullish" | "bearish" | "neutral";
+    },
+    llmConfig?: LLMConfig
+  ): Promise<StockEnhancement | null> {
     const llm = llmConfig ?? getLLMConfigFromEnv();
     if (!llm) return null;
 

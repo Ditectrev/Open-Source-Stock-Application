@@ -14,12 +14,13 @@ interface AIPredictionPanelProps {
 function RecommendationBadge({
   recommendation,
 }: {
-  recommendation: AIPredictionReport["recommendation"];
+  recommendation?: AIPredictionReport["recommendation"];
 }) {
+  const recommendationValue = recommendation ?? "hold";
   const styles =
-    recommendation === "buy"
+    recommendationValue === "buy"
       ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
-      : recommendation === "sell"
+      : recommendationValue === "sell"
         ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
         : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300";
 
@@ -27,7 +28,7 @@ function RecommendationBadge({
     <span
       className={`px-2.5 py-1 rounded-full text-xs font-semibold ${styles}`}
     >
-      {recommendation.toUpperCase()}
+      {recommendationValue.toUpperCase()}
     </span>
   );
 }
@@ -38,6 +39,10 @@ export function AIPredictionPanel({
   locked,
   error,
 }: AIPredictionPanelProps) {
+  const politicalFactors = prediction?.politicalFactors ?? [];
+  const financialTrendFactors = prediction?.financialTrendFactors ?? [];
+  const geopoliticalFactors = prediction?.geopoliticalFactors ?? [];
+
   return (
     <section className="mt-6">
       <div className="p-4 sm:p-6 rounded-lg shadow-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 relative overflow-hidden">
@@ -77,7 +82,7 @@ export function AIPredictionPanel({
                   Political Context
                 </h3>
                 <ul className="space-y-1 text-gray-600 dark:text-gray-300">
-                  {prediction.politicalFactors.map((item) => (
+                  {politicalFactors.map((item) => (
                     <li key={item}>- {item}</li>
                   ))}
                 </ul>
@@ -88,7 +93,7 @@ export function AIPredictionPanel({
                   Financial Trends
                 </h3>
                 <ul className="space-y-1 text-gray-600 dark:text-gray-300">
-                  {prediction.financialTrendFactors.map((item) => (
+                  {financialTrendFactors.map((item) => (
                     <li key={item}>- {item}</li>
                   ))}
                 </ul>
@@ -99,7 +104,7 @@ export function AIPredictionPanel({
                   Geopolitical Signals
                 </h3>
                 <ul className="space-y-1 text-gray-600 dark:text-gray-300">
-                  {prediction.geopoliticalFactors.map((item) => (
+                  {geopoliticalFactors.map((item) => (
                     <li key={item}>- {item}</li>
                   ))}
                 </ul>
@@ -126,7 +131,9 @@ export function AIPredictionPanel({
                     type="button"
                     onClick={() => {
                       if (typeof window !== "undefined") {
-                        window.dispatchEvent(new Event("open-user-profile-menu"));
+                        window.dispatchEvent(
+                          new Event("open-user-profile-menu")
+                        );
                       }
                     }}
                     className="inline-flex items-center rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700"

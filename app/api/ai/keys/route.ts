@@ -8,15 +8,18 @@ function isBYOKProvider(value: string): value is BYOKProvider {
   return ["OPENAI", "GEMINI", "MISTRAL", "DEEPSEEK"].includes(value);
 }
 
-async function getAuthorizedBYOKUser(request: NextRequest): Promise<
-  | { userId: string }
-  | { response: NextResponse }
-> {
+async function getAuthorizedBYOKUser(
+  request: NextRequest
+): Promise<{ userId: string } | { response: NextResponse }> {
   const auth = await getAuthenticatedUser(request);
   if (!auth) {
     return {
       response: NextResponse.json(
-        { success: false, error: "Authentication required", timestamp: new Date() },
+        {
+          success: false,
+          error: "Authentication required",
+          timestamp: new Date(),
+        },
         { status: 401 }
       ),
     };

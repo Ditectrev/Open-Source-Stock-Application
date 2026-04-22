@@ -21,39 +21,108 @@ export interface APIKeyValidationResult {
   error?: string;
 }
 
+interface EncryptedPayload {
+  encryptedKey: string;
+  iv: string;
+}
+
 export class APIKeyManagerService {
+  private getStorageKey(provider: BYOKProvider): string {
+    return `byok_key_${provider}`;
+  }
+
+  private getPassphrase(provider: BYOKProvider): string {
+    return `stock-app-byok-${provider}`;
+  }
+
+  private base64Encode(bytes: Uint8Array): string {
+    return Buffer.from(bytes).toString("base64");
+  }
+
+  private base64Decode(value: string): Uint8Array {
+    return Uint8Array.from(Buffer.from(value, "base64"));
+  }
+
+  private async deriveEncryptionKey(
+    provider: BYOKProvider
+  ): Promise<CryptoKey> {
+    const subtle = crypto.subtle;
+    const encoder = new TextEncoder();
+    const keyMaterial = await subtle.importKey(
+      "raw",
+      encoder.encode(this.getPassphrase(provider)),
+      "PBKDF2",
+      false,
+      ["deriveKey"]
+    );
+
+    return subtle.deriveKey(
+      {
+        name: "PBKDF2",
+        salt: encoder.encode(`byok-salt-${provider}`),
+        iterations: 100_000,
+        hash: "SHA-256",
+      },
+      keyMaterial,
+      { name: "AES-GCM", length: 256 },
+      false,
+      ["encrypt", "decrypt"]
+    );
+  }
+
+  async encrypt(
+    apiKey: string,
+    provider: BYOKProvider = "OPENAI"
+  ): Promise<EncryptedPayload> {
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const key = await this.deriveEncryptionKey(provider);
+    const encrypted = await crypto.subtle.encrypt(
+      { name: "AES-GCM", iv },
+      key,
+      new TextEncoder().encode(apiKey)
+    );
+
+    return {
+      encryptedKey: this.base64Encode(new Uint8Array(encrypted)),
+      iv: this.base64Encode(iv),
+    };
+  }
+
+  async decrypt(
+    encryptedKey: string,
+    iv: string,
+    provider: BYOKProvider = "OPENAI"
+  ): Promise<string> {
+    const key = await this.deriveEncryptionKey(provider);
+    const decrypted = await crypto.subtle.decrypt(
+      { name: "AES-GCM", iv: this.base64Decode(iv) },
+      key,
+      this.base64Decode(encryptedKey)
+    );
+
+    return new TextDecoder().decode(decrypted);
+  }
+
+  async storeKey(provider: BYOKProvider, apiKey: string): Promise<void> {
+    const payload = await this.encrypt(apiKey, provider);
+    localStorage.setItem(this.getStorageKey(provider), JSON.stringify(payload));
+  }
+
   async validateAndStore(
     provider: BYOKProvider,
     apiKey: string
   ): Promise<APIKeyValidationResult> {
-    try {
-      const response = await fetch("/api/ai/keys", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider, apiKey }),
-      });
-      const data = (await response.json().catch(() => ({}))) as {
-        success?: boolean;
-        error?: string;
-      };
-      if (!response.ok || !data.success) {
-        return { valid: false, error: data.error ?? "Failed to store API key" };
-      }
-      return { valid: true };
-    } catch (error) {
-      return {
-        valid: false,
-        error: error instanceof Error ? error.message : "Failed to store API key",
-      };
+    const validationResult = await this.validateKey(provider, apiKey);
+    if (!validationResult.valid) {
+      return validationResult;
     }
+
+    await this.storeKey(provider, apiKey);
+    return { valid: true };
   }
 
   async removeKey(provider: BYOKProvider): Promise<void> {
-    await fetch(`/api/ai/keys/${provider}`, {
-      method: "DELETE",
-      credentials: "include",
-    });
+    localStorage.removeItem(this.getStorageKey(provider));
   }
 
   async getStoredKeyInfo(provider: BYOKProvider): Promise<StoredAPIKey | null> {
@@ -68,30 +137,78 @@ export class APIKeyManagerService {
     });
     if (!response.ok) return [];
     const data = (await response.json().catch(() => ({}))) as {
-      data?: Array<{ provider: BYOKProvider; addedAt: string; lastValidated?: string }>;
+      data?: Array<{
+        provider: BYOKProvider;
+        addedAt: string;
+        lastValidated?: string;
+      }>;
     };
     const rows = data.data ?? [];
     return rows.map((row) => ({
       provider: row.provider,
       addedAt: new Date(row.addedAt),
-      lastValidated: row.lastValidated ? new Date(row.lastValidated) : undefined,
+      lastValidated: row.lastValidated
+        ? new Date(row.lastValidated)
+        : undefined,
     }));
   }
 
-  async getKey(_provider: BYOKProvider): Promise<string | null> {
-    // BYOK keys are now server-managed and never returned to the browser.
-    return null;
+  async getKey(provider: BYOKProvider): Promise<string | null> {
+    const raw = localStorage.getItem(this.getStorageKey(provider));
+    if (!raw) return null;
+
+    try {
+      const parsed = JSON.parse(raw) as EncryptedPayload;
+      if (!parsed.encryptedKey || !parsed.iv) return null;
+      return await this.decrypt(parsed.encryptedKey, parsed.iv, provider);
+    } catch {
+      return null;
+    }
   }
 
   async validateKey(
     provider: BYOKProvider,
     apiKey: string
   ): Promise<APIKeyValidationResult> {
-    return this.validateAndStore(provider, apiKey);
+    try {
+      const response = await fetch("/api/ai/keys/validate", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ provider, apiKey }),
+      });
+
+      if (response.status === 200 || response.status === 429) {
+        return { valid: true };
+      }
+
+      if (response.status === 401 || response.status === 403) {
+        return {
+          valid: false,
+          error: "API key rejected by provider. Please verify and try again.",
+        };
+      }
+
+      return {
+        valid: false,
+        error: "Unable to validate API key with provider.",
+      };
+    } catch (error) {
+      return {
+        valid: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : "Network error while validating API key.",
+      };
+    }
   }
 
   getStoredProviders(): BYOKProvider[] {
-    return [];
+    const all: BYOKProvider[] = ["OPENAI", "GEMINI", "MISTRAL", "DEEPSEEK"];
+    return all.filter((provider) =>
+      localStorage.getItem(this.getStorageKey(provider))
+    );
   }
 }
 

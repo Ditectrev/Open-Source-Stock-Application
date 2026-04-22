@@ -1,9 +1,17 @@
-import { createHash, randomBytes, createCipheriv, createDecipheriv } from "node:crypto";
+import {
+  createHash,
+  randomBytes,
+  createCipheriv,
+  createDecipheriv,
+} from "node:crypto";
 import { ID, Query } from "node-appwrite";
 import { createServerClient } from "@/lib/appwrite";
 import { assertAppwriteAIEnv } from "@/lib/appwrite-ai-env";
 import { getAppwriteServerEnv } from "@/lib/appwrite-server-env";
-import type { BYOKProvider, APIKeyValidationResult } from "@/services/api-key-manager.service";
+import type {
+  BYOKProvider,
+  APIKeyValidationResult,
+} from "@/services/api-key-manager.service";
 
 type AIKeyDocument = {
   $id: string;
@@ -72,11 +80,15 @@ export class AppwriteAIKeyStoreService {
   ): Promise<AIKeyDocument | null> {
     const { databaseId, keysCollectionId } = assertAppwriteAIEnv();
     const { databases } = createServerClient();
-    const result = (await databases.listDocuments(databaseId, keysCollectionId, [
-      Query.equal("userId", userId),
-      Query.equal("provider", provider),
-      Query.limit(1),
-    ])) as unknown as { documents: AIKeyDocument[] };
+    const result = (await databases.listDocuments(
+      databaseId,
+      keysCollectionId,
+      [
+        Query.equal("userId", userId),
+        Query.equal("provider", provider),
+        Query.limit(1),
+      ]
+    )) as unknown as { documents: AIKeyDocument[] };
     return result.documents[0] ?? null;
   }
 
@@ -89,10 +101,11 @@ export class AppwriteAIKeyStoreService {
   > {
     const { databaseId, keysCollectionId } = assertAppwriteAIEnv();
     const { databases } = createServerClient();
-    const result = (await databases.listDocuments(databaseId, keysCollectionId, [
-      Query.equal("userId", userId),
-      Query.limit(100),
-    ])) as unknown as { documents: AIKeyDocument[] };
+    const result = (await databases.listDocuments(
+      databaseId,
+      keysCollectionId,
+      [Query.equal("userId", userId), Query.limit(100)]
+    )) as unknown as { documents: AIKeyDocument[] };
 
     return result.documents.map((doc) => ({
       provider: doc.provider,
