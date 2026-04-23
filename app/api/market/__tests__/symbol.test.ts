@@ -468,7 +468,7 @@ describe("Rate Limiting", () => {
     vi.clearAllMocks();
   });
 
-  it("should propagate rate limit error from service as 500", async () => {
+  it("should propagate rate limit error from service as 502", async () => {
     (marketDataService.getSymbolData as any).mockRejectedValue(
       new Error("Rate limit exceeded and no cached data available")
     );
@@ -478,10 +478,9 @@ describe("Rate Limiting", () => {
     const response = await GET(req, makeParams("AAPL"));
     const data = await response.json();
 
-    // Symbol route falls back to mock data on error, so it still returns success
-    // This is the route's resilience behavior
-    expect(data.success).toBe(true);
-    expect(data.isMockData).toBe(true);
+    expect(response.status).toBe(502);
+    expect(data.success).toBe(false);
+    expect(data.error).toContain("Rate limit exceeded");
   });
 
   it("should return 500 with rate limit error for fear-greed route", async () => {
@@ -711,8 +710,8 @@ describe("Error Responses", () => {
     });
   });
 
-  describe("Symbol route mock data fallback", () => {
-    it("should fall back to mock data when symbol API fails", async () => {
+  describe("Symbol route live data errors", () => {
+    it("should return a 502 when symbol API fails", async () => {
       (marketDataService.getSymbolData as any).mockRejectedValue(
         new Error("API unavailable")
       );
@@ -722,14 +721,12 @@ describe("Error Responses", () => {
       const response = await GET(req, makeParams("AAPL"));
       const data = await response.json();
 
-      // Symbol route has mock data fallback
-      expect(response.status).toBe(200);
-      expect(data.success).toBe(true);
-      expect(data.isMockData).toBe(true);
-      expect(data.data.symbol).toBe("AAPL");
+      expect(response.status).toBe(502);
+      expect(data.success).toBe(false);
+      expect(data.error).toContain("API unavailable");
     });
 
-    it("should fall back to mock data when historical API fails", async () => {
+    it("should return a 502 when historical API fails", async () => {
       (marketDataService.getHistoricalPrices as any).mockRejectedValue(
         new Error("API unavailable")
       );
@@ -742,10 +739,9 @@ describe("Error Responses", () => {
       const response = await GET(req, makeParams("AAPL"));
       const data = await response.json();
 
-      expect(response.status).toBe(200);
-      expect(data.success).toBe(true);
-      expect(data.isMockData).toBe(true);
-      expect(Array.isArray(data.data)).toBe(true);
+      expect(response.status).toBe(502);
+      expect(data.success).toBe(false);
+      expect(data.error).toContain("API unavailable");
     });
   });
 

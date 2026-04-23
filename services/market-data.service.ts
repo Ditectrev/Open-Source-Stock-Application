@@ -8,6 +8,7 @@ import { env } from "@/lib/env";
 import { cacheService } from "@/lib/cache";
 import { rateLimiter } from "@/lib/rate-limiter";
 import { yahooFinanceService } from "./yahoo-finance.service";
+import { finnhubService } from "./finnhub.service";
 import { cnnApiService } from "./cnn-api.service";
 import { tradingEconomicsService } from "./trading-economics.service";
 import {
@@ -95,8 +96,26 @@ export class MarketDataService {
       throw new Error("Rate limit exceeded and no cached data available");
     }
 
-    // Fetch from API
-    const data = await yahooFinanceService.searchSymbols(normalizedQuery);
+    // Fetch from API (Finnhub primary, Yahoo fallback)
+    let data: Array<{
+      symbol: string;
+      name: string;
+      type: string;
+      exchange: string;
+    }>;
+    if (finnhubService.isConfigured()) {
+      try {
+        data = await finnhubService.searchSymbols(normalizedQuery);
+      } catch (error) {
+        logger.warn("Finnhub search failed, falling back to Yahoo", {
+          query: normalizedQuery,
+          error: (error as Error).message,
+        });
+        data = await yahooFinanceService.searchSymbols(normalizedQuery);
+      }
+    } else {
+      data = await yahooFinanceService.searchSymbols(normalizedQuery);
+    }
     rateLimiter.recordCall(endpoint);
 
     // Cache the result (shorter TTL for search results)
@@ -132,8 +151,21 @@ export class MarketDataService {
       throw new Error("Rate limit exceeded and no cached data available");
     }
 
-    // Fetch from API
-    const data = await yahooFinanceService.getSymbolQuote(symbol);
+    // Fetch from API (Finnhub primary, Yahoo fallback)
+    let data: SymbolData;
+    if (finnhubService.isConfigured()) {
+      try {
+        data = await finnhubService.getSymbolQuote(symbol);
+      } catch (error) {
+        logger.warn("Finnhub quote failed, falling back to Yahoo", {
+          symbol,
+          error: (error as Error).message,
+        });
+        data = await yahooFinanceService.getSymbolQuote(symbol);
+      }
+    } else {
+      data = await yahooFinanceService.getSymbolQuote(symbol);
+    }
     rateLimiter.recordCall(endpoint);
 
     // Cache the result
@@ -172,8 +204,22 @@ export class MarketDataService {
       throw new Error("Rate limit exceeded and no cached data available");
     }
 
-    // Fetch from API
-    const data = await yahooFinanceService.getHistoricalData(symbol, range);
+    // Fetch from API (Finnhub primary, Yahoo fallback)
+    let data: PriceData[];
+    if (finnhubService.isConfigured()) {
+      try {
+        data = await finnhubService.getHistoricalData(symbol, range);
+      } catch (error) {
+        logger.warn("Finnhub historical fetch failed, falling back to Yahoo", {
+          symbol,
+          range,
+          error: (error as Error).message,
+        });
+        data = await yahooFinanceService.getHistoricalData(symbol, range);
+      }
+    } else {
+      data = await yahooFinanceService.getHistoricalData(symbol, range);
+    }
     rateLimiter.recordCall(endpoint);
 
     // Cache the result

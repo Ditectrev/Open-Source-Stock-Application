@@ -85,6 +85,8 @@ Also required for trial features: `APPWRITE_COLLECTION_ID_TRIAL_SESSIONS`.
 
 | Variable                             | Description                                                                     | Default                            |
 | ------------------------------------ | ------------------------------------------------------------------------------- | ---------------------------------- |
+| `FINNHUB_API_KEY`                    | Finnhub API key used for higher-quality live quotes/search/candles              | unset                              |
+| `FINNHUB_BASE_URL`                   | Finnhub API base URL                                                            | `https://finnhub.io/api/v1`        |
 | `YAHOO_FINANCE_API_URL`              | Yahoo Finance API base URL                                                      | `https://query1.finance.yahoo.com` |
 | `CACHE_TTL_SECONDS`                  | Cache TTL in seconds                                                            | `300`                              |
 | `RATE_LIMIT_MAX_REQUESTS`            | Max API requests per window                                                     | `100`                              |
