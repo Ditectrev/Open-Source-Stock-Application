@@ -338,7 +338,8 @@ export class YahooFinanceService {
           symbol: idx.symbol,
           value: price.regularMarketPrice?.raw || 0,
           change: price.regularMarketChange?.raw || 0,
-          changePercent: price.regularMarketChangePercent?.raw || 0,
+          // Yahoo quoteSummary returns this as a decimal (e.g. 0.0144 for 1.44%)
+          changePercent: (price.regularMarketChangePercent?.raw || 0) * 100,
           region: idx.region,
         };
       } catch (error) {
