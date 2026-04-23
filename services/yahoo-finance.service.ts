@@ -338,7 +338,8 @@ export class YahooFinanceService {
           symbol: idx.symbol,
           value: price.regularMarketPrice?.raw || 0,
           change: price.regularMarketChange?.raw || 0,
-          changePercent: price.regularMarketChangePercent?.raw || 0,
+          // Yahoo quoteSummary returns this as a decimal (e.g. 0.0144 for 1.44%)
+          changePercent: (price.regularMarketChangePercent?.raw || 0) * 100,
           region: idx.region,
         };
       } catch (error) {
@@ -884,10 +885,7 @@ export class YahooFinanceService {
           // IPO endpoint may not be available; fall through to fallback
         }
 
-        // Fallback: return curated mock data for known upcoming IPOs
-        if (ipoEvents.length === 0) {
-          ipoEvents = this.getFallbackIPOData(rangeStart, rangeEnd);
-        }
+        // No mock fallback: return empty list when upstream IPO data is unavailable.
 
         ipoEvents.sort(
           (a, b) =>
@@ -944,73 +942,6 @@ export class YahooFinanceService {
     }
 
     return events;
-  }
-
-  /**
-   * Fallback IPO data when the Yahoo Finance IPO endpoint is unavailable.
-   * Returns an empty array — the API route will handle this gracefully.
-   */
-  private getFallbackIPOData(rangeStart: Date, rangeEnd: Date): IPOEvent[] {
-    const now = new Date();
-    const day = 24 * 60 * 60 * 1000;
-
-    const fallbackIPOs: IPOEvent[] = [
-      {
-        id: "ipo-klarna-2026",
-        companyName: "Klarna Group plc",
-        symbol: "KLAR",
-        expectedDate: new Date(now.getTime() + 5 * day),
-        priceRangeLow: 60.0,
-        priceRangeHigh: 72.0,
-        sharesOffered: 40_000_000,
-        exchange: "NYSE",
-      },
-      {
-        id: "ipo-stubhub-2026",
-        companyName: "StubHub Holdings",
-        symbol: "STUB",
-        expectedDate: new Date(now.getTime() + 10 * day),
-        priceRangeLow: 28.0,
-        priceRangeHigh: 33.0,
-        sharesOffered: 25_000_000,
-        exchange: "NASDAQ",
-      },
-      {
-        id: "ipo-cerebras-2026",
-        companyName: "Cerebras Systems",
-        symbol: "CBRS",
-        expectedDate: new Date(now.getTime() + 14 * day),
-        priceRangeLow: 34.0,
-        priceRangeHigh: 40.0,
-        sharesOffered: 20_000_000,
-        exchange: "NASDAQ",
-      },
-      {
-        id: "ipo-medline-2026",
-        companyName: "Medline Industries",
-        symbol: "MDLN",
-        expectedDate: new Date(now.getTime() + 21 * day),
-        priceRangeLow: 42.0,
-        priceRangeHigh: 48.0,
-        sharesOffered: 35_000_000,
-        exchange: "NYSE",
-      },
-      {
-        id: "ipo-chime-2026",
-        companyName: "Chime Financial",
-        symbol: "CHME",
-        expectedDate: new Date(now.getTime() + 30 * day),
-        priceRangeLow: 22.0,
-        priceRangeHigh: 26.0,
-        sharesOffered: 30_000_000,
-        exchange: "NYSE",
-      },
-    ];
-
-    return fallbackIPOs.filter((ipo) => {
-      const d = new Date(ipo.expectedDate);
-      return d >= rangeStart && d <= rangeEnd;
-    });
   }
 
   /**
