@@ -172,6 +172,9 @@ jobs:
           ENV_TYPE=${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
           vercel env add NEXT_PUBLIC_APPWRITE_ENDPOINT $ENV_TYPE "" --value "${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
           vercel env add NEXT_PUBLIC_APPWRITE_PROJECT_ID $ENV_TYPE "" --value "${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
+          if [ -n "${{ vars.NEXT_PUBLIC_GTM_ID }}" ]; then
+            vercel env add NEXT_PUBLIC_GTM_ID $ENV_TYPE "" --value "${{ vars.NEXT_PUBLIC_GTM_ID }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
+          fi
           vercel env add APPWRITE_API_KEY $ENV_TYPE "" --value "${{ secrets.APPWRITE_API_KEY }}" --yes --force --sensitive --token=${{ secrets.VERCEL_TOKEN }}
           vercel env add APPWRITE_DATABASE_ID $ENV_TYPE "" --value "${{ secrets.APPWRITE_DATABASE_ID }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
           vercel env add APPWRITE_COLLECTION_ID_AI_KEYS $ENV_TYPE "" --value "${{ secrets.APPWRITE_COLLECTION_ID_AI_KEYS }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
@@ -190,6 +193,7 @@ jobs:
       - name: Build Project Artifacts
         run: vercel build ${{ github.ref == 'refs/heads/main' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
         env:
+          NEXT_PUBLIC_GTM_ID: ${{ vars.NEXT_PUBLIC_GTM_ID }}
           NEXT_PUBLIC_APPWRITE_ENDPOINT: ${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}
           NEXT_PUBLIC_APPWRITE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}
           APPWRITE_API_KEY: ${{ secrets.APPWRITE_API_KEY }}
