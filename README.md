@@ -20,7 +20,7 @@ Most stock market tools are either expensive, cluttered with ads, or locked behi
 - Dark mode support
 - Mobile-friendly responsive design
 
-No paywall for core features. No tracking. Just a clean stock analysis tool you can run yourself.
+No paywall for core features. No forced tracking. Just a clean stock analysis tool you can run yourself.
 
 ## Screenshots
 
@@ -92,6 +92,7 @@ Also required for trial features: `APPWRITE_COLLECTION_ID_TRIAL_SESSIONS`.
 | `RATE_LIMIT_MAX_REQUESTS`            | Max API requests per window                                                     | `100`                              |
 | `RATE_LIMIT_WINDOW_SECONDS`          | Rate limit window in seconds                                                    | `60`                               |
 | `LOG_LEVEL`                          | Logging level                                                                   | `info`                             |
+| `NEXT_PUBLIC_GTM_ID`                 | Google Tag Manager container ID (enables GTM when set, e.g. `GTM-XXXXXXX`)      | unset                              |
 | `DEV_OVERRIDE_PRICING_TIER`          | Temporary non-prod tier override (`FREE`,`ADS_FREE`,`LOCAL`,`BYOK`,`HOSTED_AI`) | unset                              |
 | `DEV_OVERRIDE_PRICING_TIER_USER_IDS` | Optional comma-separated user IDs for scoped override                           | unset                              |
 
