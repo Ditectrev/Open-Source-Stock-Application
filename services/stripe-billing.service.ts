@@ -58,12 +58,19 @@ function getPeriodBounds(subscription: Stripe.Subscription): {
   const subAny = subscription as unknown as {
     current_period_start?: number;
     current_period_end?: number;
-    items?: { data?: Array<{ current_period_start?: number; current_period_end?: number }> };
+    items?: {
+      data?: Array<{
+        current_period_start?: number;
+        current_period_end?: number;
+      }>;
+    };
   };
   return {
     start:
-      subAny.current_period_start ?? subAny.items?.data?.[0]?.current_period_start,
-    end: subAny.current_period_end ?? subAny.items?.data?.[0]?.current_period_end,
+      subAny.current_period_start ??
+      subAny.items?.data?.[0]?.current_period_start,
+    end:
+      subAny.current_period_end ?? subAny.items?.data?.[0]?.current_period_end,
   };
 }
 
@@ -119,7 +126,9 @@ export class StripeBillingService {
     baseUrl: string;
   }): Promise<{ url: string }> {
     const stripe = requireStripeClient();
-    const current = await subscriptionStoreService.getMostRecentForUser(args.userId);
+    const current = await subscriptionStoreService.getMostRecentForUser(
+      args.userId
+    );
     const customerId = current?.stripeCustomerId?.trim();
     if (!customerId) {
       throw new Error("No Stripe customer found for this user.");
@@ -147,7 +156,8 @@ export class StripeBillingService {
     const userId = session.metadata?.appUserId;
     const subscriptionId =
       typeof session.subscription === "string" ? session.subscription : "";
-    const customerId = typeof session.customer === "string" ? session.customer : "";
+    const customerId =
+      typeof session.customer === "string" ? session.customer : "";
     const priceId = session.metadata?.stripePriceId ?? "";
     if (!userId || !subscriptionId) return;
 
@@ -163,7 +173,10 @@ export class StripeBillingService {
       subscriptionId,
       customerId,
       priceId:
-        priceId || sub.items.data[0]?.price?.id || session.metadata?.stripePriceId || "",
+        priceId ||
+        sub.items.data[0]?.price?.id ||
+        session.metadata?.stripePriceId ||
+        "",
       status: sub.status,
       cancelAtPeriodEnd: sub.cancel_at_period_end,
       currentPeriodStart: bounds.start,

@@ -62,12 +62,19 @@ export class SubscriptionStoreService {
     return { databases, databaseId, subscriptionsCollectionId };
   }
 
-  async getMostRecentForUser(userId: string): Promise<SubscriptionRecord | null> {
-    const { databases, databaseId, subscriptionsCollectionId } = this.getClient();
+  async getMostRecentForUser(
+    userId: string
+  ): Promise<SubscriptionRecord | null> {
+    const { databases, databaseId, subscriptionsCollectionId } =
+      this.getClient();
     const result = (await databases.listDocuments(
       databaseId,
       subscriptionsCollectionId,
-      [Query.equal("userId", userId), Query.orderDesc("$updatedAt"), Query.limit(1)]
+      [
+        Query.equal("userId", userId),
+        Query.orderDesc("$updatedAt"),
+        Query.limit(1),
+      ]
     )) as unknown as { documents: SubscriptionDocument[] };
 
     const doc = result.documents[0];
@@ -78,7 +85,8 @@ export class SubscriptionStoreService {
     stripeSubscriptionId: string,
     payload: Omit<SubscriptionRecord, "id">
   ): Promise<void> {
-    const { databases, databaseId, subscriptionsCollectionId } = this.getClient();
+    const { databases, databaseId, subscriptionsCollectionId } =
+      this.getClient();
     const existing = (await databases.listDocuments(
       databaseId,
       subscriptionsCollectionId,
@@ -121,7 +129,8 @@ export class SubscriptionStoreService {
   async getByStripeSubscriptionId(
     stripeSubscriptionId: string
   ): Promise<SubscriptionRecord | null> {
-    const { databases, databaseId, subscriptionsCollectionId } = this.getClient();
+    const { databases, databaseId, subscriptionsCollectionId } =
+      this.getClient();
     const result = (await databases.listDocuments(
       databaseId,
       subscriptionsCollectionId,
@@ -137,7 +146,8 @@ export class SubscriptionStoreService {
   async getByStripeCustomerId(
     stripeCustomerId: string
   ): Promise<SubscriptionRecord | null> {
-    const { databases, databaseId, subscriptionsCollectionId } = this.getClient();
+    const { databases, databaseId, subscriptionsCollectionId } =
+      this.getClient();
     const result = (await databases.listDocuments(
       databaseId,
       subscriptionsCollectionId,

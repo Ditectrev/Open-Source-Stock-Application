@@ -142,10 +142,10 @@ describe("PricingPage", () => {
 
     it("should display monthly prices for paid tiers", () => {
       renderPricingPage();
-      expect(screen.getByText("$4.99")).toBeInTheDocument();
-      expect(screen.getByText("$9.99")).toBeInTheDocument();
-      expect(screen.getByText("$14.99")).toBeInTheDocument();
-      expect(screen.getByText("$19.99")).toBeInTheDocument();
+      expect(screen.getByText("€4.99")).toBeInTheDocument();
+      expect(screen.getByText("€9.99")).toBeInTheDocument();
+      expect(screen.getByText("€14.99")).toBeInTheDocument();
+      expect(screen.getByText("€19.99")).toBeInTheDocument();
     });
 
     it("should display '/ mo' billing period for paid tiers", () => {

@@ -71,13 +71,13 @@ Open [http://localhost:3000](http://localhost:3000) to view the application.
 
 ### Required
 
-| Variable                          | Description                  |
-| --------------------------------- | ---------------------------- |
-| `NEXT_PUBLIC_APPWRITE_ENDPOINT`   | Appwrite API endpoint        |
-| `NEXT_PUBLIC_APPWRITE_PROJECT_ID` | Appwrite project ID          |
-| `APPWRITE_API_KEY`                | Appwrite server-side API key |
-| `APPWRITE_DATABASE_ID`            | Appwrite DB for app data     |
-| `APPWRITE_COLLECTION_ID_AI_KEYS`  | Appwrite collection for keys |
+| Variable                               | Description                           |
+| -------------------------------------- | ------------------------------------- |
+| `NEXT_PUBLIC_APPWRITE_ENDPOINT`        | Appwrite API endpoint                 |
+| `NEXT_PUBLIC_APPWRITE_PROJECT_ID`      | Appwrite project ID                   |
+| `APPWRITE_API_KEY`                     | Appwrite server-side API key          |
+| `APPWRITE_DATABASE_ID`                 | Appwrite DB for app data              |
+| `APPWRITE_COLLECTION_ID_AI_KEYS`       | Appwrite collection for keys          |
 | `APPWRITE_COLLECTION_ID_SUBSCRIPTIONS` | Appwrite collection for subscriptions |
 
 Also required for trial features: `APPWRITE_COLLECTION_ID_TRIAL_SESSIONS`.
@@ -97,11 +97,11 @@ Also required for trial features: `APPWRITE_COLLECTION_ID_TRIAL_SESSIONS`.
 | `DEV_OVERRIDE_PRICING_TIER`          | Temporary non-prod tier override (`FREE`,`ADS_FREE`,`LOCAL`,`BYOK`,`HOSTED_AI`) | unset                              |
 | `DEV_OVERRIDE_PRICING_TIER_USER_IDS` | Optional comma-separated user IDs for scoped override                           | unset                              |
 | `STRIPE_SECRET_KEY`                  | Stripe secret API key (`sk_*`)                                                  | unset                              |
-| `STRIPE_WEBHOOK_SECRET`              | Stripe webhook signing secret (`whsec_*`)                                        | unset                              |
-| `STRIPE_PRICE_ADS_FREE`              | Stripe recurring price id for Ads-free tier                                      | unset                              |
-| `STRIPE_PRICE_LOCAL`                 | Stripe recurring price id for Local tier                                         | unset                              |
-| `STRIPE_PRICE_BYOK`                  | Stripe recurring price id for BYOK tier                                          | unset                              |
-| `STRIPE_PRICE_HOSTED_AI`             | Stripe recurring price id for Hosted AI tier                                     | unset                              |
+| `STRIPE_WEBHOOK_SECRET`              | Stripe webhook signing secret (`whsec_*`)                                       | unset                              |
+| `STRIPE_PRICE_ADS_FREE`              | Stripe recurring price id for Ads-free tier                                     | unset                              |
+| `STRIPE_PRICE_LOCAL`                 | Stripe recurring price id for Local tier                                        | unset                              |
+| `STRIPE_PRICE_BYOK`                  | Stripe recurring price id for BYOK tier                                         | unset                              |
+| `STRIPE_PRICE_HOSTED_AI`             | Stripe recurring price id for Hosted AI tier                                    | unset                              |
 
 See `.env.example` for the full list.
 

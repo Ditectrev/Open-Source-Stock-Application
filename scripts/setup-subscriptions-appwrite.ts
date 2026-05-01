@@ -69,7 +69,13 @@ async function main() {
   };
 
   await createAttribute("userId", () =>
-    databases.createStringAttribute(databaseId, collectionId, "userId", 64, true)
+    databases.createStringAttribute(
+      databaseId,
+      collectionId,
+      "userId",
+      64,
+      true
+    )
   );
   await createAttribute("tier", () =>
     databases.createStringAttribute(databaseId, collectionId, "tier", 32, true)

@@ -182,7 +182,8 @@ export class SubscriptionService {
         }
       }
 
-      const current = await subscriptionStoreService.getMostRecentForUser(userId);
+      const current =
+        await subscriptionStoreService.getMostRecentForUser(userId);
       if (!current) return "FREE";
 
       const isActive =
@@ -346,7 +347,8 @@ export class SubscriptionService {
     try {
       logger.info("Cancelling subscription for user", { userId });
 
-      const current = await subscriptionStoreService.getMostRecentForUser(userId);
+      const current =
+        await subscriptionStoreService.getMostRecentForUser(userId);
       if (!current) {
         return { success: false, error: "No active subscription found" };
       }
