@@ -78,7 +78,7 @@ function PricingCard({
         ) : (
           <div className="flex items-end gap-1">
             <span className="text-4xl font-extrabold text-gray-900 dark:text-gray-100">
-              ${tier.price}
+              €{tier.price}
             </span>
             <span className="text-sm text-gray-500 dark:text-gray-400 mb-1">
               / mo

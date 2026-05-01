@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { subscriptionService } from "@/services/subscription.service";
 import { logger } from "@/lib/logger";
 import { getAuthenticatedUser } from "@/lib/server-auth";
+import { stripeBillingService } from "@/services/stripe-billing.service";
 
 export async function DELETE(request: NextRequest) {
   try {
@@ -33,6 +34,22 @@ export async function DELETE(request: NextRequest) {
           timestamp: new Date(),
         },
         { status: 400 }
+      );
+    }
+
+    try {
+      await stripeBillingService.cancelActiveSubscription(auth.id);
+    } catch (error) {
+      logger.error("Failed to cancel Stripe subscription", error as Error, {
+        userId: auth.id,
+      });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Failed to cancel Stripe subscription",
+          timestamp: new Date(),
+        },
+        { status: 500 }
       );
     }
 

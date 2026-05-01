@@ -78,6 +78,7 @@ Open [http://localhost:3000](http://localhost:3000) to view the application.
 | `APPWRITE_API_KEY`                | Appwrite server-side API key |
 | `APPWRITE_DATABASE_ID`            | Appwrite DB for app data     |
 | `APPWRITE_COLLECTION_ID_AI_KEYS`  | Appwrite collection for keys |
+| `APPWRITE_COLLECTION_ID_SUBSCRIPTIONS` | Appwrite collection for subscriptions |
 
 Also required for trial features: `APPWRITE_COLLECTION_ID_TRIAL_SESSIONS`.
 
@@ -95,6 +96,12 @@ Also required for trial features: `APPWRITE_COLLECTION_ID_TRIAL_SESSIONS`.
 | `NEXT_PUBLIC_GTM_ID`                 | Google Tag Manager container ID (enables GTM when set, e.g. `GTM-XXXXXXX`)      | unset                              |
 | `DEV_OVERRIDE_PRICING_TIER`          | Temporary non-prod tier override (`FREE`,`ADS_FREE`,`LOCAL`,`BYOK`,`HOSTED_AI`) | unset                              |
 | `DEV_OVERRIDE_PRICING_TIER_USER_IDS` | Optional comma-separated user IDs for scoped override                           | unset                              |
+| `STRIPE_SECRET_KEY`                  | Stripe secret API key (`sk_*`)                                                  | unset                              |
+| `STRIPE_WEBHOOK_SECRET`              | Stripe webhook signing secret (`whsec_*`)                                        | unset                              |
+| `STRIPE_PRICE_ADS_FREE`              | Stripe recurring price id for Ads-free tier                                      | unset                              |
+| `STRIPE_PRICE_LOCAL`                 | Stripe recurring price id for Local tier                                         | unset                              |
+| `STRIPE_PRICE_BYOK`                  | Stripe recurring price id for BYOK tier                                          | unset                              |
+| `STRIPE_PRICE_HOSTED_AI`             | Stripe recurring price id for Hosted AI tier                                     | unset                              |
 
 See `.env.example` for the full list.
 
@@ -107,6 +114,12 @@ bun run setup:appwrite:ai-keys
 ```
 
 This uses your existing `APPWRITE_DATABASE_ID` and creates (or reuses) the BYOK keys collection in that database.
+
+For subscriptions collection setup, run:
+
+```bash
+bun run setup:appwrite:subscriptions
+```
 
 ## Project Structure
 

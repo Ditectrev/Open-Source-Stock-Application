@@ -8,12 +8,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { subscriptionService } from "@/services/subscription.service";
 import { logger } from "@/lib/logger";
 import { PricingTier } from "@/types";
+import { getAuthenticatedUser } from "@/lib/server-auth";
 
 export async function PUT(request: NextRequest) {
   try {
-    const userId = request.headers.get("x-user-id");
-
-    if (!userId) {
+    const auth = await getAuthenticatedUser(request);
+    if (!auth) {
       return NextResponse.json(
         {
           success: false,
@@ -38,7 +38,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const result = await subscriptionService.downgradeTier(userId, newTier);
+    const result = await subscriptionService.downgradeTier(auth.id, newTier);
 
     if (!result.success) {
       return NextResponse.json(

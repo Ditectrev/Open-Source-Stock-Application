@@ -72,6 +72,7 @@ export function UserProfileMenu() {
     null
   );
   const [cancelling, setCancelling] = useState(false);
+  const [openingBilling, setOpeningBilling] = useState(false);
   const [selectedExplanationProvider, setSelectedExplanationProvider] =
     useState<ExplanationProvider>("OLLAMA");
   const [selectedProvider, setSelectedProvider] = useState<
@@ -229,6 +230,28 @@ export function UserProfileMenu() {
     }
   }
 
+  async function handleOpenBillingPortal() {
+    if (!user || !hasPaidPlan) return;
+    setOpeningBilling(true);
+    try {
+      const res = await fetch("/api/stripe/create-portal-session", {
+        method: "POST",
+        credentials: "include",
+      });
+      const data = (await res.json().catch(() => ({}))) as {
+        data?: { url?: string };
+        error?: string;
+      };
+      if (!res.ok || !data.data?.url) {
+        setProviderSaveMessage(data.error ?? "Failed to open billing portal.");
+        return;
+      }
+      window.location.assign(data.data.url);
+    } finally {
+      setOpeningBilling(false);
+    }
+  }
+
   if (loading) {
     return (
       <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -372,14 +395,24 @@ export function UserProfileMenu() {
                 Manage subscription
               </a>
               {hasPaidPlan && (
-                <button
-                  type="button"
-                  onClick={() => void handleCancelSubscription()}
-                  disabled={cancelling}
-                  className="text-xs rounded-md border border-red-500 text-red-600 px-3 py-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 disabled:opacity-50"
-                >
-                  {cancelling ? "Cancelling..." : "Cancel subscription"}
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={() => void handleOpenBillingPortal()}
+                    disabled={openingBilling}
+                    className="text-xs rounded-md border border-blue-500 text-blue-600 px-3 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 disabled:opacity-50"
+                  >
+                    {openingBilling ? "Opening..." : "Manage billing"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void handleCancelSubscription()}
+                    disabled={cancelling}
+                    className="text-xs rounded-md border border-red-500 text-red-600 px-3 py-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 disabled:opacity-50"
+                  >
+                    {cancelling ? "Cancelling..." : "Cancel subscription"}
+                  </button>
+                </>
               )}
             </div>
             <button

@@ -6,6 +6,7 @@
 
 import { logger } from "@/lib/logger";
 import { PricingTier, PricingTierInfo, Subscription } from "@/types";
+import { subscriptionStoreService } from "@/services/subscription-store.service";
 
 export interface SubscriptionResult {
   success: boolean;
@@ -181,10 +182,15 @@ export class SubscriptionService {
         }
       }
 
-      // In a full implementation this would query Appwrite for the user's subscription.
-      // For now we return FREE as the default tier.
-      logger.info("Getting current tier for user", { userId });
-      return "FREE";
+      const current = await subscriptionStoreService.getMostRecentForUser(userId);
+      if (!current) return "FREE";
+
+      const isActive =
+        current.status === "active" ||
+        current.status === "trialing" ||
+        (current.status === "canceled" && current.cancelAtPeriodEnd);
+      if (!isActive) return "FREE";
+      return current.tier;
     } catch (error) {
       logger.error("Failed to get current tier", error as Error, { userId });
       return "FREE";
@@ -218,7 +224,7 @@ export class SubscriptionService {
           startDate: new Date(),
           billingPeriod: "monthly",
           amount: 0,
-          currency: "USD",
+          currency: "EUR",
           paymentMethod: "none",
         };
         logger.info("User subscribed to free tier", { userId });
@@ -242,7 +248,7 @@ export class SubscriptionService {
         endDate: this.getNextBillingDate(),
         billingPeriod: tierInfo.billingPeriod,
         amount: tierInfo.price,
-        currency: "USD",
+        currency: "EUR",
         paymentMethod,
       };
 
@@ -308,7 +314,7 @@ export class SubscriptionService {
         endDate: this.getNextBillingDate(),
         billingPeriod: "monthly",
         amount: PRICING_TIERS.find((t) => t.tier === newTier)?.price ?? 0,
-        currency: "USD",
+        currency: "EUR",
         paymentMethod: "existing",
       };
 
@@ -340,14 +346,10 @@ export class SubscriptionService {
     try {
       logger.info("Cancelling subscription for user", { userId });
 
-      // In production this would update the Appwrite record and cancel with payment processor
-      logger.info(
-        "Subscription cancelled, access maintained until billing period ends",
-        {
-          userId,
-          accessUntil: this.getNextBillingDate(),
-        }
-      );
+      const current = await subscriptionStoreService.getMostRecentForUser(userId);
+      if (!current) {
+        return { success: false, error: "No active subscription found" };
+      }
 
       return { success: true };
     } catch (error) {

@@ -1,6 +1,6 @@
 {
   "name": "stock-exchange-app",
-  "version": "0.55.0",
+  "version": "0.56.0",
   "private": true,
   "scripts": {
     "dev": "bun --bun next dev",
@@ -15,6 +15,7 @@
     "test:e2e:ui": "playwright test --ui",
     "test:market-data": "bun run scripts/test-market-data.ts",
     "setup:appwrite:ai-keys": "bun run scripts/setup-ai-keys-appwrite.ts",
+    "setup:appwrite:subscriptions": "bun run scripts/setup-subscriptions-appwrite.ts",
     "analyze": "ANALYZE=true bun run build",
     "lighthouse": "lhci autorun"
   },
@@ -26,6 +27,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-github-btn": "^1.4.0",
+    "stripe": "^22.1.0",
     "swr": "^2.2.5"
   },
   "devDependencies": {

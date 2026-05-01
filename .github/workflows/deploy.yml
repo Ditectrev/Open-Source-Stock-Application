@@ -146,7 +146,7 @@ jobs:
   # - main: production on Vercel; PRs: preview on Vercel
   #
   # Environment secrets (GitHub "Production" vs "Preview"): only Appwrite targets differ per env:
-  #   APPWRITE_DATABASE_ID, APPWRITE_COLLECTION_ID_TRIAL_SESSIONS, APPWRITE_COLLECTION_ID_AI_KEYS
+  #   APPWRITE_DATABASE_ID, APPWRITE_COLLECTION_ID_TRIAL_SESSIONS, APPWRITE_COLLECTION_ID_AI_KEYS, APPWRITE_COLLECTION_ID_SUBSCRIPTIONS
   # All other deploy secrets stay repository-wide: VERCEL_*, NEXT_PUBLIC_APPWRITE_*, APPWRITE_API_KEY.
   # With `environment:` set, GitHub still exposes repository secrets to the job; environment adds/overrides
   # only the names defined on that environment (here: Appwrite DB + collection ids).
@@ -179,6 +179,21 @@ jobs:
           vercel env add APPWRITE_DATABASE_ID $ENV_TYPE "" --value "${{ secrets.APPWRITE_DATABASE_ID }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
           vercel env add APPWRITE_COLLECTION_ID_AI_KEYS $ENV_TYPE "" --value "${{ secrets.APPWRITE_COLLECTION_ID_AI_KEYS }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
           vercel env add APPWRITE_COLLECTION_ID_TRIAL_SESSIONS $ENV_TYPE "" --value "${{ secrets.APPWRITE_COLLECTION_ID_TRIAL_SESSIONS }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
+          vercel env add APPWRITE_COLLECTION_ID_SUBSCRIPTIONS $ENV_TYPE "" --value "${{ secrets.APPWRITE_COLLECTION_ID_SUBSCRIPTIONS }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
+          if [ -n "${{ vars.STRIPE_PRICE_ADS_FREE }}" ]; then
+            vercel env add STRIPE_PRICE_ADS_FREE $ENV_TYPE "" --value "${{ vars.STRIPE_PRICE_ADS_FREE }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
+          fi
+          if [ -n "${{ vars.STRIPE_PRICE_LOCAL }}" ]; then
+            vercel env add STRIPE_PRICE_LOCAL $ENV_TYPE "" --value "${{ vars.STRIPE_PRICE_LOCAL }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
+          fi
+          if [ -n "${{ vars.STRIPE_PRICE_BYOK }}" ]; then
+            vercel env add STRIPE_PRICE_BYOK $ENV_TYPE "" --value "${{ vars.STRIPE_PRICE_BYOK }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
+          fi
+          if [ -n "${{ vars.STRIPE_PRICE_HOSTED_AI }}" ]; then
+            vercel env add STRIPE_PRICE_HOSTED_AI $ENV_TYPE "" --value "${{ vars.STRIPE_PRICE_HOSTED_AI }}" --yes --force --token=${{ secrets.VERCEL_TOKEN }}
+          fi
+          vercel env add STRIPE_SECRET_KEY $ENV_TYPE "" --value "${{ secrets.STRIPE_SECRET_KEY }}" --yes --force --sensitive --token=${{ secrets.VERCEL_TOKEN }}
+          vercel env add STRIPE_WEBHOOK_SECRET $ENV_TYPE "" --value "${{ secrets.STRIPE_WEBHOOK_SECRET }}" --yes --force --sensitive --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -200,6 +215,13 @@ jobs:
           APPWRITE_DATABASE_ID: ${{ secrets.APPWRITE_DATABASE_ID }}
           APPWRITE_COLLECTION_ID_AI_KEYS: ${{ secrets.APPWRITE_COLLECTION_ID_AI_KEYS }}
           APPWRITE_COLLECTION_ID_TRIAL_SESSIONS: ${{ secrets.APPWRITE_COLLECTION_ID_TRIAL_SESSIONS }}
+          APPWRITE_COLLECTION_ID_SUBSCRIPTIONS: ${{ secrets.APPWRITE_COLLECTION_ID_SUBSCRIPTIONS }}
+          STRIPE_PRICE_ADS_FREE: ${{ vars.STRIPE_PRICE_ADS_FREE }}
+          STRIPE_PRICE_LOCAL: ${{ vars.STRIPE_PRICE_LOCAL }}
+          STRIPE_PRICE_BYOK: ${{ vars.STRIPE_PRICE_BYOK }}
+          STRIPE_PRICE_HOSTED_AI: ${{ vars.STRIPE_PRICE_HOSTED_AI }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
 
       - name: Deploy Project Artifacts to Vercel
         id: vercel-deploy
