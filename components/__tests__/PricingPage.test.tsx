@@ -182,7 +182,9 @@ describe("PricingPage", () => {
     it("should not display a money-back guarantee footer note", () => {
       renderPricingPage();
       expect(
-        screen.queryByText(/All paid plans include a 7-day money-back guarantee/)
+        screen.queryByText(
+          /All paid plans include a 7-day money-back guarantee/
+        )
       ).not.toBeInTheDocument();
     });
   });
