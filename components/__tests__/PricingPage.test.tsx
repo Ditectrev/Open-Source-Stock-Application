@@ -179,11 +179,11 @@ describe("PricingPage", () => {
       ).toBeInTheDocument();
     });
 
-    it("should display the money-back guarantee footer note", () => {
+    it("should not display a money-back guarantee footer note", () => {
       renderPricingPage();
       expect(
-        screen.getByText(/All paid plans include a 7-day money-back guarantee/)
-      ).toBeInTheDocument();
+        screen.queryByText(/All paid plans include a 7-day money-back guarantee/)
+      ).not.toBeInTheDocument();
     });
   });
 

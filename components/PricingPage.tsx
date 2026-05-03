@@ -185,11 +185,6 @@ export function PricingPage({
           Complete checkout to activate.
         </p>
       )}
-
-      {/* Footer note */}
-      <p className="mt-10 text-center text-xs text-gray-400 dark:text-gray-500">
-        All paid plans include a 7-day money-back guarantee. Cancel anytime.
-      </p>
     </section>
   );
 }

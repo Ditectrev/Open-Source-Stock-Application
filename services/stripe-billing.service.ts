@@ -38,6 +38,16 @@ function normalizeSubscriptionStatus(value: string): StoredSubscriptionStatus {
     : "canceled";
 }
 
+/** Stripe often returns an id string; expanded responses use `{ id }`. */
+function stripeObjectId(
+  ref: string | { id: string } | null | undefined
+): string {
+  if (ref == null) return "";
+  if (typeof ref === "string") return ref;
+  if (typeof ref === "object" && typeof ref.id === "string") return ref.id;
+  return "";
+}
+
 function requireStripeClient(): Stripe {
   const key = getStripeSecretKey();
   if (!key) {
@@ -97,7 +107,7 @@ export class StripeBillingService {
           targetTier: args.tier,
         },
       },
-      success_url: `${args.baseUrl}/pricing?success=1`,
+      success_url: `${args.baseUrl}/pricing?success=1&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${args.baseUrl}/pricing?canceled=1`,
       customer_email: args.email,
       metadata: {
@@ -151,13 +161,43 @@ export class StripeBillingService {
     return stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
   }
 
+  /**
+   * Syncs subscription after the user returns from Checkout with `?session_id=…`.
+   * Ensures Appwrite updates when webhooks are not delivered (e.g. local dev
+   * without `stripe listen`, or a delayed webhook).
+   */
+  async confirmCheckoutSessionAfterRedirect(
+    sessionId: string,
+    appUserId: string
+  ): Promise<void> {
+    const stripe = requireStripeClient();
+    const session = await stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ["subscription", "customer"],
+    });
+    const metaUserId = session.metadata?.appUserId?.trim();
+    if (!metaUserId || metaUserId !== appUserId) {
+      throw new Error("This checkout session does not belong to your account.");
+    }
+    if (session.mode !== "subscription") {
+      throw new Error("Invalid checkout session.");
+    }
+    if (session.status !== "complete") {
+      throw new Error("Checkout is not complete yet.");
+    }
+    if (
+      session.payment_status !== "paid" &&
+      session.payment_status !== "no_payment_required"
+    ) {
+      throw new Error(`Payment not complete (${session.payment_status}).`);
+    }
+    await this.syncFromCheckoutCompleted(session);
+  }
+
   async syncFromCheckoutCompleted(session: Stripe.Checkout.Session) {
     const stripe = requireStripeClient();
     const userId = session.metadata?.appUserId;
-    const subscriptionId =
-      typeof session.subscription === "string" ? session.subscription : "";
-    const customerId =
-      typeof session.customer === "string" ? session.customer : "";
+    const subscriptionId = stripeObjectId(session.subscription);
+    const customerId = stripeObjectId(session.customer);
     const priceId = session.metadata?.stripePriceId ?? "";
     if (!userId || !subscriptionId) return;
 
@@ -185,8 +225,7 @@ export class StripeBillingService {
   }
 
   async syncFromSubscriptionUpdated(subscription: Stripe.Subscription) {
-    const customerId =
-      typeof subscription.customer === "string" ? subscription.customer : "";
+    const customerId = stripeObjectId(subscription.customer);
     const priceId = subscription.items.data[0]?.price?.id ?? "";
     const userId = await this.resolveUserIdFromSubscription(subscription);
     if (!userId) return;
@@ -208,8 +247,7 @@ export class StripeBillingService {
     const userId = await this.resolveUserIdFromSubscription(subscription);
     if (!userId) return;
     const priceId = subscription.items.data[0]?.price?.id ?? "";
-    const customerId =
-      typeof subscription.customer === "string" ? subscription.customer : "";
+    const customerId = stripeObjectId(subscription.customer);
     const bounds = getPeriodBounds(subscription);
     await this.writeSubscriptionRecord({
       userId,
@@ -234,10 +272,7 @@ export class StripeBillingService {
     const metadataUserId = subscription.metadata?.appUserId?.trim();
     if (metadataUserId) return metadataUserId;
 
-    const customerId =
-      typeof subscription.customer === "string"
-        ? subscription.customer
-        : subscription.customer?.id;
+    const customerId = stripeObjectId(subscription.customer);
     if (customerId) {
       const byCustomer =
         await subscriptionStoreService.getByStripeCustomerId(customerId);

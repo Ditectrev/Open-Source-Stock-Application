@@ -1,7 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import type { PricingTier, PricingTierInfo } from "@/types";
 
@@ -13,55 +14,122 @@ const PricingPage = dynamic(
   }
 );
 
-export default function PricingRoutePage() {
+function PricingRouteContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [tiers, setTiers] = useState<PricingTierInfo[]>([]);
   const [currentTier, setCurrentTier] = useState<PricingTier>("FREE");
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<{
+    text: string;
+    tone: "success" | "warning";
+  } | null>(null);
 
   const paidTierSet = useMemo(
     () => new Set<PricingTier>(["ADS_FREE", "LOCAL", "BYOK", "HOSTED_AI"]),
     []
   );
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const [tiersRes, currentRes] = await Promise.all([
-          fetch("/api/subscription/tiers", {
-            method: "GET",
-            credentials: "include",
-            cache: "no-store",
-          }),
-          fetch("/api/subscription/current", {
-            method: "GET",
-            credentials: "include",
-            cache: "no-store",
-          }),
-        ]);
+  const loadSubscriptionData = useCallback(async () => {
+    try {
+      const [tiersRes, currentRes] = await Promise.all([
+        fetch("/api/subscription/tiers", {
+          method: "GET",
+          credentials: "include",
+          cache: "no-store",
+        }),
+        fetch("/api/subscription/current", {
+          method: "GET",
+          credentials: "include",
+          cache: "no-store",
+        }),
+      ]);
 
-        if (tiersRes.ok) {
-          const tiersData = (await tiersRes.json()) as {
-            data?: PricingTierInfo[];
-          };
-          setTiers(tiersData.data ?? []);
+      if (tiersRes.ok) {
+        const tiersData = (await tiersRes.json()) as {
+          data?: PricingTierInfo[];
+        };
+        setTiers(tiersData.data ?? []);
+      }
+      if (currentRes.ok) {
+        const currentData = (await currentRes.json()) as {
+          data?: { tier?: PricingTier };
+        };
+        setCurrentTier(currentData.data?.tier ?? "FREE");
+      }
+    } catch {
+      setMessage({
+        text: "Failed to load pricing details. Please refresh.",
+        tone: "warning",
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadSubscriptionData();
+  }, [loadSubscriptionData]);
+
+  const checkoutSessionId = searchParams.get("session_id")?.trim() ?? "";
+
+  useEffect(() => {
+    if (!checkoutSessionId) return;
+
+    let cancelled = false;
+
+    const confirmAndRefresh = async () => {
+      try {
+        const res = await fetch("/api/stripe/confirm-checkout-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ sessionId: checkoutSessionId }),
+        });
+        const payload = (await res.json()) as {
+          success?: boolean;
+          error?: string;
+        };
+        if (cancelled) return;
+        if (!res.ok || !payload.success) {
+          setMessage({
+            text:
+              payload.error ??
+              "Could not confirm your subscription. If you were charged, contact support.",
+            tone: "warning",
+          });
+          return;
         }
-        if (currentRes.ok) {
-          const currentData = (await currentRes.json()) as {
-            data?: { tier?: PricingTier };
-          };
-          setCurrentTier(currentData.data?.tier ?? "FREE");
+        await loadSubscriptionData();
+        if (!cancelled) {
+          setMessage({
+            text: "Subscription active. Thank you!",
+            tone: "success",
+          });
         }
       } catch {
-        setMessage("Failed to load pricing details. Please refresh.");
+        if (!cancelled) {
+          setMessage({
+            text: "Could not confirm checkout. Please refresh the page.",
+            tone: "warning",
+          });
+        }
+      } finally {
+        if (!cancelled) {
+          router.replace("/pricing", { scroll: false });
+        }
       }
     };
 
-    void loadData();
-  }, []);
+    void confirmAndRefresh();
+    return () => {
+      cancelled = true;
+    };
+  }, [router, checkoutSessionId, loadSubscriptionData]);
 
   const handleSelectTier = async (tier: PricingTier) => {
     if (!paidTierSet.has(tier)) {
-      setMessage("Free tier is already active by default.");
+      setMessage({
+        text: "Free tier is already active by default.",
+        tone: "warning",
+      });
       return;
     }
     setMessage(null);
@@ -78,12 +146,15 @@ export default function PricingRoutePage() {
         error?: string;
       };
       if (!response.ok || !payload.data?.url) {
-        setMessage(payload.error ?? "Failed to start checkout.");
+        setMessage({
+          text: payload.error ?? "Failed to start checkout.",
+          tone: "warning",
+        });
         return;
       }
       window.location.assign(payload.data.url);
     } catch {
-      setMessage("Failed to start checkout.");
+      setMessage({ text: "Failed to start checkout.", tone: "warning" });
     }
   };
 
@@ -95,10 +166,30 @@ export default function PricingRoutePage() {
         onSelectTier={handleSelectTier}
       />
       {message && (
-        <p className="mt-4 text-center text-sm text-amber-600 dark:text-amber-400">
-          {message}
+        <p
+          className={`mt-4 text-center text-sm ${
+            message.tone === "success"
+              ? "text-emerald-600 dark:text-emerald-400"
+              : "text-amber-600 dark:text-amber-400"
+          }`}
+        >
+          {message.text}
         </p>
       )}
     </div>
+  );
+}
+
+export default function PricingRoutePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="mt-6 sm:mt-8 lg:mt-10 flex justify-center py-16">
+          <LoadingSpinner size="md" message="Loading pricing..." />
+        </div>
+      }
+    >
+      <PricingRouteContent />
+    </Suspense>
   );
 }
