@@ -37,12 +37,12 @@ function isAttributeNotAvailableError(error: unknown): boolean {
   return message.includes("not yet available");
 }
 
-async function main() {
+async function main(): Promise<void> {
   const endpoint = requireEnv("NEXT_PUBLIC_APPWRITE_ENDPOINT");
   const projectId = requireEnv("NEXT_PUBLIC_APPWRITE_PROJECT_ID");
   const apiKey = requireEnv("APPWRITE_API_KEY");
   const databaseId = requireEnv("APPWRITE_DATABASE_ID");
-  const collectionId = requireEnv("APPWRITE_COLLECTION_ID_SUBSCRIPTIONS");
+  const collectionId = requireEnv("APPWRITE_COLLECTION_ID_TRIAL_SESSIONS");
 
   const client = new Client()
     .setEndpoint(endpoint)
@@ -56,7 +56,7 @@ async function main() {
     await databases.createCollection(
       databaseId,
       collectionId,
-      "Subscriptions",
+      "Trial sessions",
       [],
       true,
       true
@@ -77,76 +77,64 @@ async function main() {
     }
   };
 
-  await createAttribute("userId", () =>
+  await createAttribute("fingerprint", () =>
     databases.createStringAttribute(
       databaseId,
       collectionId,
-      "userId",
+      "fingerprint",
+      512,
+      true
+    )
+  );
+  await createAttribute("ipAddress", () =>
+    databases.createStringAttribute(
+      databaseId,
+      collectionId,
+      "ipAddress",
+      128,
+      false,
+      ""
+    )
+  );
+  await createAttribute("startTime", () =>
+    databases.createDatetimeAttribute(
+      databaseId,
+      collectionId,
+      "startTime",
+      true
+    )
+  );
+  await createAttribute("endTime", () =>
+    databases.createDatetimeAttribute(databaseId, collectionId, "endTime", true)
+  );
+  await createAttribute("isActive", () =>
+    databases.createBooleanAttribute(databaseId, collectionId, "isActive", true)
+  );
+  await createAttribute("userAgent", () =>
+    databases.createStringAttribute(
+      databaseId,
+      collectionId,
+      "userAgent",
+      2048,
+      true
+    )
+  );
+  await createAttribute("screenResolution", () =>
+    databases.createStringAttribute(
+      databaseId,
+      collectionId,
+      "screenResolution",
       64,
       true
     )
   );
-  await createAttribute("tier", () =>
-    databases.createStringAttribute(databaseId, collectionId, "tier", 32, true)
-  );
-  await createAttribute("status", () =>
+  await createAttribute("timezone", () =>
     databases.createStringAttribute(
       databaseId,
       collectionId,
-      "status",
-      32,
+      "timezone",
+      128,
       true
-    )
-  );
-  await createAttribute("stripeCustomerId", () =>
-    databases.createStringAttribute(
-      databaseId,
-      collectionId,
-      "stripeCustomerId",
-      128,
-      false
-    )
-  );
-  await createAttribute("stripeSubscriptionId", () =>
-    databases.createStringAttribute(
-      databaseId,
-      collectionId,
-      "stripeSubscriptionId",
-      128,
-      false
-    )
-  );
-  await createAttribute("stripePriceId", () =>
-    databases.createStringAttribute(
-      databaseId,
-      collectionId,
-      "stripePriceId",
-      128,
-      false
-    )
-  );
-  await createAttribute("currentPeriodStart", () =>
-    databases.createDatetimeAttribute(
-      databaseId,
-      collectionId,
-      "currentPeriodStart",
-      false
-    )
-  );
-  await createAttribute("currentPeriodEnd", () =>
-    databases.createDatetimeAttribute(
-      databaseId,
-      collectionId,
-      "currentPeriodEnd",
-      false
-    )
-  );
-  await createAttribute("cancelAtPeriodEnd", () =>
-    databases.createBooleanAttribute(
-      databaseId,
-      collectionId,
-      "cancelAtPeriodEnd",
-      false
     )
   );
 
@@ -175,30 +163,30 @@ async function main() {
     }
   };
 
-  await createIndex("idx_userId", () =>
+  await createIndex("idx_fingerprint", () =>
     databases.createIndex(
       databaseId,
       collectionId,
-      "idx_userId",
+      "idx_fingerprint",
       IndexType.Key,
-      ["userId"]
+      ["fingerprint"]
     )
   );
-  await createIndex("idx_stripeSubscriptionId_unique", () =>
+  await createIndex("idx_ipAddress", () =>
     databases.createIndex(
       databaseId,
       collectionId,
-      "idx_stripeSubscriptionId_unique",
-      IndexType.Unique,
-      ["stripeSubscriptionId"]
+      "idx_ipAddress",
+      IndexType.Key,
+      ["ipAddress"]
     )
   );
 
-  console.log("Subscriptions Appwrite setup complete.");
+  console.log("Trial sessions Appwrite setup complete.");
 }
 
 main().catch((error) => {
-  console.error("Failed to setup subscriptions collection.");
+  console.error("Failed to setup trial sessions collection.");
   console.error(error);
   process.exit(1);
 });

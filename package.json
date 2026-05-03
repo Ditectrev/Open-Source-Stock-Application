@@ -16,6 +16,7 @@
     "test:market-data": "bun run scripts/test-market-data.ts",
     "setup:appwrite:ai-keys": "bun run scripts/setup-ai-keys-appwrite.ts",
     "setup:appwrite:subscriptions": "bun run scripts/setup-subscriptions-appwrite.ts",
+    "setup:appwrite:trial-sessions": "bun run scripts/setup-trial-sessions-appwrite.ts",
     "analyze": "ANALYZE=true bun run build",
     "lighthouse": "lhci autorun"
   },

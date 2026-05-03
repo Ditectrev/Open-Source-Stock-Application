@@ -1,4 +1,5 @@
 import { Client, Databases } from "node-appwrite";
+import { ensureAppwriteDatabase } from "./appwrite-ensure-database";
 
 function readEnv(name: string): string {
   const value = process.env[name];
@@ -36,19 +37,7 @@ async function main(): Promise<void> {
     .setKey(apiKey);
   const databases = new Databases(client);
 
-  try {
-    await databases.get(databaseId);
-    console.log(`Using existing database: ${databaseId}`);
-  } catch (error) {
-    const message =
-      error instanceof Error ? error.message.toLowerCase() : String(error);
-    if (message.includes("not found") || message.includes("404")) {
-      throw new Error(
-        `Database "${databaseId}" was not found. Set APPWRITE_DATABASE_ID to an existing Appwrite database id.`
-      );
-    }
-    throw error;
-  }
+  await ensureAppwriteDatabase(databases, databaseId);
 
   try {
     await databases.createCollection(
