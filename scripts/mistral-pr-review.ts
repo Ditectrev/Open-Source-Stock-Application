@@ -25,7 +25,11 @@ async function gitDiff(base: string, head: string): Promise<string> {
     : out;
 }
 
-async function mistralReview(diff: string, apiKey: string, model: string): Promise<string> {
+async function mistralReview(
+  diff: string,
+  apiKey: string,
+  model: string
+): Promise<string> {
   const system = `You are a senior engineer reviewing a pull request. Be concise and actionable.
 Focus on: correctness, edge cases, security, performance, and maintainability.
 Use markdown with short sections. Do not repeat the entire diff. If the change looks fine, say so briefly.`;
@@ -65,7 +69,7 @@ Use markdown with short sections. Do not repeat the entire diff. If the change l
 async function githubJson(
   token: string,
   path: string,
-  init?: RequestInit,
+  init?: RequestInit
 ): Promise<unknown> {
   const res = await fetch(`https://api.github.com${path}`, {
     ...init,
@@ -77,7 +81,8 @@ async function githubJson(
     },
   });
   const text = await res.text();
-  if (!res.ok) throw new Error(`GitHub API ${res.status} ${path}: ${text.slice(0, 400)}`);
+  if (!res.ok)
+    throw new Error(`GitHub API ${res.status} ${path}: ${text.slice(0, 400)}`);
   return text ? JSON.parse(text) : null;
 }
 
@@ -86,30 +91,38 @@ async function upsertComment(
   owner: string,
   repo: string,
   issueNumber: number,
-  body: string,
+  body: string
 ): Promise<void> {
   const comments = (await githubJson(
     token,
-    `/repos/${owner}/${repo}/issues/${issueNumber}/comments?per_page=100`,
+    `/repos/${owner}/${repo}/issues/${issueNumber}/comments?per_page=100`
   )) as Array<{ id: number; body?: string }>;
 
   const existing = comments.find((c) => c.body?.includes(MARKER));
   const fullBody = `${MARKER}\n## Mistral code review\n\n${body}`;
 
   if (existing) {
-    await githubJson(token, `/repos/${owner}/${repo}/issues/comments/${existing.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ body: fullBody }),
-    });
+    await githubJson(
+      token,
+      `/repos/${owner}/${repo}/issues/comments/${existing.id}`,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ body: fullBody }),
+      }
+    );
     return;
   }
 
-  await githubJson(token, `/repos/${owner}/${repo}/issues/${issueNumber}/comments`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ body: fullBody }),
-  });
+  await githubJson(
+    token,
+    `/repos/${owner}/${repo}/issues/${issueNumber}/comments`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ body: fullBody }),
+    }
+  );
 }
 
 async function main(): Promise<void> {
