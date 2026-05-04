@@ -27,8 +27,8 @@ const PROVIDER_OPTIONS: Array<{
   {
     id: "OLLAMA",
     name: "Ollama (Local)",
-    subtitle: "Run locally on your machine",
-    allowedTiers: ["LOCAL"],
+    subtitle: "Run on your machine (no provider API key)",
+    allowedTiers: ["LOCAL", "BYOK"],
   },
   {
     id: "OPENAI",
@@ -160,6 +160,22 @@ export function UserProfileMenu() {
       setActiveUntil(storedUntil);
     }
   }, []);
+
+  useEffect(() => {
+    const allowedForTier = PROVIDER_OPTIONS.filter((p) =>
+      p.allowedTiers.includes(tier)
+    );
+    if (allowedForTier.length === 0) return;
+    const currentOk = allowedForTier.some(
+      (p) => p.id === selectedExplanationProvider
+    );
+    if (currentOk) return;
+    const next = allowedForTier[0].id;
+    setSelectedExplanationProvider(next);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("explanations_provider", next);
+    }
+  }, [tier, selectedExplanationProvider]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;

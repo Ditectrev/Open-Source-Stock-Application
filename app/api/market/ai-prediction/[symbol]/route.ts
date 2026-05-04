@@ -3,13 +3,7 @@ import { aiMarketInsightsService } from "@/services/ai-market-insights.service";
 import { logger } from "@/lib/logger";
 import { getAuthenticatedUser } from "@/lib/server-auth";
 import { subscriptionService } from "@/services/subscription.service";
-import { appwriteAIKeyStoreService } from "@/services/appwrite-ai-key-store.service";
-import type { AIProvider } from "@/types";
-import type { BYOKProvider } from "@/services/api-key-manager.service";
-
-function isBYOKProvider(value: string): value is BYOKProvider {
-  return ["OPENAI", "GEMINI", "MISTRAL", "DEEPSEEK"].includes(value);
-}
+import { resolveMarketRouteLLMConfig } from "@/lib/resolve-market-ai-llm-config";
 
 export async function GET(
   request: NextRequest,
@@ -43,54 +37,22 @@ export async function GET(
 
     const requestedProviderRaw =
       request.headers.get("x-ai-provider")?.trim().toUpperCase() ?? "";
-    const model = process.env.AI_MODEL;
 
-    let llmConfig:
-      | {
-          provider: AIProvider;
-          apiKey?: string;
-          model?: string;
-        }
-      | undefined;
-
-    if (tier === "LOCAL") {
-      llmConfig = {
-        provider: "OLLAMA",
-        model: process.env.OLLAMA_MODEL ?? model,
-      };
-    } else if (tier === "BYOK") {
-      const requestedProvider = isBYOKProvider(requestedProviderRaw)
-        ? requestedProviderRaw
-        : null;
-      const provider =
-        requestedProvider ??
-        (await appwriteAIKeyStoreService.getPreferredProvider(auth.id));
-      if (!provider) {
-        return NextResponse.json(
-          {
-            success: false,
-            error:
-              "No BYOK API key found. Save a provider key in profile first.",
-          },
-          { status: 403 }
-        );
-      }
-      const apiKey = await appwriteAIKeyStoreService.getDecryptedKey(
-        auth.id,
-        provider
-      );
-      if (!apiKey) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: `No API key stored for provider ${provider}. Change provider in profile or save a key for ${provider}.`,
-          },
-          { status: 403 }
-        );
-      }
-      llmConfig = { provider, apiKey, model };
+    const resolved = await resolveMarketRouteLLMConfig({
+      tier,
+      userId: auth.id,
+      requestedProviderRaw,
+    });
+    if (!resolved.ok) {
+      logger.warn("AI prediction: no LLM credentials; using heuristic only", {
+        userId: auth.id,
+        tier,
+        symbol,
+        detail: resolved.error,
+      });
     }
 
+    const llmConfig = resolved.ok ? resolved.llmConfig : undefined;
     const data = await aiMarketInsightsService.generatePrediction(
       symbol,
       llmConfig
