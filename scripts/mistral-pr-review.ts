@@ -2,6 +2,8 @@
  * CI helper: reads BASE_SHA..HEAD_SHA diff, asks Mistral for a review, posts or updates one PR comment.
  * Skips cleanly when MISTRAL_API_KEY is unset.
  */
+import { spawnSync } from "node:child_process";
+
 const MARKER = "<!-- mistral-pr-review-bot -->";
 const MAX_DIFF_CHARS = 120_000;
 
@@ -11,15 +13,18 @@ function required(name: string): string {
   return v;
 }
 
-async function gitDiff(base: string, head: string): Promise<string> {
-  const proc = Bun.spawn(["git", "diff", `${base}...${head}`], {
-    stdout: "pipe",
-    stderr: "pipe",
+function gitDiff(base: string, head: string): string {
+  const result = spawnSync("git", ["diff", `${base}...${head}`], {
+    encoding: "utf-8",
+    maxBuffer: 10 * 1024 * 1024,
   });
-  const out = await new Response(proc.stdout).text();
-  const err = await new Response(proc.stderr).text();
-  const code = await proc.exited;
-  if (code !== 0) throw new Error(`git diff failed: ${err || code}`);
+  if (result.error) throw result.error;
+  if (result.status !== 0) {
+    throw new Error(
+      `git diff failed: ${(result.stderr ?? "").trim() || result.status}`
+    );
+  }
+  const out = result.stdout ?? "";
   return out.length > MAX_DIFF_CHARS
     ? `${out.slice(0, MAX_DIFF_CHARS)}\n\n…(diff truncated after ${MAX_DIFF_CHARS} chars)`
     : out;
@@ -142,7 +147,7 @@ async function main(): Promise<void> {
   const [owner, repo] = repository.split("/");
   if (!owner || !repo) throw new Error(`Invalid REPOSITORY: ${repository}`);
 
-  const diff = await gitDiff(baseSha, headSha);
+  const diff = gitDiff(baseSha, headSha);
   if (!diff.trim()) {
     console.log("Empty diff; skipping.");
     return;
