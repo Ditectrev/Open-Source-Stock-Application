@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import type { AIPredictionReport } from "@/types";
+import type { AIPredictionReport, PricingTier } from "@/types";
+import { getAiSubscriptionGateMessage } from "@/lib/ai-subscription-ux";
 import { isMissingByokApiKeyMessage } from "@/lib/missing-byok-api-key";
 
 interface AIPredictionPanelProps {
@@ -9,6 +10,7 @@ interface AIPredictionPanelProps {
   loading: boolean;
   locked: boolean;
   error?: string | null;
+  pricingTier?: PricingTier | null;
 }
 
 function RecommendationBadge({
@@ -38,6 +40,7 @@ export function AIPredictionPanel({
   loading,
   locked,
   error,
+  pricingTier,
 }: AIPredictionPanelProps) {
   const politicalFactors = prediction?.politicalFactors ?? [];
   const financialTrendFactors = prediction?.financialTrendFactors ?? [];
@@ -155,7 +158,7 @@ export function AIPredictionPanel({
         {locked && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/70 dark:bg-gray-900/70 px-6 text-center">
             <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100">
-              AI prediction is available only for AI subscriptions.
+              {getAiSubscriptionGateMessage(pricingTier ?? undefined)}
             </p>
             <Link
               href="/pricing"

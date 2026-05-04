@@ -28,10 +28,13 @@ interface EnvConfig {
   };
 }
 
+const defaultYahooFinanceUrl = "https://query2.finance.yahoo.com";
+
 export const env: EnvConfig = {
   apis: {
     cnnDatavizUrl: "https://production.dataviz.cnn.io",
-    yahooFinanceUrl: "https://query1.finance.yahoo.com",
+    yahooFinanceUrl:
+      process.env.YAHOO_FINANCE_API_URL?.trim() || defaultYahooFinanceUrl,
   },
   cache: {
     ttlSeconds: 300,

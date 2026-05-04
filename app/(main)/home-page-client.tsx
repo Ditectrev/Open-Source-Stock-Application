@@ -258,7 +258,10 @@ export function HomePageClient() {
           `/api/market/symbol/${selectedSymbol}`
         );
         if (!symbolResponse.ok) {
-          throw new Error("Failed to fetch symbol data");
+          const body = (await symbolResponse.json().catch(() => ({}))) as {
+            error?: string;
+          };
+          throw new Error(body.error ?? "Failed to fetch symbol data");
         }
         const symbolResult = await symbolResponse.json();
         setSymbolData(symbolResult.data);
@@ -531,6 +534,7 @@ export function HomePageClient() {
                 loading={aiPredictionLoading}
                 locked={!hasAIAccess}
                 error={aiPredictionError}
+                pricingTier={effectiveTier}
               />
             </>
           )}
@@ -569,6 +573,7 @@ export function HomePageClient() {
               loading={stockOfTheDayLoading}
               locked={!hasAIAccess}
               error={stockOfTheDayError}
+              pricingTier={effectiveTier}
             />
           </div>
         </div>

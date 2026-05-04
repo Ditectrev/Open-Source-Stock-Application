@@ -102,6 +102,7 @@ export default function StockOfTheDayPage() {
         loading={loading}
         locked={!hasAIAccess}
         error={loadError}
+        pricingTier={pricingTier}
       />
     </div>
   );
