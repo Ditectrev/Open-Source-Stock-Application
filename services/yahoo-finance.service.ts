@@ -31,7 +31,23 @@ export class YahooFinanceService {
   private crumbExpiry: number = 0;
 
   constructor() {
-    this.baseUrl = env.apis.yahooFinanceUrl;
+    this.baseUrl = env.apis.yahooFinanceUrl.replace(/\/$/, "");
+  }
+
+  /** Yahoo exposes query1/query2; some datacenters get 5xx on one host only. */
+  private alternateYahooOrigin(): string | null {
+    if (this.baseUrl.includes("query1.finance.yahoo.com")) {
+      return "https://query2.finance.yahoo.com";
+    }
+    if (this.baseUrl.includes("query2.finance.yahoo.com")) {
+      return "https://query1.finance.yahoo.com";
+    }
+    return null;
+  }
+
+  private yahooChartBases(): string[] {
+    const alt = this.alternateYahooOrigin();
+    return alt ? [this.baseUrl, alt] : [this.baseUrl];
   }
 
   /**
@@ -127,15 +143,31 @@ export class YahooFinanceService {
   async getSymbolQuote(symbol: string): Promise<SymbolData> {
     return retryWithBackoff(async () => {
       try {
-        const response = await fetch(
-          `${this.baseUrl}/v8/finance/quote?symbols=${symbol}`,
-          {
-            headers: {
-              Accept: "application/json",
-              "User-Agent": "Mozilla/5.0",
-            },
-          }
-        );
+        const ua = "Mozilla/5.0 (compatible; StockExchangeApp/1.0)";
+        let response: Response | undefined;
+        for (const base of this.yahooChartBases()) {
+          response = await fetch(
+            `${base}/v8/finance/quote?symbols=${encodeURIComponent(symbol)}`,
+            {
+              headers: {
+                Accept: "application/json",
+                "User-Agent": ua,
+              },
+            }
+          );
+          if (response.ok) break;
+          const retryable = [429, 500, 502, 503, 504].includes(response.status);
+          if (!retryable) break;
+          logger.warn("Yahoo quote: transient error, trying alternate host", {
+            symbol,
+            status: response.status,
+            base,
+          });
+        }
+
+        if (!response) {
+          throw new Error("Yahoo Finance quote: empty response");
+        }
 
         if (!response.ok) {
           throw new Error(
@@ -171,15 +203,32 @@ export class YahooFinanceService {
       try {
         const { interval, period } = this.getTimeRangeParams(range);
 
-        const response = await fetch(
-          `${this.baseUrl}/v8/finance/chart/${symbol}?interval=${interval}&range=${period}`,
-          {
-            headers: {
-              Accept: "application/json",
-              "User-Agent": "Mozilla/5.0",
-            },
-          }
-        );
+        const ua = "Mozilla/5.0 (compatible; StockExchangeApp/1.0)";
+        let response: Response | undefined;
+        for (const base of this.yahooChartBases()) {
+          response = await fetch(
+            `${base}/v8/finance/chart/${encodeURIComponent(symbol)}?interval=${interval}&range=${period}`,
+            {
+              headers: {
+                Accept: "application/json",
+                "User-Agent": ua,
+              },
+            }
+          );
+          if (response.ok) break;
+          const retryable = [429, 500, 502, 503, 504].includes(response.status);
+          if (!retryable) break;
+          logger.warn("Yahoo chart: transient error, trying alternate host", {
+            symbol,
+            range,
+            status: response.status,
+            base,
+          });
+        }
+
+        if (!response) {
+          throw new Error("Yahoo Finance chart: empty response");
+        }
 
         if (!response.ok) {
           throw new Error(

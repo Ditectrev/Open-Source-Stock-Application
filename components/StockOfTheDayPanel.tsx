@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import type { StockOfTheDay } from "@/types";
+import type { PricingTier, StockOfTheDay } from "@/types";
+import { getAiSubscriptionGateMessage } from "@/lib/ai-subscription-ux";
 import { isMissingByokApiKeyMessage } from "@/lib/missing-byok-api-key";
 
 interface StockOfTheDayPanelProps {
@@ -9,6 +10,8 @@ interface StockOfTheDayPanelProps {
   loading: boolean;
   locked: boolean;
   error?: string | null;
+  /** When locked, used to explain which upgrade path applies. */
+  pricingTier?: PricingTier | null;
 }
 
 export function StockOfTheDayPanel({
@@ -16,6 +19,7 @@ export function StockOfTheDayPanel({
   loading,
   locked,
   error,
+  pricingTier,
 }: StockOfTheDayPanelProps) {
   return (
     <section className="mt-6 sm:mt-8 lg:mt-10">
@@ -102,8 +106,7 @@ export function StockOfTheDayPanel({
         {locked && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/70 dark:bg-gray-900/70 px-6 text-center">
             <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100">
-              AI section locked. Enable any AI subscription to reveal
-              today&apos;s pick.
+              {getAiSubscriptionGateMessage(pricingTier ?? undefined)}
             </p>
             <Link
               href="/pricing"

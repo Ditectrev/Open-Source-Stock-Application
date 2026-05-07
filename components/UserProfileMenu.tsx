@@ -27,8 +27,8 @@ const PROVIDER_OPTIONS: Array<{
   {
     id: "OLLAMA",
     name: "Ollama (Local)",
-    subtitle: "Run locally on your machine",
-    allowedTiers: ["LOCAL"],
+    subtitle: "Run on your machine (no provider API key)",
+    allowedTiers: ["LOCAL", "BYOK"],
   },
   {
     id: "OPENAI",
@@ -160,6 +160,30 @@ export function UserProfileMenu() {
       setActiveUntil(storedUntil);
     }
   }, []);
+
+  useEffect(() => {
+    const allowedForTier = PROVIDER_OPTIONS.filter((p) =>
+      p.allowedTiers.includes(tier)
+    );
+    if (allowedForTier.length === 0) {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("explanations_provider");
+      }
+      setSelectedExplanationProvider((prev) =>
+        prev === "OPENAI" ? prev : "OPENAI"
+      );
+      return;
+    }
+    const currentOk = allowedForTier.some(
+      (p) => p.id === selectedExplanationProvider
+    );
+    if (currentOk) return;
+    const next = allowedForTier[0].id;
+    setSelectedExplanationProvider(next);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("explanations_provider", next);
+    }
+  }, [tier, selectedExplanationProvider]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -331,6 +355,13 @@ export function UserProfileMenu() {
               <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                 Explanations Provider
               </h3>
+              {!["LOCAL", "BYOK", "HOSTED_AI"].includes(tier) && (
+                <p className="text-xs text-amber-700 dark:text-amber-300/90">
+                  AI explanations (Ollama, cloud keys, or Ditectrev AI) unlock
+                  after you subscribe to an AI plan — Ads-free and Free tiers do
+                  not include server-side AI.
+                </p>
+              )}
               <div className="grid grid-cols-2 gap-2">
                 {PROVIDER_OPTIONS.map((provider) => {
                   const allowed = provider.allowedTiers.includes(tier);
