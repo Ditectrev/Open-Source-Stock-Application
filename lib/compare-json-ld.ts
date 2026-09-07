@@ -137,5 +137,11 @@ export function comparisonTitle(name: string): string {
 export function comparisonDescription(
   competitor: CompetitorComparison
 ): string {
-  return competitor.verdict.slice(0, 158);
+  const maxLength = 158;
+  if (competitor.verdict.length <= maxLength) {
+    return competitor.verdict;
+  }
+  const truncated = competitor.verdict.slice(0, maxLength);
+  const lastSpace = truncated.lastIndexOf(" ");
+  return lastSpace > 0 ? truncated.slice(0, lastSpace) + "…" : truncated;
 }

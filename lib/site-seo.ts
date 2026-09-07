@@ -75,7 +75,9 @@ export function buildPageMetadata(input: PageMetadataInput): Metadata {
       : `${input.title} | ${SITE_NAME}`;
 
   return {
-    title: input.title,
+    title: input.title.includes(SITE_NAME)
+      ? { absolute: input.title }
+      : input.title,
     description: input.description,
     keywords: input.keywords?.length
       ? [...input.keywords, ...SITE_KEYWORDS]
