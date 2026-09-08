@@ -59,6 +59,8 @@ export type PageMetadataInput = {
   title: string;
   description: string;
   path?: string;
+  /** Extra keywords merged ahead of site defaults when set. */
+  keywords?: string[];
   /** Omit on pages that should not be indexed (e.g. profile). */
   noIndex?: boolean;
 };
@@ -73,9 +75,13 @@ export function buildPageMetadata(input: PageMetadataInput): Metadata {
       : `${input.title} | ${SITE_NAME}`;
 
   return {
-    title: input.title,
+    title: input.title.includes(SITE_NAME)
+      ? { absolute: input.title }
+      : input.title,
     description: input.description,
-    keywords: SITE_KEYWORDS,
+    keywords: input.keywords?.length
+      ? [...input.keywords, ...SITE_KEYWORDS]
+      : SITE_KEYWORDS,
     alternates: { canonical },
     robots: input.noIndex
       ? { index: false, follow: false }
