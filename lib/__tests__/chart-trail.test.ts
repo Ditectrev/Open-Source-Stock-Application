@@ -209,4 +209,40 @@ describe("animateChartTrail", () => {
     expect(onComplete).toHaveBeenCalled();
     expect(fitContent).not.toHaveBeenCalled();
   });
+
+  it("keeps time-scale edges locked after the trail so the series cannot pan off-screen", () => {
+    const series = createSeriesMock();
+    const { chart, applyOptions } = createChartMock();
+    const data = Array.from({ length: 40 }, (_, i) => ({
+      time: i + 1,
+      value: i,
+    }));
+
+    let now = 0;
+    vi.mocked(performance.now).mockImplementation(() => now);
+    vi.mocked(requestAnimationFrame).mockImplementation((cb) => {
+      now += 200;
+      cb(now);
+      return now;
+    });
+
+    animateChartTrail(series as never, data, {
+      chart,
+      durationMs: 1000,
+    });
+
+    const timeScaleLocks = applyOptions.mock.calls
+      .map(
+        (call) => call[0] as { fixLeftEdge?: boolean; fixRightEdge?: boolean }
+      )
+      .filter(
+        (options) => "fixLeftEdge" in options || "fixRightEdge" in options
+      );
+
+    expect(timeScaleLocks.length).toBeGreaterThan(0);
+    expect(timeScaleLocks.at(-1)).toMatchObject({
+      fixLeftEdge: true,
+      fixRightEdge: true,
+    });
+  });
 });

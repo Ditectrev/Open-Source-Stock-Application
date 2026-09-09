@@ -1,13 +1,33 @@
 "use client";
 
 import { DNA_BODY, DNA_BODY_SECONDARY, DNA_CAPTION } from "@/lib/design-dna";
+import { normalizeReleaseTag } from "@/lib/release-tag";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import GitHubButton from "react-github-btn";
 import packageJson from "../package.json";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
+  const [version, setVersion] = useState(packageJson.version);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetch("/api/version")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((payload: { version?: string } | null) => {
+        if (cancelled || !payload?.version) return;
+        setVersion(normalizeReleaseTag(payload.version));
+      })
+      .catch(() => {
+        // Keep package.json version when GitHub is unreachable.
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <footer
@@ -27,8 +47,11 @@ export function Footer() {
         </GitHubButton>
       </div>
 
-      <p className={`mb-2 text-center ${DNA_CAPTION}`}>
-        v{packageJson.version} (open alpha, might contain bugs)
+      <p
+        className={`mb-2 text-center ${DNA_CAPTION}`}
+        data-testid="app-version"
+      >
+        v{version} (open alpha, might contain bugs)
       </p>
 
       <nav

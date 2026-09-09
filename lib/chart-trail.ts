@@ -167,10 +167,12 @@ function lockTimeScale(chart: IChartApi): void {
 
 function unlockTimeScale(chart: IChartApi): void {
   try {
+    // Keep both edges fixed so drag/zoom cannot pan the series into empty space.
     chart.timeScale().applyOptions({
-      fixLeftEdge: false,
-      fixRightEdge: false,
-      shiftVisibleRangeOnNewBar: true,
+      fixLeftEdge: true,
+      fixRightEdge: true,
+      shiftVisibleRangeOnNewBar: false,
+      rightOffset: 0,
     });
   } catch {
     // Chart may already be removed.
@@ -195,12 +197,16 @@ function unlockChartInteraction(chart: IChartApi): void {
         mouseWheel: true,
         pressedMouseMove: true,
         horzTouchDrag: true,
-        vertTouchDrag: true,
+        vertTouchDrag: false,
       },
       handleScale: {
         axisPressedMouseMove: true,
         mouseWheel: true,
         pinch: true,
+      },
+      kineticScroll: {
+        mouse: false,
+        touch: false,
       },
     });
   } catch {

@@ -1,6 +1,6 @@
 {
   "name": "the-open-stock",
-  "version": "0.67.0",
+  "version": "0.70.0",
   "private": true,
   "scripts": {
     "dev": "bun --bun next dev",
