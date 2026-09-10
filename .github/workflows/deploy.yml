@@ -100,7 +100,13 @@ jobs:
       - run: bun install
 
       - name: Install Playwright browsers
-        run: bunx playwright install --with-deps chromium
+        run: |
+          # GitHub-hosted Ubuntu ships Google's Chrome apt source. A hash mismatch
+          # there makes `apt-get update` fail and aborts `playwright install --with-deps`.
+          sudo rm -f /etc/apt/sources.list.d/google-chrome.list \
+            /etc/apt/sources.list.d/google-chrome.sources \
+            /etc/apt/sources.list.d/google.list
+          bunx playwright install --with-deps chromium
 
       - name: Build
         run: bun run build
