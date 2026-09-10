@@ -116,12 +116,16 @@ export const getDefaultChartOptions = (
       mouseWheel: true,
       pressedMouseMove: true,
       horzTouchDrag: true,
-      vertTouchDrag: true,
+      vertTouchDrag: false,
     },
     handleScale: {
       axisPressedMouseMove: true,
       mouseWheel: true,
       pinch: true,
+    },
+    kineticScroll: {
+      mouse: false,
+      touch: false,
     },
   };
 };

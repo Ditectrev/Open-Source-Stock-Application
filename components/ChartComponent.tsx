@@ -350,6 +350,13 @@ export function ChartComponent({
 
         let mainSeries: ISeriesApi<"Candlestick"> | ISeriesApi<"Area">;
 
+        chart.timeScale().applyOptions({
+          fixLeftEdge: true,
+          fixRightEdge: true,
+          shiftVisibleRangeOnNewBar: false,
+          rightOffset: 0,
+        });
+
         if (chartType === "candlestick") {
           mainSeries = chart.addSeries(CandlestickSeries, {
             upColor: chartColors.up,
@@ -359,13 +366,6 @@ export function ChartComponent({
             wickDownColor: chartColors.wickDown,
           });
         } else {
-          chart.timeScale().applyOptions({
-            fixLeftEdge: true,
-            fixRightEdge: true,
-            shiftVisibleRangeOnNewBar: false,
-            rightOffset: 0,
-          });
-
           mainSeries = chart.addSeries(AreaSeries, {
             lineColor: chartColors.series,
             topColor: chartColors.areaTop,
