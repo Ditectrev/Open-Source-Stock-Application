@@ -39,6 +39,8 @@ export const MARKET_UI_COPY = {
     cryptoPerformance: "We couldn't load crypto performance. Try again.",
     liveSymbol: "We couldn't load live quote data. Try again.",
     liveHistorical: "We couldn't load live price history. Try again.",
+    marketNews: "We couldn't load market news. Try again.",
+    newsArticle: "We couldn't load that article. Try again.",
     aiPredictionGenerate: "We couldn't generate the AI prediction. Try again.",
     aiPredictionSnapshot:
       "We couldn't load data for the AI prediction. Try again.",

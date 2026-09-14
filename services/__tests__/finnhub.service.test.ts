@@ -108,3 +108,40 @@ describe("FinnhubService.getSymbolQuote", () => {
     expect(data.fiftyTwoWeekLow).toBe(80);
   });
 });
+
+describe("FinnhubService market news", () => {
+  const fetchSpy = vi.fn();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    process.env.FINNHUB_API_KEY = "test-finnhub-key";
+    vi.stubGlobal("fetch", fetchSpy);
+  });
+
+  it("maps headlines, summaries, and related tickers", async () => {
+    fetchSpy.mockResolvedValue(
+      jsonResponse([
+        {
+          datetime: 1_705_320_000,
+          headline: "McDonald's same-store sales rise",
+          id: 42,
+          image: "https://example.com/mcd.jpg",
+          related: "MCD,SBUX",
+          source: "Reuters",
+          summary: "McDonald's beat estimates.",
+          url: "https://example.com/mcd-story",
+        },
+      ])
+    );
+
+    const articles = await new FinnhubService().getMarketNews();
+    expect(fetchSpy).toHaveBeenCalledWith(
+      expect.stringContaining("/news?category=general")
+    );
+    expect(articles[0]?.slug).toBe("mcdonalds-same-store-sales-rise");
+    expect(articles[0]?.mentionedSymbols).toEqual(
+      expect.arrayContaining(["MCD", "SBUX"])
+    );
+    expect(articles[0]?.title).toMatch(/McDonald/);
+  });
+});

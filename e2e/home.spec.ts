@@ -14,6 +14,7 @@ test.describe("Home Page", () => {
   test("should display navigation links for all sections", async ({ page }) => {
     const nav = page.locator("nav[aria-label='Main navigation']");
     await expect(nav.getByText("Home")).toBeVisible();
+    await expect(nav.getByText("News")).toBeVisible();
     await expect(nav.getByText("Sectors")).toBeVisible();
     await expect(nav.getByText("Calendars")).toBeVisible();
     await expect(nav.getByText("Heatmaps")).toBeVisible();
@@ -27,6 +28,7 @@ test.describe("Home Page", () => {
     await expect(home.getByText("Visual market overview")).toBeVisible();
     await expect(home.getByText("Filter and find assets")).toBeVisible();
     await expect(home.getByText("Earnings, dividends & IPOs")).toBeVisible();
+    await expect(home.getByText("Headlines & mentioned stocks")).toBeVisible();
   });
 
   test("should display Fear & Greed gauge on the home page (Req 9.1)", async ({
@@ -47,7 +49,7 @@ test.describe("Home Page", () => {
     page,
   }) => {
     const nav = page.locator("nav[aria-label='Main navigation']");
-    await nav.getByText("Sectors").click();
+    await nav.getByRole("link", { name: "Sectors" }).click();
 
     await expect(page).toHaveURL(/\/sectors$/);
     const sectorHub = page.getByTestId("sector-hub");
@@ -71,5 +73,7 @@ test.describe("Home Page", () => {
     const footer = page.locator("footer[aria-label='Site footer']");
     await footer.scrollIntoViewIfNeeded();
     await expect(footer).toBeVisible();
+    await expect(footer.getByRole("link", { name: "Compare" })).toBeVisible();
+    await expect(footer.getByRole("link", { name: "News" })).toHaveCount(0);
   });
 });

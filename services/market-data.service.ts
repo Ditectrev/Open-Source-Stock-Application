@@ -42,6 +42,7 @@ import {
   getBollingerSignal,
   getOverallSentiment,
 } from "@/lib/technical-indicators";
+import { newsSlugFromId, type NewsArticle } from "@/lib/news";
 
 function quoteNeedsYahooEnrichment(data: SymbolData): boolean {
   return (
@@ -798,6 +799,109 @@ export class MarketDataService {
     }
 
     return { heatmap, averageByMonth };
+  }
+
+  /**
+   * Latest market news (Finnhub when configured, Yahoo otherwise).
+   */
+  async getMarketNews(symbol?: string | null): Promise<NewsArticle[]> {
+    const ticker = symbol?.trim().toUpperCase() || null;
+    const cacheKey = ticker ? `news:symbol:${ticker}` : "news:market";
+
+    const cached = cacheService.get<NewsArticle[]>(cacheKey);
+    if (cached) {
+      this.indexNewsArticles(cached);
+      return cached;
+    }
+
+    const endpoint = ticker ? `news:symbol:${ticker}` : "news:market";
+    const allowed = await rateLimiter.checkLimit(endpoint);
+
+    if (!allowed) {
+      logger.warn(
+        "Rate limit exceeded for news, serving stale cache if available",
+        {
+          symbol: ticker,
+        }
+      );
+      const stale = cacheService.get<NewsArticle[]>(cacheKey);
+      if (stale) {
+        this.indexNewsArticles(stale);
+        return stale;
+      }
+      throw new Error("Rate limit exceeded and no cached data available");
+    }
+
+    const data = ticker
+      ? await this.fetchCompanyNews(ticker)
+      : await this.fetchMarketNews();
+    rateLimiter.recordCall(endpoint);
+    cacheService.set(cacheKey, data, this.cacheTTL);
+    this.indexNewsArticles(data);
+    return data;
+  }
+
+  async getNewsArticle(slug: string): Promise<NewsArticle | null> {
+    const normalized = slug.trim().toLowerCase();
+    if (!normalized) return null;
+
+    const cached = cacheService.get<NewsArticle>(`news:article:${normalized}`);
+    if (cached) return cached;
+
+    const articles = await this.getMarketNews();
+    return (
+      articles.find(
+        (article) =>
+          article.slug === normalized ||
+          newsSlugFromId("fh", article.id) === normalized ||
+          newsSlugFromId("yh", article.id) === normalized
+      ) ?? cacheService.get<NewsArticle>(`news:article:${normalized}`)
+    );
+  }
+
+  private async fetchMarketNews(): Promise<NewsArticle[]> {
+    if (finnhubService.isConfigured()) {
+      try {
+        const articles = await finnhubService.getMarketNews();
+        if (articles.length > 0) return articles;
+      } catch (error) {
+        logger.warn("Finnhub market news failed, falling back to Yahoo", {
+          error: (error as Error).message,
+        });
+      }
+    }
+    return yahooFinanceService.getMarketNews();
+  }
+
+  private async fetchCompanyNews(symbol: string): Promise<NewsArticle[]> {
+    if (finnhubService.isConfigured()) {
+      try {
+        const articles = await finnhubService.getCompanyNews(symbol);
+        if (articles.length > 0) return articles;
+      } catch (error) {
+        logger.warn("Finnhub company news failed, falling back to Yahoo", {
+          symbol,
+          error: (error as Error).message,
+        });
+      }
+    }
+    return yahooFinanceService.getCompanyNews(symbol);
+  }
+
+  private indexNewsArticles(articles: NewsArticle[]): void {
+    for (const article of articles) {
+      cacheService.set(`news:article:${article.slug}`, article, this.cacheTTL);
+      cacheService.set(
+        `news:article:${newsSlugFromId("fh", article.id)}`,
+        article,
+        this.cacheTTL
+      );
+      cacheService.set(
+        `news:article:${newsSlugFromId("yh", article.id)}`,
+        article,
+        this.cacheTTL
+      );
+    }
   }
 
   /**

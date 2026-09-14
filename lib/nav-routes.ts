@@ -3,6 +3,7 @@
  */
 export const MAIN_NAV = [
   { id: "home", label: "Home", href: "/" },
+  { id: "news", label: "News", href: "/news" },
   { id: "sectors", label: "Sectors", href: "/sectors" },
   { id: "calendars", label: "Calendars", href: "/calendars" },
   { id: "heatmaps", label: "Heatmaps", href: "/heatmaps" },
@@ -23,7 +24,8 @@ export function pathnameToNavId(pathname: string): MainNavId | string {
     first === "screener" ||
     first === "pricing" ||
     first === "profile" ||
-    first === "compare"
+    first === "compare" ||
+    first === "news"
   ) {
     return first;
   }

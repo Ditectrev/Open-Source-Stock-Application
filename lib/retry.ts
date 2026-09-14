@@ -43,6 +43,22 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function httpStatusFromError(error: Error): number | undefined {
+  const tagged = (error as Error & { status?: unknown }).status;
+  if (typeof tagged === "number" && Number.isFinite(tagged)) {
+    return tagged;
+  }
+  const match = error.message.match(/(?:failed|error):\s*(\d{3})\b/i);
+  return match ? Number(match[1]) : undefined;
+}
+
+/** 4xx (except 429) will not recover by waiting — skip backoff and fall through. */
+export function isRetryableFailure(error: Error): boolean {
+  const status = httpStatusFromError(error);
+  if (status == null) return true;
+  return status === 429 || status >= 500;
+}
+
 /**
  * Retry a function with exponential backoff
  */
@@ -70,12 +86,13 @@ export async function retryWithBackoff<T>(
       return result;
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
+      const retryable = isRetryableFailure(lastError);
+      const isLastAttempt = attempt === opts.maxAttempts - 1;
 
-      // Don't retry on last attempt
-      if (attempt === opts.maxAttempts - 1) {
+      if (isLastAttempt || !retryable) {
         logger.error("All retry attempts failed", lastError, {
           context,
-          attempts: opts.maxAttempts,
+          attempts: attempt + 1,
         });
         break;
       }

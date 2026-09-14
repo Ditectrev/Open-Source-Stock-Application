@@ -1,14 +1,9 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { Suspense } from "react";
+import { Footer } from "@/components/Footer";
 import { Navigation } from "@/components/Navigation";
 import { HOME_PAGE_BACKGROUND } from "@/lib/home-ui";
-
-const Footer = dynamic(
-  () => import("@/components/Footer").then((m) => m.Footer),
-  { ssr: false }
-);
 
 function NavigationFallback() {
   return (

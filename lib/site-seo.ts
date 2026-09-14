@@ -27,6 +27,8 @@ export const SITE_KEYWORDS = [
   "earnings calendar",
   "sector performance",
   "stock heatmap",
+  "stock news",
+  "market news",
   "Fear and Greed Index",
   "analyst forecasts",
   "open source stock app",
@@ -82,7 +84,12 @@ export function buildPageMetadata(input: PageMetadataInput): Metadata {
     keywords: input.keywords?.length
       ? [...input.keywords, ...SITE_KEYWORDS]
       : SITE_KEYWORDS,
-    alternates: { canonical },
+    alternates: {
+      canonical,
+      types: {
+        "application/rss+xml": `${siteUrl}/news/rss.xml`,
+      },
+    },
     robots: input.noIndex
       ? { index: false, follow: false }
       : { index: true, follow: true },
@@ -120,6 +127,9 @@ export function buildRootMetadata(): Metadata {
     category: "finance",
     alternates: {
       canonical: "/",
+      types: {
+        "application/rss+xml": `${siteUrl}/news/rss.xml`,
+      },
     },
     robots: {
       index: true,
@@ -165,12 +175,21 @@ export function buildWebSiteJsonLd() {
         description: DEFAULT_DESCRIPTION,
         inLanguage: "en-US",
         publisher: { "@id": `${siteUrl}/#organization` },
+        potentialAction: {
+          "@type": "SearchAction",
+          target: {
+            "@type": "EntryPoint",
+            urlTemplate: `${siteUrl}/?symbol={symbol}`,
+          },
+          "query-input": "required name=symbol",
+        },
       },
       {
         "@type": "Organization",
         "@id": `${siteUrl}/#organization`,
         name: SITE_NAME,
         url: siteUrl,
+        description: DEFAULT_DESCRIPTION,
         sameAs: ["https://github.com/Ditectrev/Open-Source-Stock-Application"],
       },
       {
@@ -197,6 +216,7 @@ export const PUBLIC_ROUTES = [
   { path: "/calendars", priority: 0.85, changeFrequency: "daily" as const },
   { path: "/heatmaps", priority: 0.85, changeFrequency: "daily" as const },
   { path: "/screener", priority: 0.9, changeFrequency: "daily" as const },
+  { path: "/news", priority: 0.9, changeFrequency: "hourly" as const },
   {
     path: "/stock-of-the-day",
     priority: 0.9,

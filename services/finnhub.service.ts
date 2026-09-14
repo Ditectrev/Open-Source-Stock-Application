@@ -1,4 +1,10 @@
 import { logger } from "@/lib/logger";
+import {
+  buildNewsArticle,
+  toIsoFromUnixSeconds,
+  withUniqueNewsSlugs,
+  type NewsArticle,
+} from "@/lib/news";
 import { retryWithBackoff } from "@/lib/retry";
 import { PriceData, SymbolData, TimeRange } from "@/types";
 
@@ -277,6 +283,77 @@ export class FinnhubService {
       return points;
     }, `Finnhub:Historical:${symbol}:${range}`);
   }
+
+  async getMarketNews(): Promise<NewsArticle[]> {
+    return retryWithBackoff(async () => {
+      const apiKey = requireFinnhubApiKey();
+      const response = await fetch(
+        `${FINNHUB_BASE_URL}/news?category=general&token=${encodeURIComponent(apiKey)}`
+      );
+      if (!response.ok) {
+        throw new Error(`Finnhub news failed: ${response.status}`);
+      }
+      const data: unknown = await response.json();
+      return mapFinnhubNews(data);
+    }, "Finnhub:MarketNews");
+  }
+
+  async getCompanyNews(symbol: string): Promise<NewsArticle[]> {
+    const upperSymbol = symbol.trim().toUpperCase();
+    return retryWithBackoff(async () => {
+      const apiKey = requireFinnhubApiKey();
+      const to = new Date();
+      const from = new Date();
+      from.setUTCDate(to.getUTCDate() - 14);
+      const fromDate = from.toISOString().slice(0, 10);
+      const toDate = to.toISOString().slice(0, 10);
+      const response = await fetch(
+        `${FINNHUB_BASE_URL}/company-news?symbol=${encodeURIComponent(upperSymbol)}&from=${fromDate}&to=${toDate}&token=${encodeURIComponent(apiKey)}`
+      );
+      if (!response.ok) {
+        throw new Error(`Finnhub company news failed: ${response.status}`);
+      }
+      const data: unknown = await response.json();
+      return mapFinnhubNews(data, upperSymbol);
+    }, `Finnhub:CompanyNews:${upperSymbol}`);
+  }
+}
+
+type FinnhubNewsItem = {
+  datetime?: number;
+  headline?: string;
+  id?: number | string;
+  related?: string;
+  source?: string;
+  summary?: string;
+  url?: string;
+};
+
+function mapFinnhubNews(
+  payload: unknown,
+  fallbackSymbol?: string
+): NewsArticle[] {
+  if (!Array.isArray(payload)) return [];
+  const articles: NewsArticle[] = [];
+  for (const item of payload as FinnhubNewsItem[]) {
+    const related = item.related
+      ? item.related
+      : fallbackSymbol
+        ? fallbackSymbol
+        : [];
+    const article = buildNewsArticle({
+      sourcePrefix: "fh",
+      id: String(item.id ?? ""),
+      title: item.headline ?? "",
+      summary: item.summary ?? "",
+      source: item.source ?? "Finnhub",
+      sourceUrl: item.url ?? "",
+      publishedAt: toIsoFromUnixSeconds(item.datetime),
+      related,
+    });
+    if (article) articles.push(article);
+  }
+  return withUniqueNewsSlugs(articles).slice(0, 40);
 }
 
 export const finnhubService = new FinnhubService();

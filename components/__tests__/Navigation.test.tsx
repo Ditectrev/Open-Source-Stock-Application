@@ -47,6 +47,10 @@ describe("Navigation", () => {
       "href",
       "/"
     );
+    expect(screen.getByRole("link", { name: "News" })).toHaveAttribute(
+      "href",
+      "/news"
+    );
     expect(screen.getByRole("link", { name: "Sectors" })).toHaveAttribute(
       "href",
       "/sectors"
@@ -113,5 +117,22 @@ describe("Navigation", () => {
       "aria-label",
       "Main navigation"
     );
+  });
+
+  it("shows a loading overlay when a news pagination link is clicked", async () => {
+    mockPathname = "/news";
+    const user = userEvent.setup();
+    render(
+      <>
+        <Navigation />
+        <a href="/news?page=2">Next</a>
+      </>
+    );
+
+    await user.click(screen.getByRole("link", { name: "Next" }));
+    expect(screen.getByTestId("news-loading-overlay")).toBeInTheDocument();
+    expect(
+      screen.getByRole("status", { name: "Loading headlines..." })
+    ).toBeInTheDocument();
   });
 });
