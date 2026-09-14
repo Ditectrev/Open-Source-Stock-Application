@@ -810,7 +810,7 @@ export class MarketDataService {
 
     const cached = cacheService.get<NewsArticle[]>(cacheKey);
     if (cached) {
-      this.indexNewsArticles(cached);
+      this.indexNewsArticles(cached, ticker);
       return cached;
     }
 
@@ -826,7 +826,7 @@ export class MarketDataService {
       );
       const stale = cacheService.get<NewsArticle[]>(cacheKey);
       if (stale) {
-        this.indexNewsArticles(stale);
+        this.indexNewsArticles(stale, ticker);
         return stale;
       }
       throw new Error("Rate limit exceeded and no cached data available");
@@ -837,7 +837,7 @@ export class MarketDataService {
       : await this.fetchMarketNews();
     rateLimiter.recordCall(endpoint);
     cacheService.set(cacheKey, data, this.cacheTTL);
-    this.indexNewsArticles(data);
+    this.indexNewsArticles(data, ticker);
     return data;
   }
 
@@ -849,14 +849,29 @@ export class MarketDataService {
     if (cached) return cached;
 
     const articles = await this.getMarketNews();
-    return (
-      articles.find(
+    const found = articles.find(
+      (article) =>
+        article.slug === normalized ||
+        newsSlugFromId("fh", article.id) === normalized ||
+        newsSlugFromId("yh", article.id) === normalized
+    );
+    if (found) return found;
+
+    const symbolHint = cacheService.get<string>(
+      `news:symbol-hint:${normalized}`
+    );
+    if (symbolHint) {
+      const symbolArticles = await this.getMarketNews(symbolHint);
+      const foundInSymbol = symbolArticles.find(
         (article) =>
           article.slug === normalized ||
           newsSlugFromId("fh", article.id) === normalized ||
           newsSlugFromId("yh", article.id) === normalized
-      ) ?? cacheService.get<NewsArticle>(`news:article:${normalized}`)
-    );
+      );
+      if (foundInSymbol) return foundInSymbol;
+    }
+
+    return cacheService.get<NewsArticle>(`news:article:${normalized}`) ?? null;
   }
 
   private async fetchMarketNews(): Promise<NewsArticle[]> {
@@ -888,7 +903,10 @@ export class MarketDataService {
     return yahooFinanceService.getCompanyNews(symbol);
   }
 
-  private indexNewsArticles(articles: NewsArticle[]): void {
+  private indexNewsArticles(
+    articles: NewsArticle[],
+    symbol?: string | null
+  ): void {
     for (const article of articles) {
       cacheService.set(`news:article:${article.slug}`, article, this.cacheTTL);
       cacheService.set(
@@ -901,6 +919,23 @@ export class MarketDataService {
         article,
         this.cacheTTL
       );
+      if (symbol) {
+        cacheService.set(
+          `news:symbol-hint:${article.slug}`,
+          symbol,
+          this.cacheTTL
+        );
+        cacheService.set(
+          `news:symbol-hint:${newsSlugFromId("fh", article.id)}`,
+          symbol,
+          this.cacheTTL
+        );
+        cacheService.set(
+          `news:symbol-hint:${newsSlugFromId("yh", article.id)}`,
+          symbol,
+          this.cacheTTL
+        );
+      }
     }
   }
 

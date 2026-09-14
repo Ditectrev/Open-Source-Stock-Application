@@ -52,6 +52,12 @@ export function Navigation({
   }, [pathname, searchParams]);
 
   useEffect(() => {
+    if (!newsPendingMessage) return;
+    const timeout = setTimeout(() => setNewsPendingMessage(null), 2000);
+    return () => clearTimeout(timeout);
+  }, [newsPendingMessage]);
+
+  useEffect(() => {
     if (!(pathname ?? "").startsWith("/news")) return;
 
     const onClick = (event: MouseEvent) => {
