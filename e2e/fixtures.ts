@@ -207,6 +207,59 @@ export async function installE2eMocks(page: Page) {
     })
   );
 
+  const STABLE_NEWS = [
+    {
+      id: "mcd-1",
+      slug: "yh-mcd-1",
+      title: "McDonald's same-store sales rise",
+      summary: "McDonald's beat estimates while Starbucks lagged.",
+      source: "Reuters",
+      sourceUrl: "https://example.com/mcd-story",
+      publishedAt: STABLE_TS,
+      mentionedSymbols: ["MCD", "SBUX"],
+    },
+  ];
+
+  await page.route("**/api/market/news**", async (route) => {
+    const url = new URL(route.request().url());
+    const path = url.pathname;
+    const slugMatch = path.match(/\/api\/market\/news\/([^/]+)$/);
+    if (slugMatch) {
+      const slug = decodeURIComponent(slugMatch[1]);
+      const article = STABLE_NEWS.find((item) => item.slug === slug);
+      if (!article) {
+        return route.fulfill({
+          status: 404,
+          contentType: "application/json",
+          body: JSON.stringify({
+            success: false,
+            error: "Article not found",
+            timestamp: STABLE_TS,
+          }),
+        });
+      }
+      return route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          success: true,
+          data: article,
+          timestamp: STABLE_TS,
+        }),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        success: true,
+        data: STABLE_NEWS,
+        timestamp: STABLE_TS,
+      }),
+    });
+  });
+
   await page.route("**/api/screener/**", async (route) => {
     const url = route.request().url();
     const method = route.request().method();

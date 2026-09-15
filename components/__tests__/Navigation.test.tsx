@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Navigation } from "@/components/Navigation";
+import Link from "next/link";
 
 const mockPush = vi.fn();
 let mockPathname = "/";
@@ -46,6 +47,10 @@ describe("Navigation", () => {
     expect(screen.getByRole("link", { name: "Home" })).toHaveAttribute(
       "href",
       "/"
+    );
+    expect(screen.getByRole("link", { name: "News" })).toHaveAttribute(
+      "href",
+      "/news"
     );
     expect(screen.getByRole("link", { name: "Sectors" })).toHaveAttribute(
       "href",
@@ -113,5 +118,22 @@ describe("Navigation", () => {
       "aria-label",
       "Main navigation"
     );
+  });
+
+  it("shows a loading overlay when a news pagination link is clicked", async () => {
+    mockPathname = "/news";
+    const user = userEvent.setup();
+    render(
+      <>
+        <Navigation />
+        <Link href="/news?page=2">Next</Link>
+      </>
+    );
+
+    await user.click(screen.getByRole("link", { name: "Next" }));
+    expect(screen.getByTestId("news-loading-overlay")).toBeInTheDocument();
+    expect(
+      screen.getByRole("status", { name: "Loading headlines..." })
+    ).toBeInTheDocument();
   });
 });

@@ -5,6 +5,12 @@
 
 import { logger } from "@/lib/logger";
 import { env } from "@/lib/env";
+import {
+  buildNewsArticle,
+  toIsoFromUnixSeconds,
+  withUniqueNewsSlugs,
+  type NewsArticle,
+} from "@/lib/news";
 import { retryWithBackoff } from "@/lib/retry";
 import {
   SymbolData,
@@ -302,6 +308,47 @@ export class YahooFinanceService {
         throw error;
       }
     }, `YahooFinance:Search:${query}`);
+  }
+
+  /**
+   * Market or symbol news via Yahoo search (headlines + related tickers).
+   */
+  async getMarketNews(query = "stock market"): Promise<NewsArticle[]> {
+    const searchQuery = query.trim() || "stock market";
+    return retryWithBackoff(async () => {
+      try {
+        const response = await fetch(
+          `${this.baseUrl}/v1/finance/search?q=${encodeURIComponent(searchQuery)}&quotesCount=0&newsCount=25`,
+          {
+            headers: {
+              Accept: "application/json",
+              "User-Agent": "Mozilla/5.0",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            `Yahoo Finance API error: ${response.status} ${response.statusText}`
+          );
+        }
+
+        const data = (await response.json()) as {
+          news?: YahooNewsItem[];
+        };
+        return mapYahooNews(data.news ?? [], searchQuery);
+      } catch (error) {
+        logger.error("Failed to fetch Yahoo news", error as Error, {
+          query: searchQuery,
+          baseUrl: this.baseUrl,
+        });
+        throw error;
+      }
+    }, `YahooFinance:News:${searchQuery}`);
+  }
+
+  async getCompanyNews(symbol: string): Promise<NewsArticle[]> {
+    return this.getMarketNews(symbol.trim().toUpperCase());
   }
 
   /**
@@ -1592,6 +1639,43 @@ export class YahooFinanceService {
         return { interval: "1d", period: "1y" };
     }
   }
+}
+
+type YahooNewsItem = {
+  uuid?: string;
+  title?: string;
+  publisher?: string;
+  link?: string;
+  summary?: string;
+  providerPublishTime?: number;
+  thumbnail?: { resolutions?: Array<{ url?: string; width?: number }> };
+  relatedTickers?: string[];
+};
+
+function mapYahooNews(
+  items: YahooNewsItem[],
+  fallbackQuery: string
+): NewsArticle[] {
+  const relatedFallback = /^[A-Z0-9][A-Z0-9.-]{0,11}$/.test(fallbackQuery)
+    ? [fallbackQuery]
+    : [];
+  const articles: NewsArticle[] = [];
+  for (const item of items) {
+    const article = buildNewsArticle({
+      sourcePrefix: "yh",
+      id: item.uuid ?? "",
+      title: item.title ?? "",
+      summary: item.summary ?? "",
+      source: item.publisher ?? "Yahoo Finance",
+      sourceUrl: item.link ?? "",
+      publishedAt: toIsoFromUnixSeconds(item.providerPublishTime),
+      related: item.relatedTickers?.length
+        ? item.relatedTickers
+        : relatedFallback,
+    });
+    if (article) articles.push(article);
+  }
+  return withUniqueNewsSlugs(articles).slice(0, 40);
 }
 
 // Export singleton instance

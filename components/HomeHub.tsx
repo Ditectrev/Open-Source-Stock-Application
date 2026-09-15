@@ -115,6 +115,29 @@ const EXPLORE_LINKS = [
       </svg>
     ),
   },
+  {
+    id: "news",
+    label: "News",
+    href: "/news",
+    description: "Headlines & mentioned stocks",
+    featured: false,
+    icon: (
+      <svg
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={1.5}
+          d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l6 6v8a2 2 0 01-2 2zM12 8v4m0 4h.01"
+        />
+      </svg>
+    ),
+  },
 ] as const;
 
 const SECTION_LABEL_CLASS = HOME_SECTION_LABEL;
@@ -177,10 +200,10 @@ export function HomeHub({
         >
           Explore
         </h2>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 lg:grid-rows-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2">
           <Link
             href={featured.href}
-            className="group relative flex min-h-[11rem] flex-col justify-between rounded-2xl border border-stone-900 bg-stone-900 p-6 text-stone-50 transition-shadow hover:shadow-lg dark:border-stone-100 dark:bg-stone-100 dark:text-stone-900 sm:min-h-[12rem] sm:col-span-2 lg:row-span-3 lg:min-h-0"
+            className="group relative flex min-h-[11rem] flex-col justify-between rounded-2xl border border-stone-900 bg-stone-900 p-6 text-stone-50 transition-shadow hover:shadow-lg dark:border-stone-100 dark:bg-stone-100 dark:text-stone-900 sm:min-h-[12rem] sm:col-span-2 lg:col-span-2 lg:row-span-2 lg:min-h-0"
           >
             <span className="text-stone-400 dark:text-stone-500">
               {featured.icon}

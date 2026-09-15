@@ -89,7 +89,6 @@ describe("Lazy loading behavior (Req 15.2)", () => {
     "ScreenerHub",
     "CalendarHub",
     "PricingPage",
-    "Footer",
   ];
 
   it("should use next/dynamic for code splitting", () => {
@@ -111,12 +110,10 @@ describe("Lazy loading behavior (Req 15.2)", () => {
   });
 
   it("should provide a loading fallback for heavy dynamic components", () => {
-    // All dynamic components except Footer should have a loading fallback
     const loadingCount = (pageSource.match(/loading:\s*\(\)\s*=>/g) || [])
       .length;
     const dynamicCount = (pageSource.match(/=\s*dynamic\(/g) || []).length;
-    // Footer is lightweight and doesn't need a loading fallback
-    expect(loadingCount).toBeGreaterThanOrEqual(dynamicCount - 1);
+    expect(loadingCount).toBe(dynamicCount);
   });
 
   it("should not statically import any lazy-loaded component", () => {
@@ -150,6 +147,7 @@ describe("Lazy loading behavior (Req 15.2)", () => {
       "HomeHub",
       "StockOfTheDayPanel",
       "ProductShell",
+      "Footer",
     ];
 
     for (const imp of staticImports!) {

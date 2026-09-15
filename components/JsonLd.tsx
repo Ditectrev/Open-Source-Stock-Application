@@ -1,4 +1,5 @@
 import { buildWebSiteJsonLd } from "@/lib/site-seo";
+import { serializeJsonLd } from "@/lib/json-ld";
 
 export function JsonLd({ data }: { data?: unknown } = {}) {
   const payload = data ?? buildWebSiteJsonLd();
@@ -6,7 +7,7 @@ export function JsonLd({ data }: { data?: unknown } = {}) {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(payload) }}
+      dangerouslySetInnerHTML={{ __html: serializeJsonLd(payload) }}
     />
   );
 }

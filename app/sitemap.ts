@@ -20,5 +20,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: path === "/compare" ? 0.8 : 0.75,
   }));
 
-  return [...appRoutes, ...compareRoutes];
+  const newsFeed = {
+    url: new URL("/news/rss.xml", siteUrl).toString(),
+    lastModified,
+    changeFrequency: "hourly" as const,
+    priority: 0.6,
+  };
+
+  const llmsTxt = {
+    url: new URL("/llms.txt", siteUrl).toString(),
+    lastModified,
+    changeFrequency: "weekly" as const,
+    priority: 0.4,
+  };
+
+  return [...appRoutes, ...compareRoutes, newsFeed, llmsTxt];
 }

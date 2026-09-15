@@ -42,6 +42,9 @@ import {
   getBollingerSignal,
   getOverallSentiment,
 } from "@/lib/technical-indicators";
+import { newsSlugFromId, type NewsArticle } from "@/lib/news";
+
+const NEWS_UPSTREAM_RATE_LIMIT_KEY = "news:upstream";
 
 function quoteNeedsYahooEnrichment(data: SymbolData): boolean {
   return (
@@ -798,6 +801,144 @@ export class MarketDataService {
     }
 
     return { heatmap, averageByMonth };
+  }
+
+  /**
+   * Latest market news (Finnhub when configured, Yahoo otherwise).
+   */
+  async getMarketNews(symbol?: string | null): Promise<NewsArticle[]> {
+    const ticker = symbol?.trim().toUpperCase() || null;
+    const cacheKey = ticker ? `news:symbol:${ticker}` : "news:market";
+
+    const cached = cacheService.get<NewsArticle[]>(cacheKey);
+    if (cached) {
+      this.indexNewsArticles(cached, ticker);
+      return cached;
+    }
+
+    // Use a shared upstream limiter bucket so symbol fan-out cannot bypass quotas.
+    const allowed = await rateLimiter.checkLimit(NEWS_UPSTREAM_RATE_LIMIT_KEY);
+
+    if (!allowed) {
+      logger.warn(
+        "Rate limit exceeded for news, serving stale cache if available",
+        {
+          symbol: ticker,
+        }
+      );
+      const stale = cacheService.get<NewsArticle[]>(cacheKey);
+      if (stale) {
+        this.indexNewsArticles(stale, ticker);
+        return stale;
+      }
+      throw new Error("Rate limit exceeded and no cached data available");
+    }
+
+    const data = ticker
+      ? await this.fetchCompanyNews(ticker)
+      : await this.fetchMarketNews();
+    rateLimiter.recordCall(NEWS_UPSTREAM_RATE_LIMIT_KEY);
+    cacheService.set(cacheKey, data, this.cacheTTL);
+    this.indexNewsArticles(data, ticker);
+    return data;
+  }
+
+  async getNewsArticle(slug: string): Promise<NewsArticle | null> {
+    const normalized = slug.trim().toLowerCase();
+    if (!normalized) return null;
+
+    const cached = cacheService.get<NewsArticle>(`news:article:${normalized}`);
+    if (cached) return cached;
+
+    const articles = await this.getMarketNews();
+    const found = articles.find(
+      (article) =>
+        article.slug === normalized ||
+        newsSlugFromId("fh", article.id) === normalized ||
+        newsSlugFromId("yh", article.id) === normalized
+    );
+    if (found) return found;
+
+    const symbolHint = cacheService.get<string>(
+      `news:symbol-hint:${normalized}`
+    );
+    if (symbolHint) {
+      const symbolArticles = await this.getMarketNews(symbolHint);
+      const foundInSymbol = symbolArticles.find(
+        (article) =>
+          article.slug === normalized ||
+          newsSlugFromId("fh", article.id) === normalized ||
+          newsSlugFromId("yh", article.id) === normalized
+      );
+      if (foundInSymbol) return foundInSymbol;
+    }
+
+    return cacheService.get<NewsArticle>(`news:article:${normalized}`) ?? null;
+  }
+
+  private async fetchMarketNews(): Promise<NewsArticle[]> {
+    if (finnhubService.isConfigured()) {
+      try {
+        const articles = await finnhubService.getMarketNews();
+        if (articles.length > 0) return articles;
+      } catch (error) {
+        logger.warn("Finnhub market news failed, falling back to Yahoo", {
+          error: (error as Error).message,
+        });
+      }
+    }
+    return yahooFinanceService.getMarketNews();
+  }
+
+  private async fetchCompanyNews(symbol: string): Promise<NewsArticle[]> {
+    if (finnhubService.isConfigured()) {
+      try {
+        const articles = await finnhubService.getCompanyNews(symbol);
+        if (articles.length > 0) return articles;
+      } catch (error) {
+        logger.warn("Finnhub company news failed, falling back to Yahoo", {
+          symbol,
+          error: (error as Error).message,
+        });
+      }
+    }
+    return yahooFinanceService.getCompanyNews(symbol);
+  }
+
+  private indexNewsArticles(
+    articles: NewsArticle[],
+    symbol?: string | null
+  ): void {
+    for (const article of articles) {
+      cacheService.set(`news:article:${article.slug}`, article, this.cacheTTL);
+      cacheService.set(
+        `news:article:${newsSlugFromId("fh", article.id)}`,
+        article,
+        this.cacheTTL
+      );
+      cacheService.set(
+        `news:article:${newsSlugFromId("yh", article.id)}`,
+        article,
+        this.cacheTTL
+      );
+      if (symbol) {
+        cacheService.set(
+          `news:symbol-hint:${article.slug}`,
+          symbol,
+          this.cacheTTL
+        );
+        cacheService.set(
+          `news:symbol-hint:${newsSlugFromId("fh", article.id)}`,
+          symbol,
+          this.cacheTTL
+        );
+        cacheService.set(
+          `news:symbol-hint:${newsSlugFromId("yh", article.id)}`,
+          symbol,
+          this.cacheTTL
+        );
+      }
+    }
   }
 
   /**
