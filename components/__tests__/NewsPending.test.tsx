@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import Link from "next/link";
 import { NewsPendingScope } from "@/components/NewsPending";
 
 describe("NewsPendingScope", () => {
@@ -8,9 +9,9 @@ describe("NewsPendingScope", () => {
     const user = userEvent.setup();
     render(
       <NewsPendingScope resetKey="/news">
-        <a href="/news?page=2">
+        <Link href="/news?page=2">
           <span>Next</span>
-        </a>
+        </Link>
       </NewsPendingScope>
     );
 

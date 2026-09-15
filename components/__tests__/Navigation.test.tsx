@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Navigation } from "@/components/Navigation";
+import Link from "next/link";
 
 const mockPush = vi.fn();
 let mockPathname = "/";
@@ -125,7 +126,7 @@ describe("Navigation", () => {
     render(
       <>
         <Navigation />
-        <a href="/news?page=2">Next</a>
+        <Link href="/news?page=2">Next</Link>
       </>
     );
 
