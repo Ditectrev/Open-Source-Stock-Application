@@ -62,7 +62,7 @@ export type PageMetadataInput = {
   description: string;
   path?: string;
   /** Extra keywords merged ahead of site defaults when set. */
-  keywords?: string[];
+  keywords?: readonly string[];
   /** Omit on pages that should not be indexed (e.g. profile). */
   noIndex?: boolean;
 };
