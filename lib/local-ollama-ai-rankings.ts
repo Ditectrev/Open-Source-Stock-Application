@@ -11,7 +11,11 @@ import {
 } from "@/lib/ai-stock-rankings";
 import { getAIProviderHeaders } from "@/lib/explanation-provider";
 import { MARKET_UI_COPY } from "@/lib/market-ui-copy";
-import type { AIStockRankingsResult, AIRankingTimeframe, PricingTier } from "@/types";
+import type {
+  AIStockRankingsResult,
+  AIRankingTimeframe,
+  PricingTier,
+} from "@/types";
 
 type AIStockRankingsApiResponse = {
   data?: AIStockRankingsResult;

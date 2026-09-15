@@ -146,7 +146,8 @@ export function AIStockRankingsPanel({
                 right={
                   data ? (
                     <p className={DNA_CAPTION}>
-                      Generated {new Date(data.generatedAt).toLocaleDateString()}
+                      Generated{" "}
+                      {new Date(data.generatedAt).toLocaleDateString()}
                     </p>
                   ) : undefined
                 }
@@ -184,7 +185,10 @@ export function AIStockRankingsPanel({
               })}
             </nav>
 
-            <p className={`mb-4 ${DNA_CAPTION}`} data-testid="ai-rankings-horizon">
+            <p
+              className={`mb-4 ${DNA_CAPTION}`}
+              data-testid="ai-rankings-horizon"
+            >
               Horizon: {activeHorizon}
             </p>
 
@@ -220,7 +224,8 @@ export function AIStockRankingsPanel({
 
             {!loading && !data && !locked && !error && (
               <p className={DNA_BODY_SECONDARY}>
-                No ranking result yet. Switch time frames or refresh to try again.
+                No ranking result yet. Switch time frames or refresh to try
+                again.
               </p>
             )}
           </div>

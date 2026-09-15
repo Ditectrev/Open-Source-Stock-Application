@@ -52,7 +52,9 @@ const TIMEFRAME_PROMPT_CONTEXT: Record<
   },
 };
 
-export function isAIRankingTimeframe(value: string): value is AIRankingTimeframe {
+export function isAIRankingTimeframe(
+  value: string
+): value is AIRankingTimeframe {
   return value === "short" || value === "medium" || value === "long";
 }
 

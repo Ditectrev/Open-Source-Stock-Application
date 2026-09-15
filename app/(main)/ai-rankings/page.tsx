@@ -65,7 +65,9 @@ export default function AIStockRankingsPage() {
       } catch (err) {
         setData(null);
         setLoadError(
-          err instanceof Error ? err.message : MARKET_UI_COPY.load.aiStockRankings
+          err instanceof Error
+            ? err.message
+            : MARKET_UI_COPY.load.aiStockRankings
         );
       } finally {
         setLoading(false);
@@ -110,7 +112,10 @@ export default function AIStockRankingsPage() {
         </p>
         <p className={DNA_CAPTION}>
           Related:{" "}
-          <Link href="/stock-of-the-day" className="underline underline-offset-2">
+          <Link
+            href="/stock-of-the-day"
+            className="underline underline-offset-2"
+          >
             Stock of the day
           </Link>
         </p>
