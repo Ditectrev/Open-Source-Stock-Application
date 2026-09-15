@@ -44,6 +44,8 @@ import {
 } from "@/lib/technical-indicators";
 import { newsSlugFromId, type NewsArticle } from "@/lib/news";
 
+const NEWS_UPSTREAM_RATE_LIMIT_KEY = "news:upstream";
+
 function quoteNeedsYahooEnrichment(data: SymbolData): boolean {
   return (
     data.volume <= 0 || data.fiftyTwoWeekHigh <= 0 || data.fiftyTwoWeekLow <= 0
@@ -814,8 +816,8 @@ export class MarketDataService {
       return cached;
     }
 
-    const endpoint = ticker ? `news:symbol:${ticker}` : "news:market";
-    const allowed = await rateLimiter.checkLimit(endpoint);
+    // Use a shared upstream limiter bucket so symbol fan-out cannot bypass quotas.
+    const allowed = await rateLimiter.checkLimit(NEWS_UPSTREAM_RATE_LIMIT_KEY);
 
     if (!allowed) {
       logger.warn(
@@ -835,7 +837,7 @@ export class MarketDataService {
     const data = ticker
       ? await this.fetchCompanyNews(ticker)
       : await this.fetchMarketNews();
-    rateLimiter.recordCall(endpoint);
+    rateLimiter.recordCall(NEWS_UPSTREAM_RATE_LIMIT_KEY);
     cacheService.set(cacheKey, data, this.cacheTTL);
     this.indexNewsArticles(data, ticker);
     return data;
