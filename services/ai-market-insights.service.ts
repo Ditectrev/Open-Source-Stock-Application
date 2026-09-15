@@ -15,6 +15,13 @@ import { marketDataService } from "@/services/market-data.service";
 import { AIIntegrationService } from "@/services/ai-integration.service";
 import { logger } from "@/lib/logger";
 import {
+  AI_STOCK_RANKINGS_DISPLAY_COUNT,
+  AI_STOCK_RANKINGS_MAX_OUTPUT_TOKENS,
+  buildAIStockRankingsPrompt,
+  parseAIStockRankingsCandidates,
+  type AIRankingTimeframe,
+} from "@/lib/ai-stock-rankings";
+import {
   parseStockOfTheDayCandidates,
   STOCK_OF_THE_DAY_CANDIDATES_PROMPT,
   STOCK_OF_THE_DAY_MAX_OUTPUT_TOKENS,
@@ -24,6 +31,8 @@ import {
 import type {
   AIPredictionReport,
   AIProvider,
+  AIStockRankingsResult,
+  AIRankedStock,
   ForecastData,
   StockOfTheDay,
   StockOfTheDayResult,
@@ -303,6 +312,49 @@ export class AIMarketInsightsService {
     };
   }
 
+  async getAIStockRankings(
+    timeframe: AIRankingTimeframe,
+    llmConfig?: LLMConfig
+  ): Promise<AIStockRankingsResult> {
+    const llm = llmConfig ?? getLLMConfigFromEnv();
+    if (!llm) {
+      throw new Error(
+        "An active AI provider is required for dynamic AI stock rankings."
+      );
+    }
+
+    const generatedCandidates = await this.generateAIStockRankingsCandidates(
+      timeframe,
+      llm
+    );
+    return this.enrichAIStockRankingsCandidates(timeframe, generatedCandidates);
+  }
+
+  async enrichAIStockRankingsCandidates(
+    timeframe: AIRankingTimeframe,
+    candidates: AIStockCandidate[]
+  ): Promise<AIStockRankingsResult> {
+    const enriched = await this.enrichRankingCandidates(candidates, timeframe);
+    const ranked = enriched
+      .sort((a, b) => b.score - a.score)
+      .slice(0, AI_STOCK_RANKINGS_DISPLAY_COUNT);
+
+    if (ranked.length < 4) {
+      throw new Error(
+        "AI did not return enough valid public stock candidates for this ranking."
+      );
+    }
+
+    const generatedAt = new Date();
+    return {
+      timeframe,
+      generatedAt,
+      stocks: ranked.map((candidate, index) =>
+        this.toAIRankedStock(candidate, index + 1)
+      ),
+    };
+  }
+
   private async generateStockOfTheDayCandidates(llm: LLMConfig): Promise<{
     buyCandidates: AIStockCandidate[];
     sellCandidates: AIStockCandidate[];
@@ -319,6 +371,86 @@ export class AIMarketInsightsService {
       maxOutputTokens: STOCK_OF_THE_DAY_MAX_OUTPUT_TOKENS,
     });
     return parseStockOfTheDayCandidates(raw);
+  }
+
+  private async generateAIStockRankingsCandidates(
+    timeframe: AIRankingTimeframe,
+    llm: LLMConfig
+  ): Promise<AIStockCandidate[]> {
+    const service = new AIIntegrationService();
+    await service.setAIProvider(llm.provider, {
+      provider: llm.provider,
+      apiKey: llm.apiKey,
+      model: llm.model,
+      settings: {},
+    });
+
+    const raw = await service.runRawPrompt(
+      buildAIStockRankingsPrompt(timeframe),
+      {
+        maxOutputTokens: AI_STOCK_RANKINGS_MAX_OUTPUT_TOKENS,
+      }
+    );
+    return parseAIStockRankingsCandidates(raw);
+  }
+
+  private async enrichRankingCandidates(
+    candidates: AIStockCandidate[],
+    timeframe: AIRankingTimeframe
+  ): Promise<EnrichedStockCandidate[]> {
+    const enriched = await Promise.all(
+      candidates.map(async (candidate) => {
+        try {
+          const [quote, indicators, forecast] = await Promise.all([
+            marketDataService.getSymbolData(candidate.symbol),
+            marketDataService.getTechnicalIndicators(candidate.symbol),
+            marketDataService.getForecastData(candidate.symbol),
+          ]);
+
+          const score = this.scoreRankingCandidate({
+            timeframe,
+            price: quote.price,
+            changePercent: quote.changePercent,
+            volume: quote.volume,
+            marketCap: quote.marketCap,
+            fiftyTwoWeekHigh: quote.fiftyTwoWeekHigh,
+            fiftyTwoWeekLow: quote.fiftyTwoWeekLow,
+            overallSentiment: indicators.overallSentiment,
+            averageTarget: forecast.priceTargets.average,
+            analystRatings: forecast.analystRatings,
+          });
+
+          return {
+            symbol: quote.symbol || candidate.symbol,
+            name: quote.name || candidate.name || candidate.symbol,
+            thesis:
+              candidate.thesis ||
+              "AI surfaced this as a differentiated candidate for this horizon.",
+            score,
+            confidence: scoreToConfidence(score, 1.25),
+            rationale: this.buildRankingRationale(timeframe, {
+              thesis: candidate.thesis,
+              changePercent: quote.changePercent,
+              marketCap: quote.marketCap,
+              overallSentiment: indicators.overallSentiment,
+              averageTarget: forecast.priceTargets.average,
+              price: quote.price,
+            }),
+          };
+        } catch (error) {
+          logger.warn("Failed to validate AI stock ranking candidate", {
+            symbol: candidate.symbol,
+            timeframe,
+            error: error instanceof Error ? error.message : String(error),
+          });
+          return null;
+        }
+      })
+    );
+
+    return enriched.filter(
+      (item): item is EnrichedStockCandidate => item !== null
+    );
   }
 
   private async enrichStockCandidates(
@@ -382,6 +514,20 @@ export class AIMarketInsightsService {
     );
   }
 
+  private toAIRankedStock(
+    candidate: EnrichedStockCandidate,
+    rank: number
+  ): AIRankedStock {
+    return {
+      rank,
+      symbol: candidate.symbol,
+      name: candidate.name,
+      assetType: "stock",
+      confidence: candidate.confidence,
+      rationale: candidate.rationale,
+    };
+  }
+
   private toStockOfTheDay(
     recommendation: "buy" | "sell",
     candidate: EnrichedStockCandidate,
@@ -396,6 +542,58 @@ export class AIMarketInsightsService {
       confidence: candidate.confidence,
       rationale: candidate.rationale,
     };
+  }
+
+  private scoreRankingCandidate(args: {
+    timeframe: AIRankingTimeframe;
+    price: number;
+    changePercent: number;
+    volume: number;
+    marketCap: number;
+    fiftyTwoWeekHigh: number;
+    fiftyTwoWeekLow: number;
+    overallSentiment: TechnicalIndicators["overallSentiment"];
+    averageTarget: number;
+    analystRatings: ForecastData["analystRatings"];
+  }): number {
+    const baseScore = this.scoreStockOfTheDayCandidate({
+      direction: "buy",
+      price: args.price,
+      changePercent: args.changePercent,
+      volume: args.volume,
+      marketCap: args.marketCap,
+      fiftyTwoWeekHigh: args.fiftyTwoWeekHigh,
+      fiftyTwoWeekLow: args.fiftyTwoWeekLow,
+      overallSentiment: args.overallSentiment,
+      averageTarget: args.averageTarget,
+      analystRatings: args.analystRatings,
+    });
+
+    if (args.timeframe === "short") {
+      const momentum = Math.min(1, Math.max(-1, args.changePercent / 8));
+      const sentiment =
+        args.overallSentiment === "underpriced"
+          ? 0.15
+          : args.overallSentiment === "overpriced"
+            ? -0.15
+            : 0;
+      return baseScore + momentum * 0.25 + sentiment;
+    }
+
+    if (args.timeframe === "long") {
+      const marketCapBillions = args.marketCap / 1_000_000_000;
+      const runway =
+        marketCapBillions <= 0
+          ? 0
+          : marketCapBillions <= 30
+            ? Math.max(0, 1 - marketCapBillions / 30)
+            : -0.1;
+      const targetUpside =
+        args.price > 0 ? (args.averageTarget - args.price) / args.price : 0;
+      return baseScore + runway * 0.2 + targetUpside * 0.15;
+    }
+
+    return baseScore;
   }
 
   private scoreStockOfTheDayCandidate(args: {
@@ -465,6 +663,33 @@ export class AIMarketInsightsService {
       -analystBias * 0.1 +
       liquidity * 0.05
     );
+  }
+
+  private buildRankingRationale(
+    timeframe: AIRankingTimeframe,
+    args: {
+      thesis?: string;
+      changePercent: number;
+      marketCap: number;
+      overallSentiment: TechnicalIndicators["overallSentiment"];
+      averageTarget: number;
+      price: number;
+    }
+  ): string[] {
+    const base = this.buildStockOfTheDayRationale("buy", args);
+    const horizonLabel =
+      timeframe === "short"
+        ? "short-term"
+        : timeframe === "medium"
+          ? "medium-term"
+          : "long-term";
+
+    return [
+      args.thesis ||
+        `AI identified a compelling ${horizonLabel} setup versus peers in this horizon.`,
+      base[1],
+      base[2],
+    ];
   }
 
   private buildStockOfTheDayRationale(

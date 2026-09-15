@@ -471,3 +471,20 @@ export interface StockOfTheDayResult {
   buy: StockOfTheDay;
   sell: StockOfTheDay;
 }
+
+export type AIRankingTimeframe = "short" | "medium" | "long";
+
+export interface AIRankedStock {
+  rank: number;
+  symbol: string;
+  name: string;
+  assetType: "stock" | "crypto" | "commodity" | "forex" | "etf" | "unknown";
+  confidence: number;
+  rationale: string[];
+}
+
+export interface AIStockRankingsResult {
+  timeframe: AIRankingTimeframe;
+  generatedAt: Date;
+  stocks: AIRankedStock[];
+}

@@ -222,5 +222,10 @@ export const PUBLIC_ROUTES = [
     priority: 0.9,
     changeFrequency: "daily" as const,
   },
+  {
+    path: "/ai-rankings",
+    priority: 0.9,
+    changeFrequency: "daily" as const,
+  },
   { path: "/pricing", priority: 0.7, changeFrequency: "weekly" as const },
 ];
