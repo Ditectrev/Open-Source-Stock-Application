@@ -103,11 +103,11 @@ export default function AIStockRankingsPage() {
   }, []);
 
   return (
-    <div className={DNA_PAGE_STACK} data-testid="ai-stock-rankings-page">
+    <div className={DNA_PAGE_STACK} data-testid="ranking-page">
       <header className="space-y-2">
-        <h1 className={DNA_DISPLAY}>AI stock rankings</h1>
+        <h1 className={DNA_DISPLAY}>Ranking</h1>
         <p className={DNA_BODY_SECONDARY}>
-          AI-ranked lists of the most promising stocks across short, medium, and
+          Ranked lists of the most promising stocks across short, medium, and
           long horizons — each with a clear rationale.
         </p>
         <p className={DNA_CAPTION}>

@@ -8,6 +8,7 @@ export const MAIN_NAV = [
   { id: "calendars", label: "Calendars", href: "/calendars" },
   { id: "heatmaps", label: "Heatmaps", href: "/heatmaps" },
   { id: "screener", label: "Screener", href: "/screener" },
+  { id: "ranking", label: "Ranking", href: "/ranking" },
   { id: "pricing", label: "Pricing", href: "/pricing" },
 ] as const;
 
@@ -22,6 +23,7 @@ export function pathnameToNavId(pathname: string): MainNavId | string {
     first === "calendars" ||
     first === "heatmaps" ||
     first === "screener" ||
+    first === "ranking" ||
     first === "pricing" ||
     first === "profile" ||
     first === "compare" ||

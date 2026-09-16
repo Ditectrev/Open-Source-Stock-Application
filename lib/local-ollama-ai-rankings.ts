@@ -38,7 +38,7 @@ async function fetchAIStockRankingsViaServerGet(
   timeframe: AIRankingTimeframe
 ): Promise<AIStockRankingsResult | null> {
   const response = await fetch(
-    `/api/market/ai-rankings?timeframe=${encodeURIComponent(timeframe)}`,
+    `/api/market/ranking?timeframe=${encodeURIComponent(timeframe)}`,
     {
       headers: getAIProviderHeaders(),
       credentials: "include",
@@ -65,7 +65,7 @@ async function fetchAIStockRankingsWithBrowserLocalOllama(
   );
   const candidates = parseAIStockRankingsCandidates(raw);
 
-  const response = await fetch("/api/market/ai-rankings", {
+  const response = await fetch("/api/market/ranking", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

@@ -319,7 +319,7 @@ export class AIMarketInsightsService {
     const llm = llmConfig ?? getLLMConfigFromEnv();
     if (!llm) {
       throw new Error(
-        "An active AI provider is required for dynamic AI stock rankings."
+        "An active AI provider is required for dynamic Ranking picks."
       );
     }
 

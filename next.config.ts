@@ -16,6 +16,11 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: "/ai-rankings",
+        destination: "/ranking",
+        permanent: true,
+      },
+      {
         source: "/vs/:slug",
         destination: "/compare/:slug",
         permanent: true,

@@ -104,8 +104,8 @@ export default function StockOfTheDayPage() {
         </p>
         <p className={DNA_CAPTION}>
           Related:{" "}
-          <Link href="/ai-rankings" className="underline underline-offset-2">
-            AI stock rankings
+          <Link href="/ranking" className="underline underline-offset-2">
+            Ranking
           </Link>
         </p>
       </header>

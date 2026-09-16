@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       requestedProviderRaw,
     });
     if (!resolved.ok) {
-      logger.warn("AI stock rankings: no LLM credentials", {
+      logger.warn("Ranking: no LLM credentials", {
         userId: auth.id,
         tier,
         detail: resolved.error,
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
       timestamp: new Date(),
     });
   } catch (error) {
-    logger.error("Failed to load AI stock rankings", error as Error);
+    logger.error("Failed to load Ranking", error as Error);
 
     return NextResponse.json(
       {
@@ -149,10 +149,7 @@ export async function POST(request: NextRequest) {
       timestamp: new Date(),
     });
   } catch (error) {
-    logger.error(
-      "Failed to validate local AI stock ranking candidates",
-      error as Error
-    );
+    logger.error("Failed to validate local Ranking candidates", error as Error);
 
     return NextResponse.json(
       {

@@ -276,8 +276,8 @@ export function HomeHub({
             >
               Stock of the day
             </Link>
-            <Link href="/ai-rankings" className="underline underline-offset-2">
-              AI stock rankings
+            <Link href="/ranking" className="underline underline-offset-2">
+              Ranking
             </Link>
           </div>
         </div>

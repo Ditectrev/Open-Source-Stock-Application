@@ -122,11 +122,11 @@ export function AIStockRankingsPanel({
   const shell = (
     <div
       className={`relative ${HOME_INSTRUMENT_PANEL} ${showLockedGateOnly ? "" : "min-h-[8rem]"}`}
-      data-testid="ai-stock-rankings-panel"
+      data-testid="ranking-panel"
     >
       {showLockedGateOnly ? (
         <SubscriptionGate
-          title="AI stock rankings"
+          title="Ranking"
           message={gateMessage}
           ctaHref="/pricing"
           ctaLabel="View AI plans"
@@ -174,7 +174,7 @@ export function AIStockRankingsPanel({
                     aria-selected={isActive}
                     tabIndex={isActive ? 0 : -1}
                     className={`flex flex-col items-start px-3 py-2 text-left sm:flex-row sm:items-center sm:gap-2 ${homeSegmentedTabClasses(isActive, isDark)}`}
-                    data-testid={`ai-rankings-timeframe-${item.id}`}
+                    data-testid={`ranking-timeframe-${item.id}`}
                   >
                     <span>{item.label}</span>
                     <span className={`${DNA_CAPTION} hidden sm:inline`}>
@@ -185,10 +185,7 @@ export function AIStockRankingsPanel({
               })}
             </nav>
 
-            <p
-              className={`mb-4 ${DNA_CAPTION}`}
-              data-testid="ai-rankings-horizon"
-            >
+            <p className={`mb-4 ${DNA_CAPTION}`} data-testid="ranking-horizon">
               Horizon: {activeHorizon}
             </p>
 
@@ -217,7 +214,7 @@ export function AIStockRankingsPanel({
             {!loading && !data && !locked && error && (
               <AiFeatureErrorNotice
                 error={error}
-                title="AI stock rankings unavailable"
+                title="Ranking unavailable"
                 defaultTone="warning"
               />
             )}
@@ -232,7 +229,7 @@ export function AIStockRankingsPanel({
 
           {showLockedOverlay && (
             <SubscriptionGate
-              title="AI stock rankings"
+              title="Ranking"
               message={gateMessage}
               ctaHref="/pricing"
               ctaLabel="View AI plans"
