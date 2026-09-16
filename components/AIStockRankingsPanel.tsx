@@ -6,8 +6,7 @@ import {
   DNA_BODY,
   DNA_BODY_SECONDARY,
   DNA_CAPTION,
-  DNA_EYEBROW,
-  DNA_SUBHEADING,
+  DNA_LABEL_STRONG,
 } from "@/lib/design-dna";
 import {
   AI_RANKING_TIMEFRAMES,
@@ -15,7 +14,6 @@ import {
 } from "@/lib/ai-stock-rankings";
 import type { AIStockRankingsResult, PricingTier } from "@/types";
 import { getAiSubscriptionGateMessage } from "@/lib/ai-subscription-ux";
-import { ConfidenceInfoTooltip } from "@/components/ConfidenceInfoTooltip";
 import { InsightPanel, InsightPanelHeader } from "@/components/InsightPanel";
 import { SubscriptionGate } from "@/components/ProductShell";
 import { AiFeatureErrorNotice } from "@/components/AiFeatureErrorNotice";
@@ -37,37 +35,8 @@ interface AIStockRankingsPanelProps {
   onTimeframeChange: (timeframe: AIRankingTimeframe) => void;
 }
 
-function RankedStockCard({
-  rank,
-  symbol,
-  name,
-  confidence,
-  rationale,
-}: {
-  rank: number;
-  symbol: string;
-  name: string;
-  confidence: number;
-  rationale: string[];
-}) {
-  return (
-    <article className="rounded-lg border border-stone-200 border-l-4 border-l-stone-900 bg-stone-100 p-4 dark:border-stone-700 dark:border-l-stone-100 dark:bg-stone-800">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className={DNA_EYEBROW}>Rank #{rank}</p>
-          <p className={`mt-1 ${DNA_SUBHEADING}`}>
-            <span className="tabular-nums">{symbol}</span>
-            <span className={`font-normal ${DNA_CAPTION}`}> · {name}</span>
-          </p>
-        </div>
-      </div>
-      <p className={`mt-2 flex items-center ${DNA_CAPTION}`}>
-        <span>Confidence {Math.round(confidence * 100)}%</span>
-        <ConfidenceInfoTooltip variant="stockOfTheDay" />
-      </p>
-      <p className={`mt-3 ${DNA_BODY}`}>{rationale.join(" ")}</p>
-    </article>
-  );
+function formatRankingRationale(rationale: string[]): string {
+  return rationale.filter(Boolean).join(" ");
 }
 
 export function AIStockRankingsPanel({
@@ -196,19 +165,70 @@ export function AIStockRankingsPanel({
             )}
 
             {!loading && data && (
-              <ol className="grid grid-cols-1 gap-4">
-                {data.stocks.map((stock) => (
-                  <li key={`${timeframe}-${stock.symbol}`}>
-                    <RankedStockCard
-                      rank={stock.rank}
-                      symbol={stock.symbol}
-                      name={stock.name}
-                      confidence={stock.confidence}
-                      rationale={stock.rationale}
-                    />
-                  </li>
-                ))}
-              </ol>
+              <div
+                className="overflow-hidden rounded-xl border border-stone-200 bg-stone-50 shadow-sm dark:border-stone-700 dark:bg-stone-950"
+                data-testid="ranking-table"
+              >
+                <div className="overflow-x-auto">
+                  <table
+                    className={`w-full min-w-[640px] ${DNA_BODY}`}
+                    aria-label="Ranking results"
+                  >
+                    <thead>
+                      <tr className="border-b border-stone-200 bg-stone-100 dark:border-stone-700 dark:bg-stone-900">
+                        <th
+                          scope="col"
+                          className="w-16 px-3 py-2 text-left font-medium text-stone-900 md:px-4 md:py-3 dark:text-stone-100"
+                        >
+                          Rank
+                        </th>
+                        <th
+                          scope="col"
+                          className="w-24 px-3 py-2 text-left font-medium text-stone-900 md:px-4 md:py-3 dark:text-stone-100"
+                        >
+                          Symbol
+                        </th>
+                        <th
+                          scope="col"
+                          className="min-w-[10rem] px-3 py-2 text-left font-medium text-stone-900 md:px-4 md:py-3 dark:text-stone-100"
+                        >
+                          Name
+                        </th>
+                        <th
+                          scope="col"
+                          className="min-w-[20rem] px-3 py-2 text-left font-medium text-stone-900 md:px-4 md:py-3 dark:text-stone-100"
+                        >
+                          Why
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.stocks.map((stock) => (
+                        <tr
+                          key={`${timeframe}-${stock.symbol}`}
+                          className="border-b border-stone-200 align-top text-stone-800 transition-colors hover:bg-stone-100 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-100 dark:hover:bg-stone-900"
+                          data-testid={`ranking-row-${stock.symbol}`}
+                        >
+                          <td className="px-3 py-3 tabular-nums md:px-4">
+                            <span className={DNA_LABEL_STRONG}>
+                              #{stock.rank}
+                            </span>
+                          </td>
+                          <td className="px-3 py-3 font-medium md:px-4">
+                            {stock.symbol}
+                          </td>
+                          <td className="max-w-[12rem] px-3 py-3 md:max-w-none md:px-4">
+                            {stock.name}
+                          </td>
+                          <td className="px-3 py-3 leading-relaxed md:px-4">
+                            {formatRankingRationale(stock.rationale)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             )}
 
             {!loading && !data && !locked && error && (
