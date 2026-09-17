@@ -109,7 +109,8 @@ export async function POST(request: NextRequest) {
 
     const body = (await request.json().catch(() => null)) as {
       timeframe?: unknown;
-      candidates?: unknown;
+      buyCandidates?: unknown;
+      sellCandidates?: unknown;
     } | null;
 
     const timeframeRaw =
@@ -126,8 +127,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const candidates = parseAIStockCandidates(body?.candidates);
-    if (candidates.length < 4) {
+    const buyCandidates = parseAIStockCandidates(body?.buyCandidates);
+    const sellCandidates = parseAIStockCandidates(body?.sellCandidates);
+    if (buyCandidates.length < 4 || sellCandidates.length < 4) {
       return NextResponse.json(
         {
           success: false,
@@ -140,7 +142,7 @@ export async function POST(request: NextRequest) {
 
     const data = await aiMarketInsightsService.enrichAIStockRankingsCandidates(
       timeframeRaw,
-      candidates
+      { buyCandidates, sellCandidates }
     );
 
     return NextResponse.json({

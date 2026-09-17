@@ -165,3 +165,14 @@ export function homeSegmentedTabClasses(
       : "text-stone-700 hover:bg-white hover:text-stone-900"
   }`;
 }
+
+/** Horizon sublabels inside ranking timeframe tabs — readable on active and idle fills. */
+export function rankingTabSublabelClasses(
+  active: boolean,
+  isDark: boolean
+): string {
+  if (active) {
+    return isDark ? "text-stone-600" : "text-stone-300";
+  }
+  return isDark ? "text-stone-300" : "text-stone-600";
+}

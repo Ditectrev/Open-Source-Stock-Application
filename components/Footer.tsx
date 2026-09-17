@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
-import { DNA_BODY, DNA_HEADING, DNA_SUBHEADING } from "@/lib/design-dna";
+import { DNA_HEADING } from "@/lib/design-dna";
 import {
   FOOTER_CONTACT,
   FOOTER_RESOURCES,
@@ -16,14 +16,16 @@ import { SITE_NAME } from "@/lib/site-seo";
 const GitHubButton = dynamic(() => import("react-github-btn"), { ssr: false });
 
 const footerLinkClass =
-  "inline-block italic text-stone-300 transition-colors hover:text-stone-50";
+  "inline-block italic text-stone-200 transition-colors hover:text-stone-50";
 
-const footerHeadingClass = `${DNA_HEADING} text-stone-50 uppercase tracking-wide`;
+const footerHeadingClass = `${DNA_HEADING} text-stone-100 uppercase tracking-wide`;
+
+const footerBodyClass = "text-sm leading-relaxed text-stone-200";
 
 function ContactIcon({ children }: { children: ReactNode }) {
   return (
     <span
-      className="mr-2 inline-flex h-4 w-4 shrink-0 items-center justify-center text-stone-400"
+      className="mr-2 inline-flex h-4 w-4 shrink-0 items-center justify-center text-stone-300"
       aria-hidden="true"
     >
       {children}
@@ -96,7 +98,7 @@ export function Footer() {
 
   return (
     <footer
-      className="mt-8 border-t border-stone-800 bg-stone-950 text-stone-300 sm:mt-12"
+      className="mt-8 border-t border-stone-800 bg-stone-950 text-stone-200 sm:mt-12"
       aria-label="Site footer"
       data-testid="site-footer"
     >
@@ -120,11 +122,11 @@ export function Footer() {
           <address className="not-italic lg:col-span-5">
             <Link
               href="/"
-              className={`mb-4 inline-block ${DNA_SUBHEADING} text-stone-50 hover:text-white`}
+              className="mb-4 inline-block text-base font-semibold tracking-tight text-stone-100 hover:text-white"
             >
               {SITE_NAME}
             </Link>
-            <div className={`space-y-2 ${DNA_BODY}`}>
+            <div className={`space-y-2 ${footerBodyClass}`}>
               <p>
                 <ContactIcon>
                   <svg
@@ -235,7 +237,7 @@ export function Footer() {
                 href={item.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-stone-300 transition-colors hover:text-stone-50"
+                className="text-stone-200 transition-colors hover:text-stone-50"
                 aria-label={item.label}
               >
                 <FooterSocialIcon id={item.id} />
@@ -247,7 +249,7 @@ export function Footer() {
             className="flex justify-center lg:col-span-12"
             data-testid="footer-copyright"
           >
-            <p className={DNA_BODY}>
+            <p className={footerBodyClass}>
               © {currentYear} {SITE_NAME}
             </p>
           </div>

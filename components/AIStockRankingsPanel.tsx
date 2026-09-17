@@ -2,27 +2,30 @@
 
 import { useCallback, useRef } from "react";
 import Link from "next/link";
-import {
-  DNA_BODY,
-  DNA_BODY_SECONDARY,
-  DNA_CAPTION,
-  DNA_LABEL_STRONG,
-} from "@/lib/design-dna";
+import { DNA_BODY, DNA_EYEBROW, DNA_LABEL_STRONG } from "@/lib/design-dna";
 import {
   AI_RANKING_TIMEFRAMES,
   type AIRankingTimeframe,
 } from "@/lib/ai-stock-rankings";
-import type { AIStockRankingsResult, PricingTier } from "@/types";
+import type {
+  AIRankedStock,
+  AIStockRankingsResult,
+  PricingTier,
+} from "@/types";
 import { getAiSubscriptionGateMessage } from "@/lib/ai-subscription-ux";
 import { InsightPanel, InsightPanelHeader } from "@/components/InsightPanel";
 import { SubscriptionGate } from "@/components/ProductShell";
 import { AiFeatureErrorNotice } from "@/components/AiFeatureErrorNotice";
 import {
   HOME_INSTRUMENT_PANEL,
+  HOME_MUTED_TEXT,
   HOME_PRIMARY_BUTTON,
   HOME_SEGMENTED_NAV,
+  HOME_SUBTLE_TEXT,
   homeSegmentedTabClasses,
+  rankingTabSublabelClasses,
 } from "@/lib/home-ui";
+import { MARKET_DOWN_TEXT, MARKET_UP_TEXT } from "@/lib/market-semantics";
 import { useTheme } from "@/lib/theme-context";
 
 interface AIStockRankingsPanelProps {
@@ -37,6 +40,92 @@ interface AIStockRankingsPanelProps {
 
 function formatRankingRationale(rationale: string[]): string {
   return rationale.filter(Boolean).join(" ");
+}
+
+function RankingSideTable({
+  title,
+  variant,
+  stocks,
+  timeframe,
+}: {
+  title: string;
+  variant: "buy" | "sell";
+  stocks: AIRankedStock[];
+  timeframe: AIRankingTimeframe;
+}) {
+  const borderClass =
+    variant === "buy"
+      ? "border-l-emerald-600 dark:border-l-emerald-500"
+      : "border-l-rose-600 dark:border-l-rose-500";
+  const stanceClass = variant === "buy" ? MARKET_UP_TEXT : MARKET_DOWN_TEXT;
+
+  return (
+    <section
+      className={`overflow-hidden rounded-xl border border-stone-200 border-l-4 bg-stone-50 shadow-sm dark:border-stone-700 dark:bg-stone-950 ${borderClass}`}
+      data-testid={`ranking-table-${variant}`}
+    >
+      <div className="border-b border-stone-200 px-4 py-3 dark:border-stone-700">
+        <p className={`${DNA_EYEBROW} ${stanceClass}`}>{title}</p>
+      </div>
+      <div className="overflow-x-auto">
+        <table
+          className={`w-full min-w-[520px] ${DNA_BODY}`}
+          aria-label={`${title} ranking results`}
+        >
+          <thead>
+            <tr className="border-b border-stone-200 bg-stone-100 dark:border-stone-700 dark:bg-stone-900">
+              <th
+                scope="col"
+                className="w-16 px-3 py-2 text-left text-sm font-medium text-stone-800 md:px-4 md:py-3 dark:text-stone-100"
+              >
+                Rank
+              </th>
+              <th
+                scope="col"
+                className="w-24 px-3 py-2 text-left text-sm font-medium text-stone-800 md:px-4 md:py-3 dark:text-stone-100"
+              >
+                Symbol
+              </th>
+              <th
+                scope="col"
+                className="min-w-[10rem] px-3 py-2 text-left text-sm font-medium text-stone-800 md:px-4 md:py-3 dark:text-stone-100"
+              >
+                Name
+              </th>
+              <th
+                scope="col"
+                className="min-w-[16rem] px-3 py-2 text-left text-sm font-medium text-stone-800 md:px-4 md:py-3 dark:text-stone-100"
+              >
+                Why
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {stocks.map((stock) => (
+              <tr
+                key={`${timeframe}-${variant}-${stock.symbol}`}
+                className="border-b border-stone-200 align-top transition-colors hover:bg-stone-100 dark:border-stone-800 dark:hover:bg-stone-900"
+                data-testid={`ranking-row-${variant}-${stock.symbol}`}
+              >
+                <td className="px-3 py-3 tabular-nums text-stone-900 md:px-4 dark:text-stone-50">
+                  <span className={DNA_LABEL_STRONG}>#{stock.rank}</span>
+                </td>
+                <td className="px-3 py-3 font-medium text-stone-900 md:px-4 dark:text-stone-50">
+                  {stock.symbol}
+                </td>
+                <td className="max-w-[12rem] px-3 py-3 text-stone-800 md:max-w-none md:px-4 dark:text-stone-200">
+                  {stock.name}
+                </td>
+                <td className="px-3 py-3 leading-relaxed text-stone-800 md:px-4 dark:text-stone-200">
+                  {formatRankingRationale(stock.rationale)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
 }
 
 export function AIStockRankingsPanel({
@@ -110,11 +199,11 @@ export function AIStockRankingsPanel({
           >
             <div className="text-stone-900 dark:text-stone-100">
               <InsightPanelHeader
-                title="Most promising stocks"
-                subtitle={`Top AI-ranked ideas for the ${activeHorizon.toLowerCase()} horizon.`}
+                title="Buy and sell rankings"
+                subtitle={`Top AI-ranked buy and sell ideas for the ${activeHorizon.toLowerCase()} horizon.`}
                 right={
                   data ? (
-                    <p className={DNA_CAPTION}>
+                    <p className={`text-xs ${HOME_SUBTLE_TEXT}`}>
                       Generated{" "}
                       {new Date(data.generatedAt).toLocaleDateString()}
                     </p>
@@ -146,7 +235,9 @@ export function AIStockRankingsPanel({
                     data-testid={`ranking-timeframe-${item.id}`}
                   >
                     <span>{item.label}</span>
-                    <span className={`${DNA_CAPTION} hidden sm:inline`}>
+                    <span
+                      className={`text-xs hidden sm:inline ${rankingTabSublabelClasses(isActive, isDark)}`}
+                    >
                       {item.horizon}
                     </span>
                   </button>
@@ -154,80 +245,37 @@ export function AIStockRankingsPanel({
               })}
             </nav>
 
-            <p className={`mb-4 ${DNA_CAPTION}`} data-testid="ranking-horizon">
+            <p
+              className={`mb-4 text-xs ${HOME_SUBTLE_TEXT}`}
+              data-testid="ranking-horizon"
+            >
               Horizon: {activeHorizon}
             </p>
 
             {loading && (
-              <p className={DNA_BODY_SECONDARY}>
-                Ranking stocks for the {activeHorizon.toLowerCase()} horizon...
+              <p className={HOME_MUTED_TEXT}>
+                Ranking buy and sell ideas for the {activeHorizon.toLowerCase()}{" "}
+                horizon...
               </p>
             )}
 
             {!loading && data && (
               <div
-                className="overflow-hidden rounded-xl border border-stone-200 bg-stone-50 shadow-sm dark:border-stone-700 dark:bg-stone-950"
-                data-testid="ranking-table"
+                className="grid grid-cols-1 gap-6 xl:grid-cols-2"
+                data-testid="ranking-tables"
               >
-                <div className="overflow-x-auto">
-                  <table
-                    className={`w-full min-w-[640px] ${DNA_BODY}`}
-                    aria-label="Ranking results"
-                  >
-                    <thead>
-                      <tr className="border-b border-stone-200 bg-stone-100 dark:border-stone-700 dark:bg-stone-900">
-                        <th
-                          scope="col"
-                          className="w-16 px-3 py-2 text-left font-medium text-stone-900 md:px-4 md:py-3 dark:text-stone-100"
-                        >
-                          Rank
-                        </th>
-                        <th
-                          scope="col"
-                          className="w-24 px-3 py-2 text-left font-medium text-stone-900 md:px-4 md:py-3 dark:text-stone-100"
-                        >
-                          Symbol
-                        </th>
-                        <th
-                          scope="col"
-                          className="min-w-[10rem] px-3 py-2 text-left font-medium text-stone-900 md:px-4 md:py-3 dark:text-stone-100"
-                        >
-                          Name
-                        </th>
-                        <th
-                          scope="col"
-                          className="min-w-[20rem] px-3 py-2 text-left font-medium text-stone-900 md:px-4 md:py-3 dark:text-stone-100"
-                        >
-                          Why
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {data.stocks.map((stock) => (
-                        <tr
-                          key={`${timeframe}-${stock.symbol}`}
-                          className="border-b border-stone-200 align-top text-stone-800 transition-colors hover:bg-stone-100 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-100 dark:hover:bg-stone-900"
-                          data-testid={`ranking-row-${stock.symbol}`}
-                        >
-                          <td className="px-3 py-3 tabular-nums md:px-4">
-                            <span className={DNA_LABEL_STRONG}>
-                              #{stock.rank}
-                            </span>
-                          </td>
-                          <td className="px-3 py-3 font-medium md:px-4">
-                            {stock.symbol}
-                          </td>
-                          <td className="max-w-[12rem] px-3 py-3 md:max-w-none md:px-4">
-                            {stock.name}
-                          </td>
-                          <td className="px-3 py-3 leading-relaxed md:px-4">
-                            {formatRankingRationale(stock.rationale)}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <RankingSideTable
+                  title="Ideas to buy"
+                  variant="buy"
+                  stocks={data.buy}
+                  timeframe={timeframe}
+                />
+                <RankingSideTable
+                  title="Ideas to sell"
+                  variant="sell"
+                  stocks={data.sell}
+                  timeframe={timeframe}
+                />
               </div>
             )}
 
@@ -240,7 +288,7 @@ export function AIStockRankingsPanel({
             )}
 
             {!loading && !data && !locked && !error && (
-              <p className={DNA_BODY_SECONDARY}>
+              <p className={HOME_MUTED_TEXT}>
                 No ranking result yet. Switch time frames or refresh to try
                 again.
               </p>
@@ -266,7 +314,7 @@ export function AIStockRankingsPanel({
   return (
     <InsightPanel>
       {shell}
-      <p className={`mt-4 ${DNA_CAPTION}`}>
+      <p className={`mt-4 text-xs ${HOME_SUBTLE_TEXT}`}>
         Also see{" "}
         <Link href="/stock-of-the-day" className="underline underline-offset-2">
           Stock of the day

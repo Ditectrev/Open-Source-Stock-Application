@@ -63,7 +63,7 @@ async function fetchAIStockRankingsWithBrowserLocalOllama(
   const raw = await generateWithBrowserLocalOllama(
     buildAIStockRankingsPrompt(timeframe)
   );
-  const candidates = parseAIStockRankingsCandidates(raw);
+  const { buyCandidates, sellCandidates } = parseAIStockRankingsCandidates(raw);
 
   const response = await fetch("/api/market/ranking", {
     method: "POST",
@@ -73,7 +73,7 @@ async function fetchAIStockRankingsWithBrowserLocalOllama(
     },
     credentials: "include",
     cache: "no-store",
-    body: JSON.stringify({ timeframe, candidates }),
+    body: JSON.stringify({ timeframe, buyCandidates, sellCandidates }),
   });
 
   if (!response.ok) {

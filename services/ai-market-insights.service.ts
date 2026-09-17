@@ -20,6 +20,7 @@ import {
   buildAIStockRankingsPrompt,
   parseAIStockRankingsCandidates,
   type AIRankingTimeframe,
+  type AIStockRankingsCandidates,
 } from "@/lib/ai-stock-rankings";
 import {
   parseStockOfTheDayCandidates,
@@ -332,14 +333,25 @@ export class AIMarketInsightsService {
 
   async enrichAIStockRankingsCandidates(
     timeframe: AIRankingTimeframe,
-    candidates: AIStockCandidate[]
+    candidates: AIStockRankingsCandidates
   ): Promise<AIStockRankingsResult> {
-    const enriched = await this.enrichRankingCandidates(candidates, timeframe);
-    const ranked = enriched
+    const [buyEnriched, sellEnriched] = await Promise.all([
+      this.enrichRankingCandidates(candidates.buyCandidates, timeframe, "buy"),
+      this.enrichRankingCandidates(
+        candidates.sellCandidates,
+        timeframe,
+        "sell"
+      ),
+    ]);
+
+    const buyRanked = buyEnriched
+      .sort((a, b) => b.score - a.score)
+      .slice(0, AI_STOCK_RANKINGS_DISPLAY_COUNT);
+    const sellRanked = sellEnriched
       .sort((a, b) => b.score - a.score)
       .slice(0, AI_STOCK_RANKINGS_DISPLAY_COUNT);
 
-    if (ranked.length < 4) {
+    if (buyRanked.length < 4 || sellRanked.length < 4) {
       throw new Error(
         "AI did not return enough valid public stock candidates for this ranking."
       );
@@ -349,7 +361,10 @@ export class AIMarketInsightsService {
     return {
       timeframe,
       generatedAt,
-      stocks: ranked.map((candidate, index) =>
+      buy: buyRanked.map((candidate, index) =>
+        this.toAIRankedStock(candidate, index + 1)
+      ),
+      sell: sellRanked.map((candidate, index) =>
         this.toAIRankedStock(candidate, index + 1)
       ),
     };
@@ -376,7 +391,7 @@ export class AIMarketInsightsService {
   private async generateAIStockRankingsCandidates(
     timeframe: AIRankingTimeframe,
     llm: LLMConfig
-  ): Promise<AIStockCandidate[]> {
+  ): Promise<AIStockRankingsCandidates> {
     const service = new AIIntegrationService();
     await service.setAIProvider(llm.provider, {
       provider: llm.provider,
@@ -396,7 +411,8 @@ export class AIMarketInsightsService {
 
   private async enrichRankingCandidates(
     candidates: AIStockCandidate[],
-    timeframe: AIRankingTimeframe
+    timeframe: AIRankingTimeframe,
+    direction: "buy" | "sell"
   ): Promise<EnrichedStockCandidate[]> {
     const enriched = await Promise.all(
       candidates.map(async (candidate) => {
@@ -408,6 +424,7 @@ export class AIMarketInsightsService {
           ]);
 
           const score = this.scoreRankingCandidate({
+            direction,
             timeframe,
             price: quote.price,
             changePercent: quote.changePercent,
@@ -425,10 +442,12 @@ export class AIMarketInsightsService {
             name: quote.name || candidate.name || candidate.symbol,
             thesis:
               candidate.thesis ||
-              "AI surfaced this as a differentiated candidate for this horizon.",
+              (direction === "buy"
+                ? "AI surfaced this as a differentiated candidate for this horizon."
+                : "AI surfaced this as a structurally vulnerable candidate for this horizon."),
             score,
             confidence: scoreToConfidence(score, 1.25),
-            rationale: this.buildRankingRationale(timeframe, {
+            rationale: this.buildRankingRationale(direction, timeframe, {
               thesis: candidate.thesis,
               changePercent: quote.changePercent,
               marketCap: quote.marketCap,
@@ -440,6 +459,7 @@ export class AIMarketInsightsService {
         } catch (error) {
           logger.warn("Failed to validate AI stock ranking candidate", {
             symbol: candidate.symbol,
+            direction,
             timeframe,
             error: error instanceof Error ? error.message : String(error),
           });
@@ -545,6 +565,7 @@ export class AIMarketInsightsService {
   }
 
   private scoreRankingCandidate(args: {
+    direction: "buy" | "sell";
     timeframe: AIRankingTimeframe;
     price: number;
     changePercent: number;
@@ -557,7 +578,7 @@ export class AIMarketInsightsService {
     analystRatings: ForecastData["analystRatings"];
   }): number {
     const baseScore = this.scoreStockOfTheDayCandidate({
-      direction: "buy",
+      direction: args.direction,
       price: args.price,
       changePercent: args.changePercent,
       volume: args.volume,
@@ -666,6 +687,7 @@ export class AIMarketInsightsService {
   }
 
   private buildRankingRationale(
+    direction: "buy" | "sell",
     timeframe: AIRankingTimeframe,
     args: {
       thesis?: string;
@@ -676,7 +698,7 @@ export class AIMarketInsightsService {
       price: number;
     }
   ): string[] {
-    const base = this.buildStockOfTheDayRationale("buy", args);
+    const base = this.buildStockOfTheDayRationale(direction, args);
     const horizonLabel =
       timeframe === "short"
         ? "short-term"
@@ -686,7 +708,9 @@ export class AIMarketInsightsService {
 
     return [
       args.thesis ||
-        `AI identified a compelling ${horizonLabel} setup versus peers in this horizon.`,
+        (direction === "buy"
+          ? `AI identified a compelling ${horizonLabel} setup versus peers in this horizon.`
+          : `AI identified a compelling ${horizonLabel} risk versus peers in this horizon.`),
       base[1],
       base[2],
     ];

@@ -27,9 +27,14 @@ export const AI_RANKING_TIMEFRAMES = [
 
 export const AI_STOCK_RANKINGS_MAX_OUTPUT_TOKENS = 4096;
 
-export const AI_STOCK_RANKINGS_CANDIDATE_COUNT = 12;
+export const AI_STOCK_RANKINGS_CANDIDATE_COUNT = 8;
 
-export const AI_STOCK_RANKINGS_DISPLAY_COUNT = 10;
+export const AI_STOCK_RANKINGS_DISPLAY_COUNT = 5;
+
+export type AIStockRankingsCandidates = {
+  buyCandidates: AIStockCandidate[];
+  sellCandidates: AIStockCandidate[];
+};
 
 const TIMEFRAME_PROMPT_CONTEXT: Record<
   AIRankingTimeframe,
@@ -66,31 +71,37 @@ export function buildAIStockRankingsPrompt(
   return `You are an equity research analyst building a premium AI stock ranking list for the ${context.horizon} horizon.
 Return ONLY valid JSON, no markdown, in this exact shape:
 {
-  "candidates": [{"symbol": string, "name": string, "thesis": string}]
+  "buyCandidates": [{"symbol": string, "name": string, "thesis": string}],
+  "sellCandidates": [{"symbol": string, "name": string, "thesis": string}]
 }
 
 Task:
-- Rank the most promising US-listed common stocks for a ${context.horizon} investment horizon.
+- Rank the most promising US-listed common stocks to BUY for a ${context.horizon} investment horizon.
+- Rank the most compelling US-listed common stocks to SELL for the same ${context.horizon} horizon.
 - Focus on ${context.focus}.
-- Return exactly ${AI_STOCK_RANKINGS_CANDIDATE_COUNT} distinct candidates ordered from most to least compelling for this horizon.
+- Return exactly ${AI_STOCK_RANKINGS_CANDIDATE_COUNT} distinct buy candidates and ${AI_STOCK_RANKINGS_CANDIDATE_COUNT} distinct sell candidates, each ordered from most to least compelling for this horizon.
 
 Rules:
 - Do not include ETFs, crypto, ADRs, funds, warrants, or preferred shares.
 - Prefer liquid public companies that Yahoo Finance can quote.
-- thesis must be one short sentence explaining why the stock ranks highly for this horizon.
+- thesis must be one short sentence explaining why the stock ranks highly for this horizon and side.
 - Use tickers only, no exchange suffixes.
 - Avoid repeating the same mega-cap default unless the thesis is unusually differentiated for this horizon.`;
 }
 
 export function parseAIStockRankingsCandidates(
   raw: string
-): AIStockCandidate[] {
+): AIStockRankingsCandidates {
   const parsed = extractFirstJsonObject(raw);
-  const candidates = parseAIStockCandidates(parsed?.candidates);
+  const buyCandidates = parseAIStockCandidates(parsed?.buyCandidates);
+  const sellCandidates = parseAIStockCandidates(parsed?.sellCandidates);
 
-  if (candidates.length < 4) {
+  if (buyCandidates.length < 4 || sellCandidates.length < 4) {
     throw new Error("AI returned an incomplete stock ranking candidate set.");
   }
 
-  return candidates.slice(0, AI_STOCK_RANKINGS_CANDIDATE_COUNT);
+  return {
+    buyCandidates: buyCandidates.slice(0, AI_STOCK_RANKINGS_CANDIDATE_COUNT),
+    sellCandidates: sellCandidates.slice(0, AI_STOCK_RANKINGS_CANDIDATE_COUNT),
+  };
 }

@@ -8,10 +8,10 @@ import { fetchAIStockRankingsForCurrentProvider } from "@/lib/local-ollama-ai-ra
 import { MARKET_UI_COPY } from "@/lib/market-ui-copy";
 import {
   DNA_BODY_SECONDARY,
-  DNA_CAPTION,
   DNA_DISPLAY,
   DNA_PAGE_STACK,
 } from "@/lib/design-dna";
+import { HOME_SUBTLE_TEXT } from "@/lib/home-ui";
 import type { AIRankingTimeframe } from "@/lib/ai-stock-rankings";
 import type { AIStockRankingsResult } from "@/types";
 import { AIStockRankingsPanel } from "@/components/AIStockRankingsPanel";
@@ -107,10 +107,10 @@ export default function AIStockRankingsPage() {
       <header className="space-y-2">
         <h1 className={DNA_DISPLAY}>Ranking</h1>
         <p className={DNA_BODY_SECONDARY}>
-          Ranked lists of the most promising stocks across short, medium, and
-          long horizons — each with a clear rationale.
+          Ranked buy and sell lists across short, medium, and long horizons —
+          each row includes a clear rationale.
         </p>
-        <p className={DNA_CAPTION}>
+        <p className={`text-xs ${HOME_SUBTLE_TEXT}`}>
           Related:{" "}
           <Link
             href="/stock-of-the-day"

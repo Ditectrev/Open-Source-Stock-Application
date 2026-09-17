@@ -122,7 +122,7 @@ describe("Color Contrast Compliance (Req 18.3)", () => {
       expect(footer).not.toBeNull();
       const cls = footer!.className;
       expect(cls).toContain("bg-stone-950");
-      expect(cls).toContain("text-stone-300");
+      expect(cls).toContain("text-stone-200");
     });
   });
 

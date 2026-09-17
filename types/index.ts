@@ -486,5 +486,6 @@ export interface AIRankedStock {
 export interface AIStockRankingsResult {
   timeframe: AIRankingTimeframe;
   generatedAt: Date;
-  stocks: AIRankedStock[];
+  buy: AIRankedStock[];
+  sell: AIRankedStock[];
 }
