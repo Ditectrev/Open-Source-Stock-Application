@@ -73,7 +73,8 @@ test.describe("Home Page", () => {
     const footer = page.locator("footer[aria-label='Site footer']");
     await footer.scrollIntoViewIfNeeded();
     await expect(footer).toBeVisible();
-    await expect(footer.getByRole("link", { name: "Compare" })).toBeVisible();
+    await expect(footer.getByTestId("footer-tools")).toBeVisible();
+    await expect(footer.getByRole("link", { name: "Screener" })).toBeVisible();
     await expect(footer.getByRole("link", { name: "News" })).toHaveCount(0);
   });
 });

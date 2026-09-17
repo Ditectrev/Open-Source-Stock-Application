@@ -138,8 +138,7 @@ describe("Responsive Design", () => {
       const { container } = render(<Footer />);
       const footer = container.querySelector("footer");
       expect(footer).not.toBeNull();
-      // Base padding is py-4, sm:py-6 — at mobile the base class applies
-      expect(footer!.className).toContain("py-4");
+      expect(footer!.className).toContain("mt-8");
     });
 
     it("should render SymbolHeader text at base size (text-3xl)", () => {
@@ -213,9 +212,11 @@ describe("Responsive Design", () => {
 
     it("should render Footer with increased padding at sm+", () => {
       const { container } = render(<Footer />);
-      const footer = container.querySelector("footer");
-      expect(footer).not.toBeNull();
-      expect(footer!.className).toContain("sm:py-6");
+      const inner = container.querySelector(
+        "[data-testid='site-footer'] > div"
+      );
+      expect(inner).not.toBeNull();
+      expect(inner!.className).toContain("py-10");
     });
   });
 
