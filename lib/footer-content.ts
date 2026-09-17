@@ -26,35 +26,45 @@ export const FOOTER_RESOURCES = [
 
 export const FOOTER_SOCIAL = [
   {
+    id: "discord",
     label: "Discord",
     href: "https://discord.com/invite/RFjtXKfJy3",
   },
   {
+    id: "facebook",
     label: "Facebook",
     href: "https://www.facebook.com/ditectrev",
   },
   {
+    id: "github",
     label: "GitHub",
     href: "https://github.com/ditectrev",
   },
   {
+    id: "instagram",
     label: "Instagram",
     href: "https://www.instagram.com/ditectrev",
   },
   {
+    id: "linkedin",
     label: "LinkedIn",
     href: "https://www.linkedin.com/company/ditectrev",
   },
   {
+    id: "medium",
     label: "Medium",
     href: "https://medium.com/@ditectrev",
   },
   {
+    id: "x",
     label: "X",
     href: "https://x.com/ditectrev",
   },
   {
+    id: "youtube",
     label: "YouTube",
     href: "https://www.youtube.com/@Ditectrev",
   },
 ] as const;
+
+export type FooterSocialId = (typeof FOOTER_SOCIAL)[number]["id"];
