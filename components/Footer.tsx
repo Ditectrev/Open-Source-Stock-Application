@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { DNA_HEADING } from "@/lib/design-dna";
 import {
   FOOTER_CONTACT,
@@ -90,20 +90,43 @@ function FooterSocialIcon({ id }: { id: FooterSocialId }) {
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
+  const starSlotRef = useRef<HTMLDivElement>(null);
   const [showGitHubStar, setShowGitHubStar] = useState(false);
 
   useEffect(() => {
-    setShowGitHubStar(true);
+    const slot = starSlotRef.current;
+    if (!slot) return;
+
+    if (typeof IntersectionObserver === "undefined") {
+      setShowGitHubStar(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShowGitHubStar(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "120px" }
+    );
+
+    observer.observe(slot);
+    return () => observer.disconnect();
   }, []);
 
   return (
     <footer
-      className="mt-8 border-t border-stone-800 bg-stone-950 text-stone-200 sm:mt-12"
+      className="border-t border-stone-800 bg-stone-950 text-stone-200"
       aria-label="Site footer"
       data-testid="site-footer"
     >
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 xl:max-w-[1400px]">
-        <div className="mb-8 flex h-[30px] items-center justify-center">
+        <div
+          ref={starSlotRef}
+          className="mb-8 flex h-[30px] items-center justify-center"
+        >
           {showGitHubStar ? (
             <GitHubButton
               href="https://github.com/Ditectrev/Open-Source-Stock-Application"

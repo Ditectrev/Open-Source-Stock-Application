@@ -138,7 +138,7 @@ describe("Responsive Design", () => {
       const { container } = render(<Footer />);
       const footer = container.querySelector("footer");
       expect(footer).not.toBeNull();
-      expect(footer!.className).toContain("mt-8");
+      expect(footer!.className).toContain("border-t");
     });
 
     it("should render SymbolHeader text at base size (text-3xl)", () => {

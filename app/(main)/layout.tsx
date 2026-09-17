@@ -1,9 +1,18 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { Suspense } from "react";
-import { Footer } from "@/components/Footer";
+import { LazySection } from "@/components/LazySection";
 import { Navigation } from "@/components/Navigation";
 import { HOME_PAGE_BACKGROUND } from "@/lib/home-ui";
+
+const Footer = dynamic(
+  () => import("@/components/Footer").then((mod) => ({ default: mod.Footer })),
+  {
+    ssr: false,
+    loading: () => <div className="min-h-[200px]" aria-hidden />,
+  }
+);
 
 function NavigationFallback() {
   return (
@@ -31,7 +40,9 @@ export default function MainLayout({
         {children}
       </div>
 
-      <Footer />
+      <LazySection className="mt-8 sm:mt-12">
+        <Footer />
+      </LazySection>
     </div>
   );
 }
