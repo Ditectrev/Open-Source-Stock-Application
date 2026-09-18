@@ -124,12 +124,16 @@ describe("Accessibility - Footer (Req 18.4)", () => {
     render(<Footer />);
     const footer = screen.getByRole("contentinfo");
     expect(footer.getAttribute("aria-label")).toBe("Site footer");
-    expect(screen.getByRole("link", { name: "Compare" })).toHaveAttribute(
+    expect(screen.getByTestId("footer-tools")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Screener" })).toHaveAttribute(
       "href",
-      "/compare"
+      "/screener"
+    );
+    expect(screen.getByRole("link", { name: "Copyrights" })).toHaveAttribute(
+      "href",
+      "/copyrights"
     );
     expect(screen.queryByRole("link", { name: "News" })).toBeNull();
-    expect(screen.queryByRole("link", { name: "Screener" })).toBeNull();
   });
 });
 

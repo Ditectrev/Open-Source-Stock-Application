@@ -52,33 +52,23 @@ describe("Navigation", () => {
       "href",
       "/news"
     );
-    expect(screen.getByRole("link", { name: "Sectors" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Ranking" })).toHaveAttribute(
       "href",
-      "/sectors"
-    );
-    expect(screen.getByRole("link", { name: "Calendars" })).toHaveAttribute(
-      "href",
-      "/calendars"
-    );
-    expect(screen.getByRole("link", { name: "Heatmaps" })).toHaveAttribute(
-      "href",
-      "/heatmaps"
-    );
-    expect(screen.getByRole("link", { name: "Screener" })).toHaveAttribute(
-      "href",
-      "/screener"
+      "/ranking"
     );
     expect(screen.getByRole("link", { name: "Pricing" })).toHaveAttribute(
       "href",
       "/pricing"
     );
+    expect(screen.queryByRole("link", { name: "Sectors" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Screener" })).toBeNull();
   });
 
   it("highlights the active section from pathname", () => {
-    mockPathname = "/sectors";
+    mockPathname = "/ranking";
     render(<Navigation />);
-    const sectorsLink = screen.getByRole("link", { name: "Sectors" });
-    expect(sectorsLink).toHaveAttribute("aria-current", "page");
+    const rankingLink = screen.getByRole("link", { name: "Ranking" });
+    expect(rankingLink).toHaveAttribute("aria-current", "page");
   });
 
   it("calls router.push when a symbol is selected from search", () => {

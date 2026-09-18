@@ -262,12 +262,25 @@ export function HomeHub({
         data-testid="home-ai-outlook"
         className={`${HOME_SECTION} flex flex-col`}
       >
-        <h2
-          id="home-ai-heading"
-          className={`${HOME_SECTION_HEADING} ${SECTION_LABEL_CLASS}`}
-        >
-          AI outlook
-        </h2>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <h2
+            id="home-ai-heading"
+            className={`${HOME_SECTION_HEADING} ${SECTION_LABEL_CLASS}`}
+          >
+            AI outlook
+          </h2>
+          <div className={`flex flex-wrap gap-x-4 gap-y-1 ${DNA_CAPTION}`}>
+            <Link
+              href="/stock-of-the-day"
+              className="underline underline-offset-2"
+            >
+              Stock of the day
+            </Link>
+            <Link href="/ranking" className="underline underline-offset-2">
+              Ranking
+            </Link>
+          </div>
+        </div>
         {stockOfTheDay}
       </section>
     </div>
