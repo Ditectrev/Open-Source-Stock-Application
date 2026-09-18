@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MARKET_UI_COPY, userFacingApiError } from "@/lib/api-user-error";
-import { isAIRankingTimeframe } from "@/lib/ai-stock-rankings";
-import { parseAIStockCandidates } from "@/lib/stock-of-the-day-ai";
+import {
+  isAIRankingCategory,
+  isAIRankingTimeframe,
+  parseAIRankingCandidates,
+} from "@/lib/ai-stock-rankings";
 import { aiMarketInsightsService } from "@/services/ai-market-insights.service";
 import { logger } from "@/lib/logger";
 import { getAuthenticatedUser } from "@/lib/server-auth";
@@ -39,6 +42,19 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const categoryRaw =
+      request.nextUrl.searchParams.get("category")?.trim().toLowerCase() ??
+      "stock";
+    if (!isAIRankingCategory(categoryRaw)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Invalid category. Use etf, crypto, or stock.",
+        },
+        { status: 400 }
+      );
+    }
+
     const requestedProviderRaw =
       request.headers.get("x-ai-provider")?.trim().toUpperCase() ?? "";
 
@@ -67,6 +83,7 @@ export async function GET(request: NextRequest) {
 
     const data = await aiMarketInsightsService.getAIStockRankings(
       timeframeRaw,
+      categoryRaw,
       resolved.llmConfig
     );
 
@@ -109,6 +126,7 @@ export async function POST(request: NextRequest) {
 
     const body = (await request.json().catch(() => null)) as {
       timeframe?: unknown;
+      category?: unknown;
       buyCandidates?: unknown;
       sellCandidates?: unknown;
     } | null;
@@ -127,8 +145,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const buyCandidates = parseAIStockCandidates(body?.buyCandidates);
-    const sellCandidates = parseAIStockCandidates(body?.sellCandidates);
+    const categoryRaw =
+      typeof body?.category === "string"
+        ? body.category.trim().toLowerCase()
+        : "stock";
+    if (!isAIRankingCategory(categoryRaw)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Invalid category. Use etf, crypto, or stock.",
+        },
+        { status: 400 }
+      );
+    }
+
+    const buyCandidates = parseAIRankingCandidates(
+      body?.buyCandidates,
+      categoryRaw
+    );
+    const sellCandidates = parseAIRankingCandidates(
+      body?.sellCandidates,
+      categoryRaw
+    );
     if (buyCandidates.length < 4 || sellCandidates.length < 4) {
       return NextResponse.json(
         {
@@ -142,6 +180,7 @@ export async function POST(request: NextRequest) {
 
     const data = await aiMarketInsightsService.enrichAIStockRankingsCandidates(
       timeframeRaw,
+      categoryRaw,
       { buyCandidates, sellCandidates }
     );
 

@@ -13,6 +13,7 @@ import { getAIProviderHeaders } from "@/lib/explanation-provider";
 import { MARKET_UI_COPY } from "@/lib/market-ui-copy";
 import type {
   AIStockRankingsResult,
+  AIRankingCategory,
   AIRankingTimeframe,
   PricingTier,
 } from "@/types";
@@ -24,27 +25,30 @@ type AIStockRankingsApiResponse = {
 
 export async function fetchAIStockRankingsForCurrentProvider(
   timeframe: AIRankingTimeframe,
+  category: AIRankingCategory,
   pricingTier: PricingTier | null
 ): Promise<AIStockRankingsResult | null> {
   const useLocalOllama = shouldUseBrowserLocalOllama(pricingTier);
   if (useLocalOllama && !isAppOpenedOnLoopbackHost()) {
-    return fetchAIStockRankingsWithBrowserLocalOllama(timeframe);
+    return fetchAIStockRankingsWithBrowserLocalOllama(timeframe, category);
   }
 
-  return fetchAIStockRankingsViaServerGet(timeframe);
+  return fetchAIStockRankingsViaServerGet(timeframe, category);
 }
 
 async function fetchAIStockRankingsViaServerGet(
-  timeframe: AIRankingTimeframe
+  timeframe: AIRankingTimeframe,
+  category: AIRankingCategory
 ): Promise<AIStockRankingsResult | null> {
-  const response = await fetch(
-    `/api/market/ranking?timeframe=${encodeURIComponent(timeframe)}`,
-    {
-      headers: getAIProviderHeaders(),
-      credentials: "include",
-      cache: "no-store",
-    }
-  );
+  const params = new URLSearchParams({
+    timeframe,
+    category,
+  });
+  const response = await fetch(`/api/market/ranking?${params.toString()}`, {
+    headers: getAIProviderHeaders(),
+    credentials: "include",
+    cache: "no-store",
+  });
 
   if (!response.ok) {
     const body = (await response.json().catch(() => ({}))) as {
@@ -58,12 +62,16 @@ async function fetchAIStockRankingsViaServerGet(
 }
 
 async function fetchAIStockRankingsWithBrowserLocalOllama(
-  timeframe: AIRankingTimeframe
+  timeframe: AIRankingTimeframe,
+  category: AIRankingCategory
 ): Promise<AIStockRankingsResult | null> {
   const raw = await generateWithBrowserLocalOllama(
-    buildAIStockRankingsPrompt(timeframe)
+    buildAIStockRankingsPrompt(timeframe, category)
   );
-  const { buyCandidates, sellCandidates } = parseAIStockRankingsCandidates(raw);
+  const { buyCandidates, sellCandidates } = parseAIStockRankingsCandidates(
+    raw,
+    category
+  );
 
   const response = await fetch("/api/market/ranking", {
     method: "POST",
@@ -73,7 +81,12 @@ async function fetchAIStockRankingsWithBrowserLocalOllama(
     },
     credentials: "include",
     cache: "no-store",
-    body: JSON.stringify({ timeframe, buyCandidates, sellCandidates }),
+    body: JSON.stringify({
+      timeframe,
+      category,
+      buyCandidates,
+      sellCandidates,
+    }),
   });
 
   if (!response.ok) {

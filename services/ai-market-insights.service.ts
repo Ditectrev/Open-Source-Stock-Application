@@ -21,6 +21,7 @@ import {
   parseAIStockRankingsCandidates,
   type AIRankingTimeframe,
   type AIStockRankingsCandidates,
+  type AIRankingCategory,
 } from "@/lib/ai-stock-rankings";
 import {
   parseStockOfTheDayCandidates,
@@ -315,6 +316,7 @@ export class AIMarketInsightsService {
 
   async getAIStockRankings(
     timeframe: AIRankingTimeframe,
+    category: AIRankingCategory,
     llmConfig?: LLMConfig
   ): Promise<AIStockRankingsResult> {
     const llm = llmConfig ?? getLLMConfigFromEnv();
@@ -326,13 +328,19 @@ export class AIMarketInsightsService {
 
     const generatedCandidates = await this.generateAIStockRankingsCandidates(
       timeframe,
+      category,
       llm
     );
-    return this.enrichAIStockRankingsCandidates(timeframe, generatedCandidates);
+    return this.enrichAIStockRankingsCandidates(
+      timeframe,
+      category,
+      generatedCandidates
+    );
   }
 
   async enrichAIStockRankingsCandidates(
     timeframe: AIRankingTimeframe,
+    category: AIRankingCategory,
     candidates: AIStockRankingsCandidates
   ): Promise<AIStockRankingsResult> {
     const [buyEnriched, sellEnriched] = await Promise.all([
@@ -359,13 +367,14 @@ export class AIMarketInsightsService {
 
     const generatedAt = new Date();
     return {
+      category,
       timeframe,
       generatedAt,
       buy: buyRanked.map((candidate, index) =>
-        this.toAIRankedStock(candidate, index + 1)
+        this.toAIRankedStock(candidate, index + 1, category)
       ),
       sell: sellRanked.map((candidate, index) =>
-        this.toAIRankedStock(candidate, index + 1)
+        this.toAIRankedStock(candidate, index + 1, category)
       ),
     };
   }
@@ -390,6 +399,7 @@ export class AIMarketInsightsService {
 
   private async generateAIStockRankingsCandidates(
     timeframe: AIRankingTimeframe,
+    category: AIRankingCategory,
     llm: LLMConfig
   ): Promise<AIStockRankingsCandidates> {
     const service = new AIIntegrationService();
@@ -401,12 +411,12 @@ export class AIMarketInsightsService {
     });
 
     const raw = await service.runRawPrompt(
-      buildAIStockRankingsPrompt(timeframe),
+      buildAIStockRankingsPrompt(timeframe, category),
       {
         maxOutputTokens: AI_STOCK_RANKINGS_MAX_OUTPUT_TOKENS,
       }
     );
-    return parseAIStockRankingsCandidates(raw);
+    return parseAIStockRankingsCandidates(raw, category);
   }
 
   private async enrichRankingCandidates(
@@ -536,13 +546,14 @@ export class AIMarketInsightsService {
 
   private toAIRankedStock(
     candidate: EnrichedStockCandidate,
-    rank: number
+    rank: number,
+    category: AIRankingCategory
   ): AIRankedStock {
     return {
       rank,
       symbol: candidate.symbol,
       name: candidate.name,
-      assetType: "stock",
+      assetType: category,
       confidence: candidate.confidence,
       rationale: candidate.rationale,
     };

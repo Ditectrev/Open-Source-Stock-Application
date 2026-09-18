@@ -5,13 +5,16 @@ import Link from "next/link";
 import { DNA_BODY, DNA_EYEBROW, DNA_LABEL_STRONG } from "@/lib/design-dna";
 import {
   AI_RANKING_TIMEFRAMES,
+  getAIRankingCategoryLabel,
   type AIRankingTimeframe,
 } from "@/lib/ai-stock-rankings";
 import type {
   AIRankedStock,
+  AIRankingCategory,
   AIStockRankingsResult,
   PricingTier,
 } from "@/types";
+import { HeatmapNavigation } from "@/components/HeatmapNavigation";
 import { getAiSubscriptionGateMessage } from "@/lib/ai-subscription-ux";
 import { InsightPanel, InsightPanelHeader } from "@/components/InsightPanel";
 import { SubscriptionGate } from "@/components/ProductShell";
@@ -34,6 +37,8 @@ interface AIStockRankingsPanelProps {
   locked: boolean;
   error?: string | null;
   pricingTier?: PricingTier | null;
+  category: AIRankingCategory;
+  onCategoryChange: (category: AIRankingCategory) => void;
   timeframe: AIRankingTimeframe;
   onTimeframeChange: (timeframe: AIRankingTimeframe) => void;
 }
@@ -46,11 +51,13 @@ function RankingSideTable({
   title,
   variant,
   stocks,
+  category,
   timeframe,
 }: {
   title: string;
   variant: "buy" | "sell";
   stocks: AIRankedStock[];
+  category: AIRankingCategory;
   timeframe: AIRankingTimeframe;
 }) {
   const borderClass =
@@ -103,7 +110,7 @@ function RankingSideTable({
           <tbody>
             {stocks.map((stock) => (
               <tr
-                key={`${timeframe}-${variant}-${stock.symbol}`}
+                key={`${category}-${timeframe}-${variant}-${stock.symbol}`}
                 className="border-b border-stone-200 align-top transition-colors hover:bg-stone-100 dark:border-stone-800 dark:hover:bg-stone-900"
                 data-testid={`ranking-row-${variant}-${stock.symbol}`}
               >
@@ -134,6 +141,8 @@ export function AIStockRankingsPanel({
   locked,
   error,
   pricingTier,
+  category,
+  onCategoryChange,
   timeframe,
   onTimeframeChange,
 }: AIStockRankingsPanelProps) {
@@ -146,6 +155,7 @@ export function AIStockRankingsPanel({
   const activeHorizon =
     AI_RANKING_TIMEFRAMES.find((item) => item.id === timeframe)?.horizon ??
     "Days to weeks";
+  const categoryLabel = getAIRankingCategoryLabel(category);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
@@ -200,7 +210,7 @@ export function AIStockRankingsPanel({
             <div className="text-stone-900 dark:text-stone-100">
               <InsightPanelHeader
                 title="Buy and sell rankings"
-                subtitle={`Top AI-ranked buy and sell ideas for the ${activeHorizon.toLowerCase()} horizon.`}
+                subtitle={`Top AI-ranked ${categoryLabel} buy and sell ideas for the ${activeHorizon.toLowerCase()} horizon.`}
                 right={
                   data ? (
                     <p className={`text-xs ${HOME_SUBTLE_TEXT}`}>
@@ -209,6 +219,13 @@ export function AIStockRankingsPanel({
                     </p>
                   ) : undefined
                 }
+              />
+            </div>
+
+            <div className="mb-4" data-testid="ranking-category">
+              <HeatmapNavigation
+                activeHeatmap={category}
+                onHeatmapChange={onCategoryChange}
               />
             </div>
 
@@ -254,8 +271,8 @@ export function AIStockRankingsPanel({
 
             {loading && (
               <p className={HOME_MUTED_TEXT}>
-                Ranking buy and sell ideas for the {activeHorizon.toLowerCase()}{" "}
-                horizon...
+                Ranking {categoryLabel} buy and sell ideas for the{" "}
+                {activeHorizon.toLowerCase()} horizon...
               </p>
             )}
 
@@ -268,12 +285,14 @@ export function AIStockRankingsPanel({
                   title="Ideas to buy"
                   variant="buy"
                   stocks={data.buy}
+                  category={category}
                   timeframe={timeframe}
                 />
                 <RankingSideTable
                   title="Ideas to sell"
                   variant="sell"
                   stocks={data.sell}
+                  category={category}
                   timeframe={timeframe}
                 />
               </div>

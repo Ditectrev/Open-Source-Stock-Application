@@ -12,8 +12,11 @@ import {
   DNA_PAGE_STACK,
 } from "@/lib/design-dna";
 import { HOME_SUBTLE_TEXT } from "@/lib/home-ui";
-import type { AIRankingTimeframe } from "@/lib/ai-stock-rankings";
-import type { AIStockRankingsResult } from "@/types";
+import type {
+  AIRankingCategory,
+  AIRankingTimeframe,
+  AIStockRankingsResult,
+} from "@/types";
 import { AIStockRankingsPanel } from "@/components/AIStockRankingsPanel";
 
 export default function AIStockRankingsPage() {
@@ -27,6 +30,7 @@ export default function AIStockRankingsPage() {
     pricingTier === "HOSTED_AI";
   const hasAIAccess = hasTierAccess || serverBYOKAccess === true;
 
+  const [category, setCategory] = useState<AIRankingCategory>("stock");
   const [timeframe, setTimeframe] = useState<AIRankingTimeframe>("short");
   const [data, setData] = useState<AIStockRankingsResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -55,9 +59,11 @@ export default function AIStockRankingsPage() {
       }
 
       setLoading(true);
+      setData(null);
       try {
         const result = await fetchAIStockRankingsForCurrentProvider(
           timeframe,
+          category,
           pricingTier
         );
         setData(result);
@@ -75,7 +81,7 @@ export default function AIStockRankingsPage() {
     };
 
     load();
-  }, [hasAIAccess, aiProviderVersion, pricingTier, timeframe]);
+  }, [hasAIAccess, aiProviderVersion, pricingTier, timeframe, category]);
 
   useEffect(() => {
     const loadBYOKAccess = async () => {
@@ -107,8 +113,8 @@ export default function AIStockRankingsPage() {
       <header className="space-y-2">
         <h1 className={DNA_DISPLAY}>Ranking</h1>
         <p className={DNA_BODY_SECONDARY}>
-          Ranked buy and sell lists across short, medium, and long horizons —
-          each row includes a clear rationale.
+          Ranked buy and sell lists for ETFs, crypto, and stocks across short,
+          medium, and long horizons — each row includes a clear rationale.
         </p>
         <p className={`text-xs ${HOME_SUBTLE_TEXT}`}>
           Related:{" "}
@@ -127,6 +133,8 @@ export default function AIStockRankingsPage() {
         locked={!hasAIAccess}
         error={loadError}
         pricingTier={pricingTier}
+        category={category}
+        onCategoryChange={setCategory}
         timeframe={timeframe}
         onTimeframeChange={setTimeframe}
       />

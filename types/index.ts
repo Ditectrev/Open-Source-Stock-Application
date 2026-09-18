@@ -474,6 +474,9 @@ export interface StockOfTheDayResult {
 
 export type AIRankingTimeframe = "short" | "medium" | "long";
 
+/** Matches HeatmapNavigation / HeatmapHub categories exactly. */
+export type AIRankingCategory = "etf" | "crypto" | "stock";
+
 export interface AIRankedStock {
   rank: number;
   symbol: string;
@@ -484,6 +487,7 @@ export interface AIRankedStock {
 }
 
 export interface AIStockRankingsResult {
+  category: AIRankingCategory;
   timeframe: AIRankingTimeframe;
   generatedAt: Date;
   buy: AIRankedStock[];
