@@ -1,72 +1,40 @@
 # macOS system files
 .DS_Store
+.DS_Store?
 .AppleDouble
 .LSOverride
 Icon
 ._*
-
-# macOS directory metadata
 .Spotlight-V100
 .Trashes
-
-# macOS Finder icons
 .DocumentRevisions-V100
 .fseventsd
-.Spotlight-V100
 .TemporaryItems
-.Trashes
 .VolumeIcon.icns
 .com.apple.timemachine.donotpresent
 
-# macOS cache files
+# macOS temporary/editor cache files
 *.swp
 *.swo
 *~
 
-# macOS temporary files
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
+# Windows system and installer files
 Thumbs.db
-
-# Windows system files
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
-*.cab
-*.msi
-*.msm
-*.msp
-*.lnk
-
-# Windows thumbnail cache files
 Thumbs.db:encryptable
 ehthumbs.db
 ehthumbs_vista.db
-*.stackdump
 [Dd]esktop.ini
-
-# Windows Installer files
+$RECYCLE.BIN/
+*.stackdump
 *.cab
 *.msi
 *.msix
 *.msm
 *.msp
-
-# Windows shortcuts
 *.lnk
 
-# Linux temporary files
-*~
+# Linux temporary/system files
 .fuse_hidden*
-.directory
-.Trash-*
-.nfs*
-
-# Linux system files
 .directory
 .Trash-*
 .nfs*
@@ -76,40 +44,34 @@ ehthumbs_vista.db
 *.tmp
 *.temp
 *.bak
-*.swp
 *~.nib
 local.properties
 .settings/
 .loadpath
 .recommenders
 
-# IDE specific files
+# IDE-specific files
 .idea/
 .vscode/
 *.sublime-workspace
 *.sublime-project
-node_modules
 
-# Next.js
+# Node dependencies
+node_modules/
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Next.js and production builds
 /.next/
 /out/
-/build
-.next
-out
-
-# Production
-/dist
+/build/
+/dist/
 
 # Environment variables
 .env
 .env*.local
 .env.production
-
-# Dependencies
-node_modules/
-/.pnp
-.pnp.js
-.yarn/install-state.gz
 
 # Package manager lock files (keep bun.lockb)
 package-lock.json
@@ -117,7 +79,7 @@ yarn.lock
 pnpm-lock.yaml
 
 # Testing
-/coverage
+/coverage/
 *.lcov
 /playwright-report/
 /test-results/
@@ -130,11 +92,10 @@ pnpm-lock.yaml
 *.tsbuildinfo
 next-env.d.ts
 
-# Debug
+# Debug logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
 # Local development
-.DS_Store
 *.pem
