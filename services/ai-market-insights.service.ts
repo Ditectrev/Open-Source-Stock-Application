@@ -12,6 +12,7 @@ import {
   type AIPredictionMarketSnapshot,
 } from "@/lib/ai-prediction";
 import { marketDataService } from "@/services/market-data.service";
+import { yahooFinanceService } from "@/services/yahoo-finance.service";
 import { AIIntegrationService } from "@/services/ai-integration.service";
 import { logger } from "@/lib/logger";
 import {
@@ -19,6 +20,7 @@ import {
   AI_STOCK_RANKINGS_MAX_OUTPUT_TOKENS,
   buildAIStockRankingsPrompt,
   parseAIStockRankingsCandidates,
+  rankingInsufficientCandidatesMessage,
   type AIRankingTimeframe,
   type AIStockRankingsCandidates,
   type AIRankingCategory,
@@ -38,6 +40,7 @@ import type {
   ForecastData,
   StockOfTheDay,
   StockOfTheDayResult,
+  SymbolData,
   TechnicalIndicators,
 } from "@/types";
 
@@ -344,10 +347,16 @@ export class AIMarketInsightsService {
     candidates: AIStockRankingsCandidates
   ): Promise<AIStockRankingsResult> {
     const [buyEnriched, sellEnriched] = await Promise.all([
-      this.enrichRankingCandidates(candidates.buyCandidates, timeframe, "buy"),
+      this.enrichRankingCandidates(
+        candidates.buyCandidates,
+        timeframe,
+        category,
+        "buy"
+      ),
       this.enrichRankingCandidates(
         candidates.sellCandidates,
         timeframe,
+        category,
         "sell"
       ),
     ]);
@@ -360,9 +369,7 @@ export class AIMarketInsightsService {
       .slice(0, AI_STOCK_RANKINGS_DISPLAY_COUNT);
 
     if (buyRanked.length < 4 || sellRanked.length < 4) {
-      throw new Error(
-        "AI did not return enough valid public stock candidates for this ranking."
-      );
+      throw new Error(rankingInsufficientCandidatesMessage(category));
     }
 
     const generatedAt = new Date();
@@ -422,16 +429,35 @@ export class AIMarketInsightsService {
   private async enrichRankingCandidates(
     candidates: AIStockCandidate[],
     timeframe: AIRankingTimeframe,
+    category: AIRankingCategory,
     direction: "buy" | "sell"
   ): Promise<EnrichedStockCandidate[]> {
     const enriched = await Promise.all(
       candidates.map(async (candidate) => {
         try {
-          const [quote, indicators, forecast] = await Promise.all([
-            marketDataService.getSymbolData(candidate.symbol),
-            marketDataService.getTechnicalIndicators(candidate.symbol),
-            marketDataService.getForecastData(candidate.symbol),
-          ]);
+          const quote = await this.getRankingQuote(candidate.symbol, category);
+          const indicators = await marketDataService
+            .getTechnicalIndicators(candidate.symbol)
+            .catch((error) => {
+              logger.warn("Using fallback indicators for ranking candidate", {
+                symbol: candidate.symbol,
+                category,
+                direction,
+                error: error instanceof Error ? error.message : String(error),
+              });
+              return this.fallbackRankingIndicators();
+            });
+          const forecast = await marketDataService
+            .getForecastData(candidate.symbol)
+            .catch((error) => {
+              logger.warn("Using fallback forecast for ranking candidate", {
+                symbol: candidate.symbol,
+                category,
+                direction,
+                error: error instanceof Error ? error.message : String(error),
+              });
+              return this.fallbackRankingForecast(quote.price);
+            });
 
           const score = this.scoreRankingCandidate({
             direction,
@@ -467,8 +493,9 @@ export class AIMarketInsightsService {
             }),
           };
         } catch (error) {
-          logger.warn("Failed to validate AI stock ranking candidate", {
+          logger.warn("Failed to validate AI ranking candidate", {
             symbol: candidate.symbol,
+            category,
             direction,
             timeframe,
             error: error instanceof Error ? error.message : String(error),
@@ -481,6 +508,46 @@ export class AIMarketInsightsService {
     return enriched.filter(
       (item): item is EnrichedStockCandidate => item !== null
     );
+  }
+
+  private async getRankingQuote(
+    symbol: string,
+    category: AIRankingCategory
+  ): Promise<SymbolData> {
+    if (category === "stock") {
+      return marketDataService.getSymbolData(symbol);
+    }
+
+    return yahooFinanceService.getSymbolQuote(symbol);
+  }
+
+  private fallbackRankingIndicators(): TechnicalIndicators {
+    return {
+      rsi: { value: 50, signal: "fair" },
+      macd: { value: 0, signal: 0, histogram: 0, trend: "fair" },
+      movingAverages: { ma50: 0, ma200: 0, signal: "fair" },
+      bollingerBands: { upper: 0, middle: 0, lower: 0, signal: "fair" },
+      overallSentiment: "fair",
+    };
+  }
+
+  private fallbackRankingForecast(price: number): ForecastData {
+    return {
+      priceTargets: {
+        low: price * 0.95,
+        average: price,
+        high: price * 1.05,
+      },
+      analystRatings: {
+        strongBuy: 0,
+        buy: 0,
+        hold: 1,
+        sell: 0,
+        strongSell: 0,
+      },
+      epsForecasts: [],
+      revenueForecasts: [],
+    };
   }
 
   private async enrichStockCandidates(

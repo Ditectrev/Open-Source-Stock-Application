@@ -4,6 +4,7 @@ import {
   isAIRankingCategory,
   isAIRankingTimeframe,
   parseAIRankingCandidates,
+  rankingIncompleteCandidatesMessage,
 } from "@/lib/ai-stock-rankings";
 import { aiMarketInsightsService } from "@/services/ai-market-insights.service";
 import { logger } from "@/lib/logger";
@@ -171,7 +172,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: "AI returned an incomplete stock ranking candidate set.",
+          error: rankingIncompleteCandidatesMessage(categoryRaw),
           timestamp: new Date(),
         },
         { status: 400 }

@@ -105,6 +105,18 @@ export function getAIRankingCategoryLabel(category: AIRankingCategory): string {
   );
 }
 
+export function rankingInsufficientCandidatesMessage(
+  category: AIRankingCategory
+): string {
+  return `AI did not return enough valid ${getAIRankingCategoryLabel(category).toLowerCase()} candidates for this ranking.`;
+}
+
+export function rankingIncompleteCandidatesMessage(
+  category: AIRankingCategory
+): string {
+  return `AI returned an incomplete ${getAIRankingCategoryLabel(category).toLowerCase()} ranking candidate set.`;
+}
+
 function normalizeRankingSymbol(
   raw: string,
   category: AIRankingCategory
@@ -198,7 +210,7 @@ export function parseAIStockRankingsCandidates(
   );
 
   if (buyCandidates.length < 4 || sellCandidates.length < 4) {
-    throw new Error("AI returned an incomplete stock ranking candidate set.");
+    throw new Error(rankingIncompleteCandidatesMessage(category));
   }
 
   return {
