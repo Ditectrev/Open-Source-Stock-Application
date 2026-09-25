@@ -4,10 +4,7 @@
 export const MAIN_NAV = [
   { id: "home", label: "Home", href: "/" },
   { id: "news", label: "News", href: "/news" },
-  { id: "sectors", label: "Sectors", href: "/sectors" },
-  { id: "calendars", label: "Calendars", href: "/calendars" },
-  { id: "heatmaps", label: "Heatmaps", href: "/heatmaps" },
-  { id: "screener", label: "Screener", href: "/screener" },
+  { id: "ranking", label: "Ranking", href: "/ranking" },
   { id: "pricing", label: "Pricing", href: "/pricing" },
 ] as const;
 
@@ -22,10 +19,15 @@ export function pathnameToNavId(pathname: string): MainNavId | string {
     first === "calendars" ||
     first === "heatmaps" ||
     first === "screener" ||
+    first === "ranking" ||
     first === "pricing" ||
     first === "profile" ||
     first === "compare" ||
-    first === "news"
+    first === "news" ||
+    first === "copyrights" ||
+    first === "privacy-and-security" ||
+    first === "sitemap" ||
+    first === "terms-of-use"
   ) {
     return first;
   }

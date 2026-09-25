@@ -116,13 +116,13 @@ describe("Color Contrast Compliance (Req 18.3)", () => {
   });
 
   describe("Footer", () => {
-    it("uses readable stone text on dark background in dark mode", () => {
+    it("uses readable stone text on a dark footer background", () => {
       const { container } = render(<Footer />);
       const footer = container.querySelector("footer");
       expect(footer).not.toBeNull();
       const cls = footer!.className;
-      expect(cls).toContain("dark:text-stone-200");
-      expect(cls).not.toContain("dark:text-stone-400");
+      expect(cls).toContain("bg-stone-950");
+      expect(cls).toContain("text-stone-200");
     });
   });
 

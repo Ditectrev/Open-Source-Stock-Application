@@ -84,6 +84,7 @@ pnpm-lock.yaml
 /playwright-report/
 /test-results/
 /playwright/.cache/
+.lighthouseci/
 
 # Vercel
 .vercel

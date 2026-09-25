@@ -1,21 +1,25 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { usePricingTier } from "@/lib/use-pricing-tier";
 import { EXPLANATIONS_PROVIDER_CHANGED_EVENT } from "@/lib/explanation-provider";
-import { fetchStockOfTheDayForCurrentProvider } from "@/lib/local-ollama-stock-of-the-day";
+import { fetchAIStockRankingsForCurrentProvider } from "@/lib/local-ollama-ai-rankings";
 import { MARKET_UI_COPY } from "@/lib/market-ui-copy";
 import {
   DNA_BODY_SECONDARY,
-  DNA_CAPTION,
   DNA_DISPLAY,
   DNA_PAGE_STACK,
 } from "@/lib/design-dna";
-import { StockOfTheDayPanel } from "@/components/StockOfTheDayPanel";
-import type { StockOfTheDayResult } from "@/types";
+import { HOME_SUBTLE_TEXT } from "@/lib/home-ui";
+import type {
+  AIRankingCategory,
+  AIRankingTimeframe,
+  AIStockRankingsResult,
+} from "@/types";
+import { AIStockRankingsPanel } from "@/components/AIStockRankingsPanel";
 
-export default function StockOfTheDayPage() {
+export default function AIStockRankingsPage() {
   const pricingTier = usePricingTier();
   const [serverBYOKAccess, setServerBYOKAccess] = useState<boolean | null>(
     null
@@ -26,7 +30,9 @@ export default function StockOfTheDayPage() {
     pricingTier === "HOSTED_AI";
   const hasAIAccess = hasTierAccess || serverBYOKAccess === true;
 
-  const [item, setItem] = useState<StockOfTheDayResult | null>(null);
+  const [category, setCategory] = useState<AIRankingCategory>("stock");
+  const [timeframe, setTimeframe] = useState<AIRankingTimeframe>("short");
+  const [data, setData] = useState<AIStockRankingsResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [aiProviderVersion, setAiProviderVersion] = useState(0);
@@ -45,30 +51,48 @@ export default function StockOfTheDayPage() {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+
     const load = async () => {
       if (!hasAIAccess) {
-        setItem(null);
+        setData(null);
         setLoadError(null);
+        setLoading(false);
         return;
       }
 
       setLoading(true);
+      setData(null);
       try {
-        const data = await fetchStockOfTheDayForCurrentProvider(pricingTier);
-        setItem(data);
+        const result = await fetchAIStockRankingsForCurrentProvider(
+          timeframe,
+          category,
+          pricingTier
+        );
+        if (cancelled) return;
+        setData(result);
         setLoadError(null);
       } catch (err) {
-        setItem(null);
+        if (cancelled) return;
+        setData(null);
         setLoadError(
-          err instanceof Error ? err.message : MARKET_UI_COPY.load.stockOfTheDay
+          err instanceof Error
+            ? err.message
+            : MARKET_UI_COPY.load.aiStockRankings
         );
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
     load();
-  }, [hasAIAccess, aiProviderVersion, pricingTier]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [hasAIAccess, aiProviderVersion, pricingTier, timeframe, category]);
 
   useEffect(() => {
     const loadBYOKAccess = async () => {
@@ -96,26 +120,34 @@ export default function StockOfTheDayPage() {
   }, []);
 
   return (
-    <div className={DNA_PAGE_STACK} data-testid="stock-of-the-day-page">
+    <div className={DNA_PAGE_STACK} data-testid="ranking-page">
       <header className="space-y-2">
-        <h1 className={DNA_DISPLAY}>Stock of the day</h1>
+        <h1 className={DNA_DISPLAY}>Ranking</h1>
         <p className={DNA_BODY_SECONDARY}>
-          AI-ranked daily opportunity across stocks and select liquid assets.
+          Ranked buy and sell lists for ETFs, crypto, and stocks across short,
+          medium, and long horizons — each row includes a clear rationale.
         </p>
-        <p className={DNA_CAPTION}>
+        <p className={`text-xs ${HOME_SUBTLE_TEXT}`}>
           Related:{" "}
-          <Link href="/ranking" className="underline underline-offset-2">
-            Ranking
+          <Link
+            href="/stock-of-the-day"
+            className="underline underline-offset-2"
+          >
+            Stock of the day
           </Link>
         </p>
       </header>
 
-      <StockOfTheDayPanel
-        item={item}
+      <AIStockRankingsPanel
+        data={data}
         loading={loading}
         locked={!hasAIAccess}
         error={loadError}
         pricingTier={pricingTier}
+        category={category}
+        onCategoryChange={setCategory}
+        timeframe={timeframe}
+        onTimeframeChange={setTimeframe}
       />
     </div>
   );

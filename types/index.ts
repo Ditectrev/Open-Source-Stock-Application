@@ -471,3 +471,25 @@ export interface StockOfTheDayResult {
   buy: StockOfTheDay;
   sell: StockOfTheDay;
 }
+
+export type AIRankingTimeframe = "short" | "medium" | "long";
+
+/** Matches HeatmapNavigation / HeatmapHub categories exactly. */
+export type AIRankingCategory = "etf" | "crypto" | "stock";
+
+export interface AIRankedStock {
+  rank: number;
+  symbol: string;
+  name: string;
+  assetType: "stock" | "crypto" | "commodity" | "forex" | "etf" | "unknown";
+  confidence: number;
+  rationale: string[];
+}
+
+export interface AIStockRankingsResult {
+  category: AIRankingCategory;
+  timeframe: AIRankingTimeframe;
+  generatedAt: Date;
+  buy: AIRankedStock[];
+  sell: AIRankedStock[];
+}
