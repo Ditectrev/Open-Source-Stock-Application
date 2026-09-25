@@ -7,10 +7,6 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     globals: true,
-    environmentMatchGlobs: [
-      ["services/__tests__/ranking-api.integration.test.ts", "node"],
-      ["services/__tests__/ranking-api-get.integration.test.ts", "node"],
-    ],
     setupFiles: ["./vitest.setup.ts"],
     exclude: ["**/node_modules/**", "**/e2e/**", "**/.next/**"],
   },
