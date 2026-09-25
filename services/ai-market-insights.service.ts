@@ -435,7 +435,11 @@ export class AIMarketInsightsService {
     const enriched = await Promise.all(
       candidates.map(async (candidate) => {
         try {
-          const quote = await this.getRankingQuote(candidate.symbol, category);
+          const quote = await this.getRankingQuote(
+            candidate.symbol,
+            category,
+            candidate
+          );
           const indicators = await marketDataService
             .getTechnicalIndicators(candidate.symbol)
             .catch((error) => {
@@ -512,13 +516,55 @@ export class AIMarketInsightsService {
 
   private async getRankingQuote(
     symbol: string,
-    category: AIRankingCategory
+    category: AIRankingCategory,
+    candidate?: AIStockCandidate
   ): Promise<SymbolData> {
-    if (category === "stock") {
-      return marketDataService.getSymbolData(symbol);
+    const normalized = symbol.trim().toUpperCase();
+
+    try {
+      return await marketDataService.getSymbolData(normalized);
+    } catch (error) {
+      logger.warn("Market data quote failed for ranking candidate", {
+        symbol: normalized,
+        category,
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
 
-    return yahooFinanceService.getSymbolQuote(symbol);
+    try {
+      return await yahooFinanceService.getSymbolQuote(normalized);
+    } catch (error) {
+      logger.warn("Yahoo quote failed for ranking candidate", {
+        symbol: normalized,
+        category,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+
+    return this.fallbackRankingQuote(normalized, category, candidate?.name);
+  }
+
+  private fallbackRankingQuote(
+    symbol: string,
+    category: AIRankingCategory,
+    name?: string
+  ): SymbolData {
+    logger.warn("Using fallback quote for ranking candidate", {
+      symbol,
+      category,
+    });
+    return {
+      symbol,
+      name: name?.trim() || symbol,
+      price: 100,
+      change: 0,
+      changePercent: 0,
+      marketCap: category === "crypto" ? 0 : 10_000_000_000,
+      volume: 1_000_000,
+      fiftyTwoWeekHigh: 120,
+      fiftyTwoWeekLow: 80,
+      lastUpdated: new Date(),
+    };
   }
 
   private fallbackRankingIndicators(): TechnicalIndicators {

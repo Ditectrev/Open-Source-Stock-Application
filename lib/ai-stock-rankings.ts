@@ -129,8 +129,8 @@ function normalizeRankingSymbol(
     case "etf":
       return /^[A-Z]{1,5}$/.test(symbol) ? symbol : null;
     case "crypto":
-      if (/^[A-Z0-9]{2,10}-USD$/.test(symbol)) return symbol;
-      if (/^[A-Z0-9]{2,10}$/.test(symbol)) return `${symbol}-USD`;
+      if (/^[A-Z0-9._-]+-USD$/.test(symbol)) return symbol;
+      if (/^[A-Z0-9._-]+$/.test(symbol)) return `${symbol}-USD`;
       return null;
   }
 }

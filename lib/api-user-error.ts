@@ -33,7 +33,9 @@ function isUserFacingMessage(message: string): boolean {
     message.startsWith("We couldn't") ||
     message.startsWith("We could not") ||
     message.startsWith("Ditectrev AI") ||
-    message.startsWith("No API key stored")
+    message.startsWith("No API key stored") ||
+    message.startsWith("AI did not return") ||
+    message.startsWith("AI returned an incomplete")
   ) {
     return true;
   }
