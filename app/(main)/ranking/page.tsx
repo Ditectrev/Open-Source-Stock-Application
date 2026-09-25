@@ -51,6 +51,8 @@ export default function AIStockRankingsPage() {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+
     const load = async () => {
       if (!hasAIAccess) {
         setData(null);
@@ -66,9 +68,11 @@ export default function AIStockRankingsPage() {
           category,
           pricingTier
         );
+        if (cancelled) return;
         setData(result);
         setLoadError(null);
       } catch (err) {
+        if (cancelled) return;
         setData(null);
         setLoadError(
           err instanceof Error
@@ -76,11 +80,17 @@ export default function AIStockRankingsPage() {
             : MARKET_UI_COPY.load.aiStockRankings
         );
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
     load();
+
+    return () => {
+      cancelled = true;
+    };
   }, [hasAIAccess, aiProviderVersion, pricingTier, timeframe, category]);
 
   useEffect(() => {

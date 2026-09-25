@@ -714,6 +714,8 @@ export class AIMarketInsightsService {
       analystRatings: args.analystRatings,
     });
 
+    const directionMultiplier = args.direction === "sell" ? -1 : 1;
+
     if (args.timeframe === "short") {
       const momentum = Math.min(1, Math.max(-1, args.changePercent / 8));
       const sentiment =
@@ -722,7 +724,7 @@ export class AIMarketInsightsService {
           : args.overallSentiment === "overpriced"
             ? -0.15
             : 0;
-      return baseScore + momentum * 0.25 + sentiment;
+      return baseScore + directionMultiplier * (momentum * 0.25 + sentiment);
     }
 
     if (args.timeframe === "long") {
@@ -735,7 +737,9 @@ export class AIMarketInsightsService {
             : -0.1;
       const targetUpside =
         args.price > 0 ? (args.averageTarget - args.price) / args.price : 0;
-      return baseScore + runway * 0.2 + targetUpside * 0.15;
+      return (
+        baseScore + directionMultiplier * (runway * 0.2 + targetUpside * 0.15)
+      );
     }
 
     return baseScore;
