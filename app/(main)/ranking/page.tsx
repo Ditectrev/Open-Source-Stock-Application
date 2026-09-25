@@ -57,6 +57,7 @@ export default function AIStockRankingsPage() {
       if (!hasAIAccess) {
         setData(null);
         setLoadError(null);
+        setLoading(false);
         return;
       }
 
