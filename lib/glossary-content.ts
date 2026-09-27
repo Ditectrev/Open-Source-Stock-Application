@@ -114,8 +114,7 @@ export const GLOSSARY_CATEGORIES: readonly GlossaryCategory[] = [
   {
     id: "crypto",
     label: "Cryptocurrency",
-    description:
-      "Digital assets and the vocabulary around blockchain markets.",
+    description: "Digital assets and the vocabulary around blockchain markets.",
     terms: [
       {
         term: "Cryptocurrency",
@@ -152,8 +151,7 @@ export const GLOSSARY_CATEGORIES: readonly GlossaryCategory[] = [
   {
     id: "analysis",
     label: "Charts, screeners & sentiment",
-    description:
-      "Terms tied to tools and indicators inside The Open Stock.",
+    description: "Terms tied to tools and indicators inside The Open Stock.",
     terms: [
       {
         term: "Screener",

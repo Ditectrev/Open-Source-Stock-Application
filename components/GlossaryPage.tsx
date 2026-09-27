@@ -1,7 +1,4 @@
-import {
-  GLOSSARY_CATEGORIES,
-  glossaryTermSlug,
-} from "@/lib/glossary-content";
+import { GLOSSARY_CATEGORIES, glossaryTermSlug } from "@/lib/glossary-content";
 import {
   DNA_BODY,
   DNA_BODY_SECONDARY,
@@ -25,8 +22,8 @@ export function GlossaryPage() {
         <h1 className={`mt-3 ${DNA_DISPLAY}`}>Glossary</h1>
         <p className={`mt-4 max-w-3xl ${DNA_HERO_LEAD}`}>
           Plain-language definitions for stocks, ETFs, crypto, and the market
-          tools you use in {SITE_NAME}. Built for DIY long-term investors—not
-          as trading advice.
+          tools you use in {SITE_NAME}. Built for DIY long-term investors—not as
+          trading advice.
         </p>
         <p className={`mt-3 ${DNA_CAPTION}`}>
           Jump to a section:{" "}

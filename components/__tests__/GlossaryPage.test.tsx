@@ -14,6 +14,8 @@ describe("GlossaryPage", () => {
     expect(
       screen.getByRole("heading", { level: 3, name: "Cryptocurrency" })
     ).toBeInTheDocument();
-    expect(screen.getByText("RSI (Relative Strength Index)")).toBeInTheDocument();
+    expect(
+      screen.getByText("RSI (Relative Strength Index)")
+    ).toBeInTheDocument();
   });
 });
