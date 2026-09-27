@@ -25,6 +25,7 @@ export function pathnameToNavId(pathname: string): MainNavId | string {
     first === "compare" ||
     first === "news" ||
     first === "copyrights" ||
+    first === "glossary" ||
     first === "privacy-and-security" ||
     first === "sitemap" ||
     first === "terms-of-use"
