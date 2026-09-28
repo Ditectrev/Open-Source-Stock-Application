@@ -19,6 +19,7 @@ export const FOOTER_TOOLS = [
 
 export const FOOTER_RESOURCES = [
   { label: "Copyrights", href: "/copyrights" },
+  { label: "Glossary", href: "/glossary" },
   { label: "Privacy & Security", href: "/privacy-and-security" },
   { label: "Sitemap", href: "/sitemap" },
   { label: "Terms of Use", href: "/terms-of-use" },

@@ -133,6 +133,10 @@ describe("Accessibility - Footer (Req 18.4)", () => {
       "href",
       "/copyrights"
     );
+    expect(screen.getByRole("link", { name: "Glossary" })).toHaveAttribute(
+      "href",
+      "/glossary"
+    );
     expect(screen.queryByRole("link", { name: "News" })).toBeNull();
   });
 });
