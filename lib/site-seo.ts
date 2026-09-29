@@ -228,7 +228,6 @@ export const PUBLIC_ROUTES = [
     changeFrequency: "daily" as const,
   },
   { path: "/pricing", priority: 0.7, changeFrequency: "weekly" as const },
-  { path: "/glossary", priority: 0.55, changeFrequency: "monthly" as const },
   { path: "/copyrights", priority: 0.3, changeFrequency: "yearly" as const },
   {
     path: "/privacy-and-security",
