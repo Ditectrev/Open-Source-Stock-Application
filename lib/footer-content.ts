@@ -10,6 +10,18 @@ export const FOOTER_CONTACT = {
   taxId: "Tax ID: PL9121899240",
 } as const;
 
+/** Operator identity used on legal pages (same entity as the footer). */
+export const COMPANY_LEGAL = {
+  legalName: "IBStructure Daniel Danielecki",
+  tradingAs: "Ditectrev",
+  dpoName: "Daniel Danielecki",
+  vies: "PL9121899240",
+  nip: "9121899240",
+  regon: "366592971",
+  country: "Poland (European Union)",
+  githubRepo: "https://github.com/Ditectrev/Open-Source-Stock-Application",
+} as const;
+
 export const FOOTER_TOOLS = [
   { label: "Sectors", href: "/sectors" },
   { label: "Calendars", href: "/calendars" },

@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
-import { LegalPlaceholderPage } from "@/components/LegalPlaceholderPage";
+import { LegalDocumentPage } from "@/components/LegalDocumentPage";
+import { COPYRIGHTS_DOCUMENT } from "@/lib/legal-content";
 import { buildPageMetadata } from "@/lib/site-seo";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Copyrights",
-  description: "Copyrights for The Open Stock.",
-  path: "/copyrights",
+  title: COPYRIGHTS_DOCUMENT.title,
+  description: COPYRIGHTS_DOCUMENT.description,
+  path: COPYRIGHTS_DOCUMENT.path,
+  keywords: COPYRIGHTS_DOCUMENT.keywords,
 });
 
 export default function CopyrightsPage() {
-  return <LegalPlaceholderPage title="Copyrights" />;
+  return <LegalDocumentPage document={COPYRIGHTS_DOCUMENT} />;
 }

@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
-import { LegalPlaceholderPage } from "@/components/LegalPlaceholderPage";
+import { LegalDocumentPage } from "@/components/LegalDocumentPage";
+import { TERMS_DOCUMENT } from "@/lib/legal-content";
 import { buildPageMetadata } from "@/lib/site-seo";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Terms of Use",
-  description: "Terms of use for The Open Stock.",
-  path: "/terms-of-use",
+  title: TERMS_DOCUMENT.title,
+  description: TERMS_DOCUMENT.description,
+  path: TERMS_DOCUMENT.path,
+  keywords: TERMS_DOCUMENT.keywords,
 });
 
 export default function TermsOfUsePage() {
-  return <LegalPlaceholderPage title="Terms of Use" />;
+  return <LegalDocumentPage document={TERMS_DOCUMENT} />;
 }
