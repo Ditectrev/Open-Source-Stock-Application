@@ -501,7 +501,7 @@ export type InvestmentPlanId =
   | "dividend"
   | "aggressive-growth";
 
-export type InvestmentAssetClass = "bond" | "stock";
+export type InvestmentAssetClass = "bond" | "etf" | "stock";
 
 export interface InvestmentPlanHolding {
   symbol: string;

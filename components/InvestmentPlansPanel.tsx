@@ -16,9 +16,11 @@ import {
   DNA_SUBHEADING,
 } from "@/lib/design-dna";
 import {
-  allocationSliceColor,
-  ASSET_CLASS_LABELS,
+  allocationSliceTone,
+  displayAssetClass,
+  holdingInstrumentLabel,
   investmentRiskTone,
+  presentInvestmentPlans,
 } from "@/lib/investment-plans";
 import { marketChangeTextClass } from "@/lib/market-semantics";
 import { HOME_INSTRUMENT_PANEL, HOME_PRIMARY_BUTTON } from "@/lib/home-ui";
@@ -89,7 +91,7 @@ export function InvestmentPlansPanel({
   error,
   pricingTier,
 }: InvestmentPlansPanelProps) {
-  const plans = result?.plans ?? [];
+  const plans = presentInvestmentPlans(result?.plans ?? []);
   const [planId, setPlanId] = useState(plans[0]?.id ?? "defensive");
   const [activeSymbol, setActiveSymbol] = useState<string | null>(null);
   const selected = plans.find((plan) => plan.id === planId) ?? plans[0] ?? null;
@@ -225,18 +227,16 @@ export function InvestmentPlansPanel({
                             >
                               <span className="flex items-center gap-2">
                                 <span
-                                  className="h-2.5 w-2.5 shrink-0 rounded-full"
-                                  style={{
-                                    backgroundColor:
-                                      allocationSliceColor(index),
-                                  }}
+                                  className={`h-2.5 w-2.5 shrink-0 rounded-full bg-current ${allocationSliceTone(index)}`}
                                   aria-hidden="true"
                                 />
                                 <span className={DNA_SUBHEADING}>
                                   {holding.symbol}
                                 </span>
                                 <span className={DNA_CAPTION}>
-                                  {ASSET_CLASS_LABELS[holding.assetClass]}
+                                  {holdingInstrumentLabel(
+                                    displayAssetClass(holding)
+                                  )}
                                 </span>
                                 <span
                                   className={`ml-auto ${DNA_METRIC_COMPACT}`}
@@ -252,12 +252,8 @@ export function InvestmentPlansPanel({
                                 aria-hidden="true"
                               >
                                 <span
-                                  className="block h-full rounded-full"
-                                  style={{
-                                    width: `${holding.weight}%`,
-                                    backgroundColor:
-                                      allocationSliceColor(index),
-                                  }}
+                                  className={`block h-full rounded-full bg-current ${allocationSliceTone(index)}`}
+                                  style={{ width: `${holding.weight}%` }}
                                 />
                               </span>
                               {holding.rationale ? (

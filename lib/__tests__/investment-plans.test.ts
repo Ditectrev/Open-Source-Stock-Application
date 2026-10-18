@@ -2,10 +2,12 @@ import { describe, expect, it } from "vitest";
 import { subscriptionService } from "@/services/subscription.service";
 import {
   assembleInvestmentPlans,
+  displayAssetClass,
   fitPlanHoldings,
   INVESTMENT_PLAN_ORDER,
   INVESTMENT_PLAN_SPECS,
   parseInvestmentPlanCandidates,
+  presentInvestmentPlans,
   selectAggressiveGrowthHoldings,
   trailingReturnPercent,
 } from "@/lib/investment-plans";
@@ -134,11 +136,11 @@ const payload = {
           rationale: "Style.",
         },
         {
-          symbol: "AAPL",
-          name: "Apple",
+          symbol: "VGT",
+          name: "Info Tech",
           assetClass: "stock",
           weight: 15,
-          rationale: "Compounder.",
+          rationale: "Sector sleeve.",
         },
       ],
     },
@@ -168,15 +170,15 @@ const payload = {
           rationale: "Growth of payouts.",
         },
         {
-          symbol: "JNJ",
-          name: "Johnson & Johnson",
+          symbol: "NOBL",
+          name: "Dividend Aristocrats",
           assetClass: "stock",
           weight: 15,
           rationale: "Payout history.",
         },
         {
-          symbol: "KO",
-          name: "Coca-Cola",
+          symbol: "DGRO",
+          name: "Dividend Growth",
           assetClass: "stock",
           weight: 15,
           rationale: "Cash returns.",
@@ -235,10 +237,15 @@ describe("investment plan ideas", () => {
     );
 
     expect(plans.map((plan) => plan.id)).toEqual([...INVESTMENT_PLAN_ORDER]);
-    expect(plans.map((plan) => plan.riskScore)).toEqual([2, 4, 7, 6, 9]);
-    expect(
-      plans.find((plan) => plan.id === "aggressive-growth")?.riskLabel
-    ).toBe("Very high");
+    expect(plans.map((plan) => plan.riskScore)).toEqual([2, 3, 5, 7, 9]);
+    expect(plans.map((plan) => plan.riskLabel)).toEqual([
+      "Very low",
+      "Low",
+      "Medium",
+      "High",
+      "Very high",
+    ]);
+    expect(plans[2]?.id).toBe("dividend");
 
     for (const plan of plans) {
       const total = plan.holdings.reduce(
@@ -265,7 +272,12 @@ describe("investment plan ideas", () => {
 
     const growth = plans.find((plan) => plan.id === "growth");
     expect(
-      growth?.holdings.every((holding) => holding.assetClass === "stock")
+      growth?.holdings.every((holding) => holding.assetClass === "etf")
+    ).toBe(true);
+
+    const dividend = plans.find((plan) => plan.id === "dividend");
+    expect(
+      dividend?.holdings.every((holding) => holding.assetClass === "etf")
     ).toBe(true);
 
     const aggressive = plans.find((plan) => plan.id === "aggressive-growth");
@@ -363,6 +375,84 @@ describe("investment plan ideas", () => {
       "LLY",
       "META",
     ]);
+  });
+
+  it("labels stored equity ETFs as ETFs and keeps single stocks as stocks", () => {
+    expect(displayAssetClass({ symbol: "SCHD", assetClass: "stock" })).toBe(
+      "etf"
+    );
+    expect(displayAssetClass({ symbol: "BND", assetClass: "stock" })).toBe(
+      "bond"
+    );
+    expect(displayAssetClass({ symbol: "NVDA", assetClass: "stock" })).toBe(
+      "stock"
+    );
+  });
+
+  it("shows dividend in the middle with the current risk labels", () => {
+    const presented = presentInvestmentPlans([
+      {
+        id: "aggressive-growth",
+        name: "Old",
+        summary: "Old",
+        thesis: "Leaders.",
+        riskScore: 9,
+        riskLabel: "Very high",
+        holdings: [],
+      },
+      {
+        id: "dividend",
+        name: "Old",
+        summary: "Old",
+        thesis: "Income.",
+        riskScore: 6,
+        riskLabel: "High",
+        holdings: [],
+      },
+      {
+        id: "growth",
+        name: "Old",
+        summary: "Old",
+        thesis: "Equities.",
+        riskScore: 7,
+        riskLabel: "High",
+        holdings: [],
+      },
+      {
+        id: "balanced",
+        name: "Old",
+        summary: "Old",
+        thesis: "Mix.",
+        riskScore: 4,
+        riskLabel: "Medium",
+        holdings: [],
+      },
+      {
+        id: "defensive",
+        name: "Old",
+        summary: "Old",
+        thesis: "Bonds.",
+        riskScore: 2,
+        riskLabel: "Low",
+        holdings: [],
+      },
+    ]);
+
+    expect(presented.map((plan) => plan.id)).toEqual([
+      "defensive",
+      "balanced",
+      "dividend",
+      "growth",
+      "aggressive-growth",
+    ]);
+    expect(presented.map((plan) => plan.riskLabel)).toEqual([
+      "Very low",
+      "Low",
+      "Medium",
+      "High",
+      "Very high",
+    ]);
+    expect(presented[2]?.riskScore).toBe(5);
   });
 
   it("lists investment plan ideas only on paid AI tiers", () => {

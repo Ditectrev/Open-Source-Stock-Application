@@ -114,10 +114,10 @@ export default function InvestmentPlansPage() {
       <header className="space-y-2">
         <h1 className={DNA_DISPLAY}>Investment Plans</h1>
         <p className={DNA_BODY_SECONDARY}>
-          Five AI portfolio ideas: a bond-heavy defensive mix, a balanced mix of
-          bonds and stocks, an equities-only growth book, a dividend plan, and a
-          concentrated aggressive-growth list of strong multi-year performers.
-          Each plan carries its own risk score.
+          Five AI portfolio ideas. Defensive, Balanced, Dividend, and Growth are
+          ETF mixes. Aggressive Growth is the book of individual stocks.
+          Dividend sits in the middle of the risk scale. Each plan carries its
+          own risk score.
         </p>
         <p className={DNA_CAPTION}>
           Research ideas for a long-term mix of listed funds and stocks. The

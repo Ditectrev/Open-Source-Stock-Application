@@ -9,8 +9,8 @@ import type {
 export const INVESTMENT_PLAN_ORDER: readonly InvestmentPlanId[] = [
   "defensive",
   "balanced",
-  "growth",
   "dividend",
+  "growth",
   "aggressive-growth",
 ];
 
@@ -85,9 +85,15 @@ const EQUITY_ETFS = new Set([
   "VWO",
   "VXUS",
   "VIG",
+  "VIGI",
   "VYM",
   "VGT",
   "XLK",
+  "DGRW",
+  "JEPI",
+  "JEPQ",
+  "SCHY",
+  "SPHD",
 ]);
 
 type PlanSpec = {
@@ -103,38 +109,38 @@ export const INVESTMENT_PLAN_SPECS: Record<InvestmentPlanId, PlanSpec> = {
   defensive: {
     name: "Defensive",
     summary:
-      "Mostly investment-grade bonds, with a small equity sleeve. Shaped like a Revolut-style defensive portfolio.",
+      "Mostly investment-grade bond ETFs, with a small equity ETF sleeve. Shaped like a Revolut-style defensive portfolio.",
     riskScore: 2,
-    riskLabel: "Low",
-    targets: { bond: 80, stock: 20 },
-    allowed: ["bond", "stock"],
+    riskLabel: "Very low",
+    targets: { bond: 80, etf: 20 },
+    allowed: ["bond", "etf"],
   },
   balanced: {
     name: "Balanced",
     summary:
-      "A mix of bonds and stocks, closer to a Revolut balanced portfolio.",
-    riskScore: 4,
-    riskLabel: "Medium",
-    targets: { bond: 40, stock: 60 },
-    allowed: ["bond", "stock"],
-  },
-  growth: {
-    name: "Growth",
-    summary:
-      "Equities only. Broad stock exposure in the spirit of Revolut Aggressive Growth.",
-    riskScore: 7,
-    riskLabel: "High",
-    targets: { stock: 100 },
-    allowed: ["stock"],
+      "Bond ETFs and equity ETFs together, closer to a Revolut balanced portfolio.",
+    riskScore: 3,
+    riskLabel: "Low",
+    targets: { bond: 40, etf: 60 },
+    allowed: ["bond", "etf"],
   },
   dividend: {
     name: "Dividend",
     summary:
-      "Dividend-paying stocks and income ETFs, in the spirit of an XTB dividend plan.",
-    riskScore: 6,
+      "Dividend ETFs built for income, in the spirit of an XTB dividend plan.",
+    riskScore: 5,
+    riskLabel: "Medium",
+    targets: { etf: 100 },
+    allowed: ["etf"],
+  },
+  growth: {
+    name: "Growth",
+    summary:
+      "Equity ETFs only. Broad market exposure, with no single-stock bets.",
+    riskScore: 7,
     riskLabel: "High",
-    targets: { stock: 100 },
-    allowed: ["stock"],
+    targets: { etf: 100 },
+    allowed: ["etf"],
   },
   "aggressive-growth": {
     name: "Aggressive Growth",
@@ -148,29 +154,39 @@ export const INVESTMENT_PLAN_SPECS: Record<InvestmentPlanId, PlanSpec> = {
 };
 
 /**
- * Slice fills for the allocation chart. Stone and emerald only, so the
- * chart stays inside the market-terminal palette.
+ * Slice tones for the allocation chart. Light mode uses darker fills so
+ * the bars stay visible on white; dark mode uses the lighter pair.
  */
-export const ALLOCATION_SLICE_COLORS = [
-  "#1c1917",
-  "#059669",
-  "#57534e",
-  "#34d399",
-  "#a8a29e",
-  "#047857",
-  "#78716c",
-  "#6ee7b7",
+export const ALLOCATION_SLICE_TONES = [
+  "text-emerald-800 dark:text-emerald-300",
+  "text-stone-700 dark:text-stone-200",
+  "text-teal-800 dark:text-teal-300",
+  "text-amber-800 dark:text-amber-300",
+  "text-sky-800 dark:text-sky-300",
+  "text-emerald-950 dark:text-emerald-200",
+  "text-orange-900 dark:text-orange-300",
+  "text-stone-600 dark:text-stone-300",
 ] as const;
 
-export const ASSET_CLASS_COLORS: Record<InvestmentAssetClass, string> = {
-  bond: "#78716c",
-  stock: "#059669",
+export const ASSET_CLASS_TONES: Record<InvestmentAssetClass, string> = {
+  bond: "text-stone-600 dark:text-stone-300",
+  etf: "text-emerald-800 dark:text-emerald-300",
+  stock: "text-amber-800 dark:text-amber-300",
 };
 
 export const ASSET_CLASS_LABELS: Record<InvestmentAssetClass, string> = {
   bond: "Bonds",
+  etf: "ETFs",
   stock: "Stocks",
 };
+
+export function holdingInstrumentLabel(
+  assetClass: InvestmentAssetClass
+): string {
+  if (assetClass === "bond") return "Bond ETF";
+  if (assetClass === "etf") return "ETF";
+  return "Stock";
+}
 
 export type InvestmentPlanDraftHolding = {
   symbol: string;
@@ -198,7 +214,7 @@ export const INVESTMENT_PLANS_PROMPT = `You are building five ready-made investm
       "id": "defensive" | "balanced" | "growth" | "dividend" | "aggressive-growth",
       "thesis": string,
       "holdings": [
-        {"symbol": string, "name": string, "assetClass": "bond" | "stock", "weight": number, "rationale": string}
+        {"symbol": string, "name": string, "assetClass": "bond" | "etf" | "stock", "weight": number, "rationale": string}
       ]
     }
   ]
@@ -207,13 +223,13 @@ export const INVESTMENT_PLANS_PROMPT = `You are building five ready-made investm
 Include all five plans. Each plan has 5 to 7 holdings. Weights inside a plan are positive numbers that sum to 100. rationale and thesis are one short sentence each. Use US-listed tickers Yahoo Finance can quote, with no exchange suffix.
 
 Plan rules:
-- defensive: mostly bonds, like a Revolut defensive portfolio. About 80% investment-grade bond ETFs (AGG, BND, IEF, LQD, TIP, VGIT, or similar) and about 20% broad equity ETFs (VTI, VXUS, or similar). No single-stock bets.
-- balanced: bonds and stocks together, like a Revolut balanced portfolio. About 60% equity ETFs or large liquid stocks and about 40% bond ETFs.
-- growth: equities only, like Revolut Aggressive Growth. 100% stocks and equity ETFs. No bonds. Diversified across regions or styles, not one theme.
-- dividend: an income plan like an XTB dividend investment plan. 100% dividend ETFs (SCHD, VYM, VIG, DGRO, NOBL) and dividend-paying stocks. No bonds.
-- aggressive-growth: 100% individual common stocks that were among the strongest price performers over the last 3 to 5 years (roughly doubled or better). No ETFs and no bonds. Do not fill the list with famous mega-caps unless their multi-year run was genuinely exceptional.
+- defensive: mostly bonds, like a Revolut defensive portfolio. About 80% investment-grade bond ETFs (AGG, BND, IEF, LQD, TIP, VGIT, or similar) and about 20% broad equity ETFs (VTI, VXUS, or similar). No single-stock bets. assetClass "bond" for bond ETFs and "etf" for equity ETFs.
+- balanced: bond ETFs and equity ETFs together, like a Revolut balanced portfolio. About 60% equity ETFs and about 40% bond ETFs. No single stocks.
+- dividend: an income plan like an XTB dividend investment plan. 100% dividend ETFs (SCHD, VYM, VIG, DGRO, NOBL, or similar). No bonds and no single stocks. assetClass "etf".
+- growth: equity ETFs only. 100% broad equity ETFs across regions or styles, not one theme. No bonds and no single stocks. assetClass "etf".
+- aggressive-growth: 100% individual common stocks that were among the strongest price performers over the last 3 to 5 years (roughly doubled or better). No ETFs and no bonds. assetClass "stock". Do not fill the list with famous mega-caps unless their multi-year run was genuinely exceptional.
 
-Do not include cash, money-market funds, or Treasury-bill ETFs such as BIL, SGOV, SHV, or GBIL. assetClass "bond" is only for bond ETFs.`;
+Do not include cash, money-market funds, or Treasury-bill ETFs such as BIL, SGOV, SHV, or GBIL. Only the aggressive-growth plan holds individual stocks. The other four plans are ETFs.`;
 
 export function incompleteInvestmentPlansMessage(): string {
   return "AI returned an incomplete investment plan set.";
@@ -229,8 +245,41 @@ export function investmentRiskTone(score: number): "low" | "medium" | "high" {
   return "high";
 }
 
-export function allocationSliceColor(index: number): string {
-  return ALLOCATION_SLICE_COLORS[index % ALLOCATION_SLICE_COLORS.length];
+export function allocationSliceTone(index: number): string {
+  return ALLOCATION_SLICE_TONES[index % ALLOCATION_SLICE_TONES.length];
+}
+
+/** Known funds stay labeled as ETFs even when an older plan stored them as stocks. */
+export function displayAssetClass(holding: {
+  symbol: string;
+  assetClass: InvestmentAssetClass;
+}): InvestmentAssetClass {
+  const symbol = holding.symbol.trim().toUpperCase();
+  if (BOND_ETFS.has(symbol)) return "bond";
+  if (EQUITY_ETFS.has(symbol)) return "etf";
+  if (holding.assetClass === "bond" || holding.assetClass === "etf") {
+    return holding.assetClass;
+  }
+  return "stock";
+}
+
+export function presentInvestmentPlans(
+  plans: InvestmentPlan[]
+): InvestmentPlan[] {
+  return INVESTMENT_PLAN_ORDER.flatMap((id) => {
+    const plan = plans.find((item) => item.id === id);
+    if (!plan) return [];
+    const spec = INVESTMENT_PLAN_SPECS[id];
+    return [
+      {
+        ...plan,
+        name: spec.name,
+        summary: spec.summary,
+        riskScore: spec.riskScore,
+        riskLabel: spec.riskLabel,
+      },
+    ];
+  });
 }
 
 export function isFundTicker(symbol: string): boolean {
@@ -245,22 +294,27 @@ export function resolveAssetClass(
 ): InvestmentAssetClass | null {
   if (CASH_ETFS.has(symbol) || claimed === "cash") return null;
   if (BOND_ETFS.has(symbol)) return "bond";
-  if (EQUITY_ETFS.has(symbol)) return "stock";
+  if (EQUITY_ETFS.has(symbol) || claimed === "etf") return "etf";
   if (claimed === "bond") return null;
   return "stock";
 }
 
 export function allocationByClass(
-  holdings: Array<{ assetClass: InvestmentAssetClass; weight: number }>
+  holdings: Array<{
+    symbol: string;
+    assetClass: InvestmentAssetClass;
+    weight: number;
+  }>
 ): Array<{ assetClass: InvestmentAssetClass; weight: number }> {
   const totals: Record<InvestmentAssetClass, number> = {
     bond: 0,
+    etf: 0,
     stock: 0,
   };
   for (const holding of holdings) {
-    totals[holding.assetClass] += holding.weight;
+    totals[displayAssetClass(holding)] += holding.weight;
   }
-  return (["bond", "stock"] as const)
+  return (["bond", "etf", "stock"] as const)
     .map((assetClass) => ({
       assetClass,
       weight: Math.round(totals[assetClass] * 10) / 10,
@@ -478,7 +532,8 @@ function parseDraftHoldings(value: unknown): InvestmentPlanDraftHolding[] {
     if (!/^[A-Z]{1,5}$/.test(symbol)) return [];
     const claimed = record.assetClass;
     if (claimed === "cash" || CASH_ETFS.has(symbol)) return [];
-    const assetClass = claimed === "bond" ? "bond" : "stock";
+    const assetClass =
+      claimed === "bond" ? "bond" : claimed === "etf" ? "etf" : "stock";
     const weight =
       typeof record.weight === "number" ? record.weight : Number(record.weight);
     return [

@@ -255,8 +255,19 @@ describe("InvestmentPlansPanel", () => {
     );
 
     expect(screen.getByRole("radio", { name: /Defensive/i })).toBeChecked();
-    expect(screen.getByText("2/10 · Low")).toBeInTheDocument();
+    expect(screen.getByText("2/10 · Very low")).toBeInTheDocument();
+    expect(screen.getByText("3/10 · Low")).toBeInTheDocument();
+    expect(screen.getByText("5/10 · Medium")).toBeInTheDocument();
     expect(screen.getByText("9/10 · Very high")).toBeInTheDocument();
+    expect(screen.getAllByText("Bond ETF").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("ETF").length).toBeGreaterThan(0);
+    const activeSlice = document.querySelector(
+      "circle[data-active='true']"
+    ) as SVGCircleElement | null;
+    expect(activeSlice).not.toBeNull();
+    const radius = Number(activeSlice?.getAttribute("r"));
+    const stroke = Number(activeSlice?.getAttribute("stroke-width"));
+    expect(radius + stroke / 2).toBeLessThanOrEqual(110);
 
     await user.click(screen.getByRole("radio", { name: /Dividend/i }));
     expect(screen.getByRole("radio", { name: /Dividend/i })).toBeChecked();
@@ -272,6 +283,7 @@ describe("InvestmentPlansPanel", () => {
     expect(screen.getByText("Cash returns.")).toBeInTheDocument();
 
     await user.click(screen.getByRole("radio", { name: /Aggressive Growth/i }));
+    expect(screen.getAllByText("Stock").length).toBeGreaterThan(0);
     expect(
       screen.getAllByText(/over the measured window/i).length
     ).toBeGreaterThan(0);

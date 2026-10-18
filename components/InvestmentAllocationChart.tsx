@@ -9,15 +9,19 @@ import {
 } from "@/lib/design-dna";
 import {
   allocationByClass,
-  allocationSliceColor,
-  ASSET_CLASS_COLORS,
+  allocationSliceTone,
   ASSET_CLASS_LABELS,
+  ASSET_CLASS_TONES,
+  displayAssetClass,
+  holdingInstrumentLabel,
 } from "@/lib/investment-plans";
 import type { InvestmentAssetClass, InvestmentPlanHolding } from "@/types";
 
 const SIZE = 220;
 const STROKE = 28;
-const RADIUS = (SIZE - STROKE) / 2;
+const HOVER_GROWTH = 8;
+/** Room for the thicker hover stroke so the ring is not clipped. */
+const RADIUS = (SIZE - STROKE - HOVER_GROWTH) / 2 - 1;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 const GAP = 2;
 
@@ -51,7 +55,7 @@ export function InvestmentAllocationChart({
 
   const selectClass = (assetClass: InvestmentAssetClass) => {
     const match = holdings
-      .filter((holding) => holding.assetClass === assetClass)
+      .filter((holding) => displayAssetClass(holding) === assetClass)
       .sort((a, b) => b.weight - a.weight)[0];
     if (match) onSelectSymbol(match.symbol);
   };
@@ -69,11 +73,8 @@ export function InvestmentAllocationChart({
             <button
               key={item.assetClass}
               type="button"
-              className="h-full min-w-[4px] transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-600 focus-visible:ring-offset-2 dark:focus-visible:ring-stone-300"
-              style={{
-                width: `${item.weight}%`,
-                backgroundColor: ASSET_CLASS_COLORS[item.assetClass],
-              }}
+              className={`h-full min-w-[4px] bg-current transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-600 focus-visible:ring-offset-2 dark:focus-visible:ring-stone-300 ${ASSET_CLASS_TONES[item.assetClass]}`}
+              style={{ width: `${item.weight}%` }}
               aria-label={`${ASSET_CLASS_LABELS[item.assetClass]} ${formatWeight(item.weight)} percent`}
               onClick={() => selectClass(item.assetClass)}
             />
@@ -83,8 +84,7 @@ export function InvestmentAllocationChart({
           {classes.map((item) => (
             <li key={item.assetClass} className="flex items-center gap-1.5">
               <span
-                className="inline-block h-2.5 w-2.5 rounded-full"
-                style={{ backgroundColor: ASSET_CLASS_COLORS[item.assetClass] }}
+                className={`inline-block h-2.5 w-2.5 rounded-full bg-current ${ASSET_CLASS_TONES[item.assetClass]}`}
                 aria-hidden="true"
               />
               {ASSET_CLASS_LABELS[item.assetClass]} {formatWeight(item.weight)}%
@@ -94,10 +94,10 @@ export function InvestmentAllocationChart({
       </div>
 
       <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:gap-6">
-        <div className="relative h-[220px] w-[220px] shrink-0">
+        <div className="relative h-[220px] w-[220px] shrink-0 overflow-hidden">
           <svg
             viewBox={`0 0 ${SIZE} ${SIZE}`}
-            className="-rotate-90"
+            className="block h-full w-full -rotate-90"
             role="group"
             aria-label="Holdings allocation"
           >
@@ -114,11 +114,11 @@ export function InvestmentAllocationChart({
                   cy={SIZE / 2}
                   r={RADIUS}
                   fill="none"
-                  stroke={allocationSliceColor(index)}
-                  strokeWidth={selected ? STROKE + 8 : STROKE}
+                  stroke="currentColor"
+                  strokeWidth={selected ? STROKE + HOVER_GROWTH : STROKE}
                   strokeDasharray={`${length} ${CIRCUMFERENCE - length}`}
                   strokeDashoffset={-((start / 100) * CIRCUMFERENCE)}
-                  className="cursor-pointer transition-all"
+                  className={`cursor-pointer stroke-current transition-all ${allocationSliceTone(index)}`}
                   role="button"
                   tabIndex={0}
                   aria-pressed={holding.symbol === activeSymbol}
@@ -147,7 +147,7 @@ export function InvestmentAllocationChart({
               <p className={DNA_METRIC}>{formatWeight(active.weight)}%</p>
               <p className={DNA_SUBHEADING}>{active.symbol}</p>
               <p className={DNA_CAPTION}>
-                {ASSET_CLASS_LABELS[active.assetClass]}
+                {holdingInstrumentLabel(displayAssetClass(active))}
               </p>
             </div>
           ) : null}
@@ -174,8 +174,7 @@ export function InvestmentAllocationChart({
                   }}
                 >
                   <span
-                    className="h-2.5 w-2.5 shrink-0 rounded-full"
-                    style={{ backgroundColor: allocationSliceColor(index) }}
+                    className={`h-2.5 w-2.5 shrink-0 rounded-full bg-current ${allocationSliceTone(index)}`}
                     aria-hidden="true"
                   />
                   <span className={`min-w-0 flex-1 truncate ${DNA_CAPTION}`}>
