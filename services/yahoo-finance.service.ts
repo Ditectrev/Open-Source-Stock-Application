@@ -1499,19 +1499,26 @@ export class YahooFinanceService {
   /**
    * Chart meta has the live price after `/v8/finance/quote` stopped responding.
    * `chartPreviousClose` is the start of the requested range, so day change
-   * comes from `fulldayChange` and `regularMarketChangePercent`.
+   * is calculated from `regularMarketPrice` and `previousClose`.
    */
   private parseChartMetaQuote(meta: any): SymbolData {
     const price = Number(meta.regularMarketPrice) || 0;
-    const change = Number(meta.fulldayChange);
-    const changePercent = Number(meta.regularMarketChangePercent);
+    const previousClose = Number(meta.previousClose);
+    const change =
+      Number.isFinite(previousClose) && previousClose > 0
+        ? price - previousClose
+        : 0;
+    const changePercent =
+      Number.isFinite(previousClose) && previousClose > 0
+        ? (change / previousClose) * 100
+        : 0;
     const marketTime = Number(meta.regularMarketTime);
     return {
       symbol: meta.symbol,
       name: meta.longName || meta.shortName || meta.symbol,
       price,
-      change: Number.isFinite(change) ? change : 0,
-      changePercent: Number.isFinite(changePercent) ? changePercent : 0,
+      change,
+      changePercent,
       marketCap: 0,
       volume: Number(meta.regularMarketVolume) || 0,
       fiftyTwoWeekHigh: Number(meta.fiftyTwoWeekHigh) || 0,
