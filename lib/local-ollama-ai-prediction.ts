@@ -12,6 +12,7 @@ import {
 } from "@/lib/ai-prediction";
 import { getAIProviderHeaders } from "@/lib/explanation-provider";
 import { MARKET_UI_COPY } from "@/lib/market-ui-copy";
+import { marketSymbolPathSegment } from "@/lib/market-symbol";
 import type { AIPredictionReport, PricingTier } from "@/types";
 
 type PredictionApiResponse = {
@@ -39,11 +40,14 @@ export async function fetchAIPredictionForCurrentProvider(
 async function fetchAIPredictionViaServerGet(
   symbol: string
 ): Promise<AIPredictionReport | null> {
-  const response = await fetch(`/api/market/ai-prediction/${symbol}`, {
-    headers: getAIProviderHeaders(),
-    credentials: "include",
-    cache: "no-store",
-  });
+  const response = await fetch(
+    `/api/market/ai-prediction/${marketSymbolPathSegment(symbol)}`,
+    {
+      headers: getAIProviderHeaders(),
+      credentials: "include",
+      cache: "no-store",
+    }
+  );
 
   if (!response.ok) {
     const body = (await response.json().catch(() => ({}))) as {
@@ -60,7 +64,7 @@ async function fetchAIPredictionWithBrowserLocalOllama(
   symbol: string
 ): Promise<AIPredictionReport | null> {
   const snapshotResponse = await fetch(
-    `/api/market/ai-prediction/${symbol}/snapshot`,
+    `/api/market/ai-prediction/${marketSymbolPathSegment(symbol)}/snapshot`,
     {
       headers: getAIProviderHeaders(),
       credentials: "include",
@@ -88,16 +92,19 @@ async function fetchAIPredictionWithBrowserLocalOllama(
     jsonFormat: true,
   });
 
-  const response = await fetch(`/api/market/ai-prediction/${symbol}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-ai-provider": "OLLAMA",
-    },
-    credentials: "include",
-    cache: "no-store",
-    body: JSON.stringify({ raw }),
-  });
+  const response = await fetch(
+    `/api/market/ai-prediction/${marketSymbolPathSegment(symbol)}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-ai-provider": "OLLAMA",
+      },
+      credentials: "include",
+      cache: "no-store",
+      body: JSON.stringify({ raw }),
+    }
+  );
 
   if (!response.ok) {
     const body = (await response.json().catch(() => ({}))) as {

@@ -171,6 +171,18 @@ describe("Home Page", () => {
       });
     });
 
+    it("shows Symbol not found when the quote reports a missing ticker", async () => {
+      searchParamsState.symbol = "NOTAREALZZZ";
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: false,
+        json: async () => ({ success: false, error: "Symbol not found" }),
+      });
+      render(<HomePageClient />);
+      await waitFor(() => {
+        expect(screen.getByText("Symbol not found")).toBeInTheDocument();
+      });
+    });
+
     it("shows symbol detail view when data loads successfully", async () => {
       searchParamsState.symbol = "AAPL";
       const mockSymbolData = {

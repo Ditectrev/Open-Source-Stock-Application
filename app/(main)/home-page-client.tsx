@@ -395,8 +395,16 @@ export function HomePageClient() {
             <div className="py-12">
               <ProductGate
                 eyebrow="Symbol"
-                title="Couldn't load symbol"
-                message={error}
+                title={
+                  /symbol not found/i.test(error)
+                    ? "Symbol not found"
+                    : "Couldn't load symbol"
+                }
+                message={
+                  /symbol not found/i.test(error)
+                    ? "The symbol you searched for could not be found. Check the ticker and try again."
+                    : error
+                }
                 onRetry={clearSymbol}
                 retryLabel="Clear selection"
                 align="center"

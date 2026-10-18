@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { MARKET_UI_COPY, userFacingApiError } from "@/lib/api-user-error";
+import { readMarketSymbolParam } from "@/lib/market-symbol";
 import { marketDataService } from "@/services/market-data.service";
 import { logger } from "@/lib/logger";
 import { TimeRange } from "@/types";
@@ -14,7 +15,7 @@ export async function GET(
   { params }: { params: Promise<{ symbol: string }> }
 ) {
   try {
-    const { symbol } = await params;
+    const symbol = await readMarketSymbolParam(params);
     const searchParams = request.nextUrl.searchParams;
     const range = (searchParams.get("range") || "1Y") as TimeRange;
 

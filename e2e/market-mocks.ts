@@ -110,7 +110,9 @@ export async function installMarketDataMocks(page: Page) {
       .request()
       .url()
       .match(/\/symbol\/([^/?]+)/);
-    const symbol = decodeURIComponent(match?.[1] ?? "AAPL").toUpperCase();
+    const symbol = decodeURIComponent(match?.[1] ?? "AAPL")
+      .replaceAll(/__dot__/gi, ".")
+      .toUpperCase();
 
     await route.fulfill({
       status: 200,

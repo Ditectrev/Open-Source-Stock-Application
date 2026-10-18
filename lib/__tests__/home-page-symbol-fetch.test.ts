@@ -42,6 +42,26 @@ describe("home-page-symbol-fetch", () => {
     expect(fetch).toHaveBeenCalledTimes(2);
   });
 
+  it("requests suffixed listings without a dot in the API path", async () => {
+    vi.mocked(fetch)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ data: { symbol: "SAP.DE", name: "SAP" } }),
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ data: [] }),
+      } as Response);
+
+    await fetchPrimarySymbolData("SAP.DE", "1Y");
+
+    expect(fetch).toHaveBeenNthCalledWith(1, "/api/market/symbol/SAP__dot__DE");
+    expect(fetch).toHaveBeenNthCalledWith(
+      2,
+      "/api/market/historical/SAP__dot__DE?range=1Y"
+    );
+  });
+
   it("returns partial secondary data when some endpoints fail", async () => {
     vi.mocked(fetch)
       .mockResolvedValueOnce({

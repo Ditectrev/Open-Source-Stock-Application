@@ -1,4 +1,5 @@
 import { MARKET_UI_COPY } from "@/lib/market-ui-copy";
+import { marketSymbolPathSegment } from "@/lib/market-symbol";
 import type {
   FinancialData,
   ForecastData,
@@ -31,7 +32,7 @@ export async function fetchHistoricalData(
   timeRange: TimeRange
 ): Promise<PriceData[]> {
   const response = await fetch(
-    `/api/market/historical/${encodeURIComponent(symbol)}?range=${encodeURIComponent(timeRange)}`
+    `/api/market/historical/${marketSymbolPathSegment(symbol)}?range=${encodeURIComponent(timeRange)}`
   );
 
   if (!response.ok) {
@@ -47,9 +48,9 @@ export async function fetchPrimarySymbolData(
   timeRange: TimeRange
 ): Promise<{ symbolData: SymbolData; historicalData: PriceData[] }> {
   const [symbolResponse, historicalResponse] = await Promise.all([
-    fetch(`/api/market/symbol/${encodeURIComponent(symbol)}`),
+    fetch(`/api/market/symbol/${marketSymbolPathSegment(symbol)}`),
     fetch(
-      `/api/market/historical/${encodeURIComponent(symbol)}?range=${encodeURIComponent(timeRange)}`
+      `/api/market/historical/${marketSymbolPathSegment(symbol)}?range=${encodeURIComponent(timeRange)}`
     ),
   ]);
 
@@ -90,7 +91,7 @@ export type SecondarySymbolData = {
 export async function fetchSecondarySymbolData(
   symbol: string
 ): Promise<SecondarySymbolData> {
-  const encoded = encodeURIComponent(symbol);
+  const encoded = marketSymbolPathSegment(symbol);
   const [technicalIndicators, forecastData, seasonalData, financialData] =
     await Promise.all([
       fetchMarketJson<TechnicalIndicators>(`/api/market/indicators/${encoded}`),
