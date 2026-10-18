@@ -109,7 +109,7 @@ export const INVESTMENT_PLAN_SPECS: Record<InvestmentPlanId, PlanSpec> = {
   defensive: {
     name: "Defensive",
     summary:
-      "Mostly investment-grade bond ETFs, with a small equity ETF sleeve. Shaped like a Revolut-style defensive portfolio.",
+      "Mostly investment-grade bond ETFs, with a small equity ETF sleeve.",
     riskScore: 2,
     riskLabel: "Very low",
     targets: { bond: 80, etf: 20 },
@@ -117,8 +117,7 @@ export const INVESTMENT_PLAN_SPECS: Record<InvestmentPlanId, PlanSpec> = {
   },
   balanced: {
     name: "Balanced",
-    summary:
-      "Bond ETFs and equity ETFs together, closer to a Revolut balanced portfolio.",
+    summary: "Bond ETFs and equity ETFs together.",
     riskScore: 3,
     riskLabel: "Low",
     targets: { bond: 40, etf: 60 },
@@ -126,8 +125,7 @@ export const INVESTMENT_PLAN_SPECS: Record<InvestmentPlanId, PlanSpec> = {
   },
   dividend: {
     name: "Dividend",
-    summary:
-      "Dividend ETFs built for income, in the spirit of an XTB dividend plan.",
+    summary: "Dividend ETFs built for income.",
     riskScore: 5,
     riskLabel: "Medium",
     targets: { etf: 100 },
@@ -207,7 +205,7 @@ type PricePoint = {
   close: number;
 };
 
-export const INVESTMENT_PLANS_PROMPT = `You are building five ready-made investment plan ideas for a paid research feature. The mixes should feel like Revolut portfolios plus an XTB dividend plan, with one custom aggressive-growth book. Return ONLY valid JSON, no markdown, in this exact shape:
+export const INVESTMENT_PLANS_PROMPT = `You are building five ready-made investment plan ideas for a paid research feature. Return ONLY valid JSON, no markdown, in this exact shape:
 {
   "plans": [
     {
@@ -223,9 +221,9 @@ export const INVESTMENT_PLANS_PROMPT = `You are building five ready-made investm
 Include all five plans. Each plan has 5 to 7 holdings. Weights inside a plan are positive numbers that sum to 100. rationale and thesis are one short sentence each. Use US-listed tickers Yahoo Finance can quote, with no exchange suffix.
 
 Plan rules:
-- defensive: mostly bonds, like a Revolut defensive portfolio. About 80% investment-grade bond ETFs (AGG, BND, IEF, LQD, TIP, VGIT, or similar) and about 20% broad equity ETFs (VTI, VXUS, or similar). No single-stock bets. assetClass "bond" for bond ETFs and "etf" for equity ETFs.
-- balanced: bond ETFs and equity ETFs together, like a Revolut balanced portfolio. About 60% equity ETFs and about 40% bond ETFs. No single stocks.
-- dividend: an income plan like an XTB dividend investment plan. 100% dividend ETFs (SCHD, VYM, VIG, DGRO, NOBL, or similar). No bonds and no single stocks. assetClass "etf".
+- defensive: mostly bonds. About 80% investment-grade bond ETFs (AGG, BND, IEF, LQD, TIP, VGIT, or similar) and about 20% broad equity ETFs (VTI, VXUS, or similar). No single-stock bets. assetClass "bond" for bond ETFs and "etf" for equity ETFs.
+- balanced: bond ETFs and equity ETFs together. About 60% equity ETFs and about 40% bond ETFs. No single stocks.
+- dividend: an income plan. 100% dividend ETFs (SCHD, VYM, VIG, DGRO, NOBL, or similar). No bonds and no single stocks. assetClass "etf".
 - growth: equity ETFs only. 100% broad equity ETFs across regions or styles, not one theme. No bonds and no single stocks. assetClass "etf".
 - aggressive-growth: 100% individual common stocks that were among the strongest price performers over the last 3 to 5 years (roughly doubled or better). No ETFs and no bonds. assetClass "stock". Do not fill the list with famous mega-caps unless their multi-year run was genuinely exceptional.
 
