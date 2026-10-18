@@ -135,6 +135,13 @@ export default function AIStockRankingsPage() {
           >
             Stock of the day
           </Link>
+          {" · "}
+          <Link
+            href="/investment-plans"
+            className="underline underline-offset-2"
+          >
+            Investment Plans
+          </Link>
         </p>
       </header>
 

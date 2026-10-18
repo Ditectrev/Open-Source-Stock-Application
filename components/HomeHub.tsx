@@ -279,6 +279,12 @@ export function HomeHub({
             <Link href="/ranking" className="underline underline-offset-2">
               Ranking
             </Link>
+            <Link
+              href="/investment-plans"
+              className="underline underline-offset-2"
+            >
+              Investment Plans
+            </Link>
           </div>
         </div>
         {stockOfTheDay}

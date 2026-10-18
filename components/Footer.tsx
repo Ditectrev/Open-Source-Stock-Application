@@ -3,7 +3,6 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { DNA_HEADING } from "@/lib/design-dna";
 import {
   FOOTER_CONTACT,
   FOOTER_RESOURCES,
@@ -18,7 +17,12 @@ const GitHubButton = dynamic(() => import("react-github-btn"), { ssr: false });
 const footerLinkClass =
   "inline-block italic text-stone-200 transition-colors hover:text-stone-50";
 
-const footerHeadingClass = `${DNA_HEADING} text-stone-100 uppercase tracking-wide`;
+/**
+ * The footer stays dark in light theme. Do not use `DNA_HEADING` here:
+ * its `text-stone-900` wins over a later light color and the labels disappear.
+ */
+const footerHeadingClass =
+  "text-lg font-semibold uppercase tracking-wide text-stone-100";
 
 const footerBodyClass = "text-sm leading-relaxed text-stone-200";
 

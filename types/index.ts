@@ -493,3 +493,41 @@ export interface AIStockRankingsResult {
   buy: AIRankedStock[];
   sell: AIRankedStock[];
 }
+
+export type InvestmentPlanId =
+  | "defensive"
+  | "balanced"
+  | "growth"
+  | "dividend"
+  | "aggressive-growth";
+
+export type InvestmentAssetClass = "bond" | "etf" | "stock";
+
+export interface InvestmentPlanHolding {
+  symbol: string;
+  name: string;
+  assetClass: InvestmentAssetClass;
+  /** Percent of the plan. Holdings in a plan sum to 100. */
+  weight: number;
+  rationale: string;
+  price?: number;
+  changePercent?: number;
+  /** Measured price change over the available multi-year window. */
+  trailingReturnPercent?: number | null;
+}
+
+export interface InvestmentPlan {
+  id: InvestmentPlanId;
+  name: string;
+  summary: string;
+  thesis: string;
+  /** 1–10. Higher means the mix can swing more. */
+  riskScore: number;
+  riskLabel: string;
+  holdings: InvestmentPlanHolding[];
+}
+
+export interface InvestmentPlansResult {
+  generatedAt: Date;
+  plans: InvestmentPlan[];
+}

@@ -124,6 +124,16 @@ describe("Color Contrast Compliance (Req 18.3)", () => {
       expect(cls).toContain("bg-stone-950");
       expect(cls).toContain("text-stone-200");
     });
+
+    it("keeps Tools and Resources headings light on the dark footer", () => {
+      const { container } = render(<Footer />);
+      for (const testId of ["footer-tools", "footer-resources"]) {
+        const heading = container.querySelector(`[data-testid='${testId}'] h3`);
+        expect(heading).not.toBeNull();
+        expect(heading!.className).toContain("text-stone-100");
+        expect(heading!.className).not.toContain("text-stone-900");
+      }
+    });
   });
 
   describe("No low-contrast dark:text-gray-400 or dark:text-gray-500 classes", () => {
