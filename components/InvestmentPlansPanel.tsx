@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AiFeatureErrorNotice } from "@/components/AiFeatureErrorNotice";
 import { InvestmentAllocationChart } from "@/components/InvestmentAllocationChart";
 import { InsightPanel, InsightPanelHeader } from "@/components/InsightPanel";
@@ -91,7 +91,10 @@ export function InvestmentPlansPanel({
   error,
   pricingTier,
 }: InvestmentPlansPanelProps) {
-  const plans = presentInvestmentPlans(result?.plans ?? []);
+  const plans = useMemo(
+    () => presentInvestmentPlans(result?.plans ?? []),
+    [result?.plans]
+  );
   const [planId, setPlanId] = useState(plans[0]?.id ?? "defensive");
   const [activeSymbol, setActiveSymbol] = useState<string | null>(null);
   const selected = plans.find((plan) => plan.id === planId) ?? plans[0] ?? null;
