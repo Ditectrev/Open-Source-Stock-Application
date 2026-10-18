@@ -25,6 +25,7 @@ export function GET() {
     `- [Heatmaps](${siteUrl}/heatmaps)`,
     `- [Calendars](${siteUrl}/calendars)`,
     `- [Pricing](${siteUrl}/pricing)`,
+    `- [Investment Plans](${siteUrl}/investment-plans): paid AI portfolio ideas (Local AI, BYOK, Hosted AI). Not on Free or Ads-free.`,
     "",
     "## News for assistants",
     `${SITE_NAME} is a market-news aggregator, not a wire publisher.`,

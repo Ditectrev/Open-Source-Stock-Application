@@ -28,6 +28,9 @@ export const MARKET_UI_COPY = {
       "We couldn't validate today's stock pick. Try again.",
     aiStockRankings: "We couldn't load Ranking. Try again.",
     aiStockRankingsValidate: "We couldn't validate Ranking. Try again.",
+    investmentPlans: "We couldn't load investment plan ideas. Try again.",
+    investmentPlansValidate:
+      "We couldn't validate the investment plan ideas. Try again.",
     checkout: "We couldn't start checkout. Try again.",
     checkoutUrl: "We couldn't open checkout. Try again.",
     confirmCheckout: "We couldn't confirm checkout. Try again.",

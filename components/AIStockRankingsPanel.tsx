@@ -338,7 +338,11 @@ export function AIStockRankingsPanel({
         <Link href="/stock-of-the-day" className="underline underline-offset-2">
           Stock of the day
         </Link>{" "}
-        for daily buy and sell ideas.
+        for daily buy and sell ideas, or{" "}
+        <Link href="/investment-plans" className="underline underline-offset-2">
+          Investment Plans
+        </Link>{" "}
+        for ready-made portfolio mixes.
       </p>
     </InsightPanel>
   );

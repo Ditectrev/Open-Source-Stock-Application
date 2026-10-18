@@ -56,6 +56,9 @@ describe("Navigation", () => {
       "href",
       "/ranking"
     );
+    expect(
+      screen.getByRole("link", { name: "Investment Plans" })
+    ).toHaveAttribute("href", "/investment-plans");
     expect(screen.getByRole("link", { name: "Pricing" })).toHaveAttribute(
       "href",
       "/pricing"

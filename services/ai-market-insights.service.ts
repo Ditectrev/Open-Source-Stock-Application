@@ -32,12 +32,25 @@ import {
   type AIStockCandidate,
   type StockOfTheDayCandidates,
 } from "@/lib/stock-of-the-day-ai";
+import {
+  assembleInvestmentPlans,
+  INVESTMENT_PLANS_MAX_OUTPUT_TOKENS,
+  INVESTMENT_PLANS_PROMPT,
+  parseInvestmentPlanCandidates,
+  refitQuotedHoldings,
+  selectAggressiveGrowthHoldings,
+  trailingReturnPercent,
+  type InvestmentPlanDraft,
+} from "@/lib/investment-plans";
 import type {
   AIPredictionReport,
   AIProvider,
   AIStockRankingsResult,
   AIRankedStock,
   ForecastData,
+  InvestmentPlan,
+  InvestmentPlanHolding,
+  InvestmentPlansResult,
   StockOfTheDay,
   StockOfTheDayResult,
   SymbolData,
@@ -402,6 +415,124 @@ export class AIMarketInsightsService {
       maxOutputTokens: STOCK_OF_THE_DAY_MAX_OUTPUT_TOKENS,
     });
     return parseStockOfTheDayCandidates(raw);
+  }
+
+  async getInvestmentPlans(
+    llmConfig?: LLMConfig
+  ): Promise<InvestmentPlansResult> {
+    const llm = llmConfig ?? getLLMConfigFromEnv();
+    if (!llm) {
+      throw new Error(
+        "An active AI provider is required for investment plan ideas."
+      );
+    }
+
+    const drafts = await this.generateInvestmentPlanDrafts(llm);
+    return this.enrichInvestmentPlans(drafts);
+  }
+
+  async enrichInvestmentPlans(
+    drafts: InvestmentPlanDraft[]
+  ): Promise<InvestmentPlansResult> {
+    const assembled = assembleInvestmentPlans(drafts);
+    const plans = await Promise.all(
+      assembled.map((plan) => this.enrichAssembledPlan(plan))
+    );
+    return {
+      generatedAt: new Date(),
+      plans,
+    };
+  }
+
+  private async generateInvestmentPlanDrafts(
+    llm: LLMConfig
+  ): Promise<InvestmentPlanDraft[]> {
+    const service = new AIIntegrationService();
+    await service.setAIProvider(llm.provider, {
+      provider: llm.provider,
+      apiKey: llm.apiKey,
+      model: llm.model,
+      settings: {},
+    });
+
+    const raw = await service.runRawPrompt(INVESTMENT_PLANS_PROMPT, {
+      maxOutputTokens: INVESTMENT_PLANS_MAX_OUTPUT_TOKENS,
+    });
+    return parseInvestmentPlanCandidates(raw);
+  }
+
+  private async enrichAssembledPlan(
+    plan: InvestmentPlan
+  ): Promise<InvestmentPlan> {
+    const quoted = (
+      await Promise.all(
+        plan.holdings.map(
+          async (holding): Promise<InvestmentPlanHolding | null> => {
+            try {
+              const quote = await marketDataService.getSymbolData(
+                holding.symbol
+              );
+              return {
+                ...holding,
+                symbol: quote.symbol || holding.symbol,
+                name: quote.name || holding.name,
+                price: quote.price,
+                changePercent: quote.changePercent,
+              };
+            } catch (error) {
+              logger.warn("Failed to quote investment plan holding", {
+                symbol: holding.symbol,
+                plan: plan.id,
+                error: error instanceof Error ? error.message : String(error),
+              });
+              return null;
+            }
+          }
+        )
+      )
+    ).filter((holding): holding is InvestmentPlanHolding => holding !== null);
+
+    if (quoted.length < 4) {
+      throw new Error(
+        "AI did not return enough quoted holdings for this investment plan."
+      );
+    }
+
+    if (plan.id !== "aggressive-growth") {
+      return {
+        ...plan,
+        holdings: refitQuotedHoldings(plan.id, quoted),
+      };
+    }
+
+    const measured: InvestmentPlanHolding[] = await Promise.all(
+      quoted.map(async (holding): Promise<InvestmentPlanHolding> => {
+        try {
+          const prices = await marketDataService.getHistoricalPrices(
+            holding.symbol,
+            "5Y"
+          );
+          return {
+            ...holding,
+            trailingReturnPercent: trailingReturnPercent(prices),
+          };
+        } catch (error) {
+          logger.warn("Failed to measure multi-year return", {
+            symbol: holding.symbol,
+            error: error instanceof Error ? error.message : String(error),
+          });
+          return { ...holding, trailingReturnPercent: null };
+        }
+      })
+    );
+
+    return {
+      ...plan,
+      holdings: refitQuotedHoldings(
+        plan.id,
+        selectAggressiveGrowthHoldings(measured)
+      ),
+    };
   }
 
   private async generateAIStockRankingsCandidates(

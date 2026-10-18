@@ -223,6 +223,11 @@ export const PUBLIC_ROUTES = [
     changeFrequency: "daily" as const,
   },
   {
+    path: "/investment-plans",
+    priority: 0.85,
+    changeFrequency: "daily" as const,
+  },
+  {
     path: "/ranking",
     priority: 0.9,
     changeFrequency: "daily" as const,
