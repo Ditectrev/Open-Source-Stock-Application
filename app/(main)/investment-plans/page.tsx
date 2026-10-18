@@ -46,19 +46,24 @@ export default function InvestmentPlansPage() {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+
     const load = async () => {
       if (!hasAIAccess) {
         setResult(null);
         setLoadError(null);
+        setLoading(false);
         return;
       }
 
       setLoading(true);
       try {
         const data = await fetchInvestmentPlansForCurrentProvider(pricingTier);
+        if (cancelled) return;
         setResult(data);
         setLoadError(null);
       } catch (err) {
+        if (cancelled) return;
         setResult(null);
         setLoadError(
           err instanceof Error
@@ -66,11 +71,17 @@ export default function InvestmentPlansPage() {
             : MARKET_UI_COPY.load.investmentPlans
         );
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
     void load();
+
+    return () => {
+      cancelled = true;
+    };
   }, [hasAIAccess, aiProviderVersion, pricingTier]);
 
   useEffect(() => {
