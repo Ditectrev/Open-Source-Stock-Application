@@ -47,6 +47,13 @@ interface MetricSection {
   metrics: MetricItem[];
 }
 
+const MINOR_UNIT_MAJOR: Record<string, string> = {
+  GBp: "GBP",
+  GBX: "GBP",
+  ZAc: "ZAR",
+  ILA: "ILS",
+};
+
 function getFavorabilityColors(favorability: Favorability): string {
   switch (favorability) {
     case "favorable":
@@ -59,8 +66,12 @@ function getFavorabilityColors(favorability: Favorability): string {
 }
 
 function formatCurrency(value: number, currency?: string): string {
+  const majorCurrency =
+    currency && MINOR_UNIT_MAJOR[currency]
+      ? MINOR_UNIT_MAJOR[currency]
+      : currency;
   if (Math.abs(value) >= 1e6) return formatQuoteCompact(value, currency);
-  return formatQuotePrice(value, currency);
+  return formatQuotePrice(value, majorCurrency);
 }
 
 function formatPercent(value: number): string {

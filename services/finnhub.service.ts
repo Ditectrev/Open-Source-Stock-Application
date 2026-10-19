@@ -214,6 +214,9 @@ export class FinnhubService {
         asFiniteNumber(latestCandleVolume) ??
         averageVolumeToShares(metric["10DayAverageTradingVolume"]);
 
+      const rawCurrency = profile.currency?.trim();
+      const currency = rawCurrency === "GBP" ? "GBp" : rawCurrency || undefined;
+
       return {
         symbol: upperSymbol,
         name: profile.name || upperSymbol,
@@ -227,7 +230,7 @@ export class FinnhubService {
         fiftyTwoWeekHigh,
         fiftyTwoWeekLow,
         lastUpdated: quote.t ? new Date(quote.t * 1000) : new Date(),
-        currency: profile.currency?.trim() || undefined,
+        currency,
       };
     }, `Finnhub:Quote:${symbol}`);
   }
