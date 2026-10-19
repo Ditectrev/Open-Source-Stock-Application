@@ -61,7 +61,7 @@ describe("SymbolHeader", () => {
   it("should display positive change with green color", () => {
     render(<SymbolHeader symbolData={mockSymbolData} />);
 
-    const changeElement = screen.getByText(/\+2\.50/);
+    const changeElement = screen.getByText(/\+\$2\.50/);
     expect(changeElement).toBeInTheDocument();
     expect(changeElement).toHaveClass("text-emerald-800");
   });
@@ -75,7 +75,7 @@ describe("SymbolHeader", () => {
 
     render(<SymbolHeader symbolData={negativeData} />);
 
-    const changeElement = screen.getByText(/-2\.50/);
+    const changeElement = screen.getByText(/-\$2\.50/);
     expect(changeElement).toBeInTheDocument();
     expect(changeElement).toHaveClass("text-rose-800");
   });

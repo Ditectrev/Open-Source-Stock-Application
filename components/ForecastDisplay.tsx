@@ -7,7 +7,11 @@
  * Requirements: 6.1, 6.2, 6.3, 6.4, 6.5
  */
 
-import { formatQuoteCompact, formatQuotePrice } from "@/lib/quote-money";
+import {
+  formatQuoteCompact,
+  formatQuotePrice,
+  quoteMajorCurrency,
+} from "@/lib/quote-money";
 import { ForecastData } from "@/types";
 import { useTheme } from "@/lib/theme-context";
 import { useState } from "react";
@@ -118,14 +122,10 @@ function SectionLabel({ label, tooltip }: TooltipTriggerProps) {
 }
 
 function formatCurrency(value: number, currency?: string): string {
-  const majorCurrency =
-    currency && MINOR_UNIT_MAJOR[currency]
-      ? MINOR_UNIT_MAJOR[currency]
-      : currency;
   if (Math.abs(value) >= 1e6) {
     return formatQuoteCompact(value, currency);
   }
-  return formatQuotePrice(value, majorCurrency);
+  return formatQuotePrice(value, quoteMajorCurrency(currency));
 }
 
 function SurpriseIndicator({

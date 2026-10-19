@@ -21,6 +21,12 @@ export function quoteCurrency(currency?: string | null): string {
   return code || "USD";
 }
 
+/** Pence and other minor-unit quotes report financials in the major currency. */
+export function quoteMajorCurrency(currency?: string | null): string {
+  const code = quoteCurrency(currency);
+  return MINOR_UNIT_MAJOR[code] ?? code;
+}
+
 export function formatQuotePrice(
   value: number,
   currency?: string | null

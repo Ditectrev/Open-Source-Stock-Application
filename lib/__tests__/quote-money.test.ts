@@ -3,6 +3,7 @@ import {
   formatQuoteChange,
   formatQuoteCompact,
   formatQuotePrice,
+  quoteMajorCurrency,
 } from "@/lib/quote-money";
 
 describe("quote money", () => {
@@ -16,5 +17,7 @@ describe("quote money", () => {
     expect(formatQuoteCompact(229_940_576_256, "EUR")).toBe("€229.94B");
     expect(formatQuoteCompact(2_500_000_000_000)).toBe("$2.50T");
     expect(formatQuoteCompact(23_000_000_000, "GBp")).toBe("£23.00B");
+    expect(quoteMajorCurrency("GBp")).toBe("GBP");
+    expect(quoteMajorCurrency("EUR")).toBe("EUR");
   });
 });
