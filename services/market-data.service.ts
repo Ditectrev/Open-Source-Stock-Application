@@ -48,7 +48,10 @@ const NEWS_UPSTREAM_RATE_LIMIT_KEY = "news:upstream";
 
 function quoteNeedsYahooEnrichment(data: SymbolData): boolean {
   return (
-    data.volume <= 0 || data.fiftyTwoWeekHigh <= 0 || data.fiftyTwoWeekLow <= 0
+    data.volume <= 0 ||
+    data.fiftyTwoWeekHigh <= 0 ||
+    data.fiftyTwoWeekLow <= 0 ||
+    !data.currency
   );
 }
 
@@ -72,6 +75,7 @@ async function enrichQuoteFromYahoo(
           : yahoo.fiftyTwoWeekHigh,
       fiftyTwoWeekLow:
         data.fiftyTwoWeekLow > 0 ? data.fiftyTwoWeekLow : yahoo.fiftyTwoWeekLow,
+      currency: data.currency || yahoo.currency || "USD",
     };
   } catch (error) {
     logger.warn("Yahoo quote enrichment failed", {

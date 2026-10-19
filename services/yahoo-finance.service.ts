@@ -1516,6 +1516,7 @@ export class YahooFinanceService {
       volume: Number(meta.regularMarketVolume) || 0,
       fiftyTwoWeekHigh: Number(meta.fiftyTwoWeekHigh) || 0,
       fiftyTwoWeekLow: Number(meta.fiftyTwoWeekLow) || 0,
+      currency: typeof meta.currency === "string" ? meta.currency : "USD",
       lastUpdated: new Date(
         (Number.isFinite(marketTime) && marketTime > 0
           ? marketTime
@@ -1542,6 +1543,7 @@ export class YahooFinanceService {
         0,
       fiftyTwoWeekHigh: quote.fiftyTwoWeekHigh || 0,
       fiftyTwoWeekLow: quote.fiftyTwoWeekLow || 0,
+      currency: typeof quote.currency === "string" ? quote.currency : "USD",
       lastUpdated: new Date(quote.regularMarketTime * 1000 || Date.now()),
     };
   }

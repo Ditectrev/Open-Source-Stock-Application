@@ -11,6 +11,7 @@ import { marketChartSignedColor } from "@/lib/market-semantics";
 
 export interface ChartMagnifierTooltipProps {
   symbol?: string;
+  currency?: string;
   isDark?: boolean;
   isPositive?: boolean;
   left?: number;
@@ -19,6 +20,7 @@ export interface ChartMagnifierTooltipProps {
 
 export function ChartMagnifierTooltip({
   symbol = "—",
+  currency,
   isDark = false,
   isPositive = true,
   left = 0,
@@ -46,7 +48,9 @@ export function ChartMagnifierTooltip({
         ● {symbol}
       </div>
       <div className="chart-magnifier-tooltip__price mt-1 text-2xl font-semibold tabular-nums leading-none">
-        {point ? formatMagnifierPrice(magnifierPriceFromPoint(point)) : "—"}
+        {point
+          ? formatMagnifierPrice(magnifierPriceFromPoint(point), currency)
+          : "—"}
       </div>
       <div className="chart-magnifier-tooltip__date mt-1 text-xs tabular-nums">
         {point ? formatMagnifierDate(new Date(point.timestamp)) : "—"}

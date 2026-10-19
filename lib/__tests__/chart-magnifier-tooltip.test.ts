@@ -34,7 +34,8 @@ describe("chart-magnifier-tooltip", () => {
       volume: 1,
     };
 
-    expect(formatMagnifierPrice(26.114)).toBe("26.11");
+    expect(formatMagnifierPrice(26.114)).toBe("$26.11");
+    expect(formatMagnifierPrice(26.114, "EUR")).toBe("€26.11");
     expect(magnifierPriceFromPoint(point)).toBe(26.11);
     expect(formatMagnifierDate(new Date("2019-03-15"))).toMatch(/Mar/);
   });

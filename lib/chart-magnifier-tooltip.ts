@@ -1,3 +1,4 @@
+import { formatQuotePrice } from "@/lib/quote-money";
 import type { PriceData } from "@/types";
 import type { ISeriesApi, Time } from "lightweight-charts";
 
@@ -25,8 +26,11 @@ export function formatMagnifierDate(timestamp: Date): string {
   });
 }
 
-export function formatMagnifierPrice(value: number): string {
-  return value.toFixed(2);
+export function formatMagnifierPrice(
+  value: number,
+  currency?: string | null
+): string {
+  return formatQuotePrice(value, currency);
 }
 
 export function magnifierPriceFromPoint(point: PriceData): number {

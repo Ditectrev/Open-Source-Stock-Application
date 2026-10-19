@@ -67,6 +67,7 @@ export interface ChartComponentProps {
   data: PriceData[];
   symbol?: string;
   symbolName?: string;
+  currency?: string;
   type?: ChartType;
   /** Active range — required when `serverRangeScoped` (parent-controlled). */
   timeRange?: TimeRange;
@@ -105,6 +106,7 @@ export function ChartComponent({
   data,
   symbol,
   symbolName,
+  currency,
   type = "area",
   timeRange: controlledTimeRange,
   initialTimeRange = "1M",
@@ -736,6 +738,7 @@ export function ChartComponent({
           <ChartWrapper
             key={chartKey}
             dataRevision={chartDataRevision}
+            currency={currency}
             height={height}
             isDark={isDark}
             chartType={chartType}
@@ -749,6 +752,7 @@ export function ChartComponent({
               <>
                 <ChartMagnifierTooltip
                   symbol={symbol ?? symbolName}
+                  currency={currency}
                   isDark={isDark}
                   isPositive={isPeriodPositive}
                   left={magnifier?.left}

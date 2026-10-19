@@ -432,7 +432,10 @@ export function HomePageClient() {
                   />
                 )}
                 {activeTab === "financials" && (
-                  <FinancialsTable financials={financialData} />
+                  <FinancialsTable
+                    financials={financialData}
+                    currency={symbolData.currency}
+                  />
                 )}
                 {activeTab === "technicals" && (
                   <TechnicalIndicatorsDisplay
@@ -440,7 +443,10 @@ export function HomePageClient() {
                   />
                 )}
                 {activeTab === "forecasts" && (
-                  <ForecastDisplay forecast={forecastData} />
+                  <ForecastDisplay
+                    forecast={forecastData}
+                    currency={symbolData.currency}
+                  />
                 )}
                 {activeTab === "seasonals" && (
                   <SeasonalHeatmap data={seasonalData} />

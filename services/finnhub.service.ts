@@ -170,6 +170,7 @@ export class FinnhubService {
       const profile = profileRes.ok
         ? ((await profileRes.json()) as {
             name?: string;
+            currency?: string;
             marketCapitalization?: number;
           })
         : {};
@@ -226,6 +227,7 @@ export class FinnhubService {
         fiftyTwoWeekHigh,
         fiftyTwoWeekLow,
         lastUpdated: quote.t ? new Date(quote.t * 1000) : new Date(),
+        currency: profile.currency?.trim() || undefined,
       };
     }, `Finnhub:Quote:${symbol}`);
   }
