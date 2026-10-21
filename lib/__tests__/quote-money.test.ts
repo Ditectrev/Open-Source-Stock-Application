@@ -11,7 +11,9 @@ describe("quote money", () => {
     expect(formatQuotePrice(150.25)).toBe("$150.25");
     expect(formatQuotePrice(199.22, "EUR")).toBe("€199.22");
     expect(formatQuotePrice(2450, "JPY")).toBe("¥2,450");
-    expect(formatQuotePrice(73.4, "GBp")).toBe("73.40p");
+    expect(formatQuotePrice(73.4, "GBp")).toBe("73.40 GBX");
+    expect(formatQuotePrice(73.4, "GBX")).toBe("73.40 GBX");
+    expect(formatQuoteChange(1.2, "GBp")).toBe("+1.20 GBX");
     expect(formatQuoteChange(-2.03, "EUR")).toBe("-€2.03");
     expect(formatQuoteChange(0, "USD")).toBe("+$0.00");
     expect(formatQuoteCompact(229_940_576_256, "EUR")).toBe("€229.94B");

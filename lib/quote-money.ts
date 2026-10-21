@@ -1,11 +1,11 @@
 /**
  * Quote prices use the listing currency (EUR, JPY, GBP, …).
- * Yahoo quotes some markets in minor units (`GBp` is London pence).
+ * Yahoo quotes London in pence (`GBp`). The price is shown as GBX.
  */
 
-const MINOR_UNIT_SUFFIX: Record<string, string> = {
-  GBp: "p",
-  GBX: "p",
+const MINOR_UNIT_LABEL: Record<string, string> = {
+  GBp: "GBX",
+  GBX: "GBX",
 };
 
 /** Market cap and financial statements are in the major currency, not pence. */
@@ -32,12 +32,12 @@ export function formatQuotePrice(
   currency?: string | null
 ): string {
   const code = quoteCurrency(currency);
-  const suffix = MINOR_UNIT_SUFFIX[code];
-  if (suffix) {
+  const label = MINOR_UNIT_LABEL[code];
+  if (label) {
     return `${new Intl.NumberFormat("en-US", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
-    }).format(value)}${suffix}`;
+    }).format(value)} ${label}`;
   }
 
   try {

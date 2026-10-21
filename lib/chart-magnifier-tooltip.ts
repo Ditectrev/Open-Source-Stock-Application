@@ -3,7 +3,7 @@ import type { PriceData } from "@/types";
 import type { ISeriesApi, Time } from "lightweight-charts";
 
 /** Fixed width — keep in sync with `.chart-magnifier-tooltip` in globals.css. */
-export const CHART_MAGNIFIER_TOOLTIP_WIDTH = 136;
+export const CHART_MAGNIFIER_TOOLTIP_WIDTH = 200;
 
 /** Clamp horizontal position so the magnifier stays over the plot area. */
 export function clampMagnifierTooltipLeft(
