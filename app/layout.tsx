@@ -1,22 +1,24 @@
 import type { Metadata } from "next";
-import { Ibarra_Real_Nova, Merriweather } from "next/font/google";
+import localFont from "next/font/local";
 import { JsonLd } from "@/components/JsonLd";
 import { gtmBootstrapHtml, normalizeGtmId } from "@/lib/gtm";
 import { buildRootMetadata } from "@/lib/site-seo";
 import "./globals.css";
 import { Providers } from "./providers";
 
-const headingFont = Merriweather({
+// Self-hosted so `next build` does not fetch Google Fonts. That fetch sometimes
+// returns extensionless font URLs and fails the Lighthouse build.
+const headingFont = localFont({
+  src: "./fonts/merriweather-latin.woff2",
   variable: "--font-heading",
-  subsets: ["latin"],
-  weight: ["300", "400", "700"],
+  weight: "300 700",
   display: "swap",
 });
 
-const bodyFont = Ibarra_Real_Nova({
+const bodyFont = localFont({
+  src: "./fonts/ibarra-real-nova-latin.woff2",
   variable: "--font-body",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: "400 700",
   display: "swap",
 });
 
