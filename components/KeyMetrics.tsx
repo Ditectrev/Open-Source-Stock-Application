@@ -7,6 +7,7 @@
  * Requirements: 4.4, 4.5
  */
 
+import { formatQuoteCompact, formatQuotePrice } from "@/lib/quote-money";
 import { SymbolData } from "@/types";
 import { useState } from "react";
 import {
@@ -30,12 +31,9 @@ interface Metric {
 }
 
 export function KeyMetrics({ symbolData }: KeyMetricsProps) {
-  const formatMarketCap = (value: number): string => {
-    if (value >= 1e12) return `$${(value / 1e12).toFixed(2)}T`;
-    if (value >= 1e9) return `$${(value / 1e9).toFixed(2)}B`;
-    if (value >= 1e6) return `$${(value / 1e6).toFixed(2)}M`;
-    return `$${value.toFixed(2)}`;
-  };
+  const money = (value: number) => formatQuotePrice(value, symbolData.currency);
+  const formatMarketCap = (value: number): string =>
+    formatQuoteCompact(value, symbolData.currency);
 
   const formatVolume = (value: number): string => {
     if (value >= 1e9) return `${(value / 1e9).toFixed(2)}B`;
@@ -59,19 +57,19 @@ export function KeyMetrics({ symbolData }: KeyMetricsProps) {
     },
     {
       label: "52-Week High",
-      value: `$${symbolData.fiftyTwoWeekHigh.toFixed(2)}`,
+      value: money(symbolData.fiftyTwoWeekHigh),
       tooltip:
         "The highest price the stock has reached in the past 52 weeks (one year). This helps investors understand the stock's recent peak performance and can indicate resistance levels.",
     },
     {
       label: "52-Week Low",
-      value: `$${symbolData.fiftyTwoWeekLow.toFixed(2)}`,
+      value: money(symbolData.fiftyTwoWeekLow),
       tooltip:
         "The lowest price the stock has reached in the past 52 weeks (one year). This helps investors understand the stock's recent bottom and can indicate support levels.",
     },
     {
       label: "52-Week Range",
-      value: `$${symbolData.fiftyTwoWeekLow.toFixed(2)} - $${symbolData.fiftyTwoWeekHigh.toFixed(2)}`,
+      value: `${money(symbolData.fiftyTwoWeekLow)} - ${money(symbolData.fiftyTwoWeekHigh)}`,
       tooltip:
         "The range between the lowest and highest prices over the past year. This shows the stock's volatility and price movement over time. A wider range indicates higher volatility.",
     },

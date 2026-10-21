@@ -3,6 +3,7 @@ import { MARKET_UI_COPY, userFacingApiError } from "@/lib/api-user-error";
 import { aiMarketInsightsService } from "@/services/ai-market-insights.service";
 import { logger } from "@/lib/logger";
 import { getAuthenticatedUser } from "@/lib/server-auth";
+import { readMarketSymbolParam } from "@/lib/market-symbol";
 import { subscriptionService } from "@/services/subscription.service";
 
 export async function GET(
@@ -26,7 +27,7 @@ export async function GET(
       );
     }
 
-    const { symbol } = await params;
+    const symbol = await readMarketSymbolParam(params);
     if (!symbol) {
       return NextResponse.json(
         { success: false, error: "Symbol parameter is required" },

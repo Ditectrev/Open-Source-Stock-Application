@@ -5,6 +5,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { logger } from "./lib/logger";
+import { rewriteDottedMarketSymbolPath } from "./lib/market-symbol";
 
 export function middleware(request: NextRequest) {
   const startTime = Date.now();
@@ -18,6 +19,21 @@ export function middleware(request: NextRequest) {
     query: search,
     userAgent: request.headers.get("user-agent") || "unknown",
   });
+
+  const dottedSymbolPath = rewriteDottedMarketSymbolPath(pathname);
+  if (dottedSymbolPath) {
+    const url = request.nextUrl.clone();
+    url.pathname = dottedSymbolPath;
+    const response = NextResponse.rewrite(url);
+    const duration = Date.now() - startTime;
+    logger.info("Request completed", {
+      method,
+      path: pathname,
+      duration: `${duration}ms`,
+      status: response.status,
+    });
+    return response;
+  }
 
   // Continue with the request
   const response = NextResponse.next();

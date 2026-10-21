@@ -8,6 +8,7 @@
  */
 
 import { DNA_CAPTION, DNA_DISPLAY } from "@/lib/design-dna";
+import { formatQuoteChange, formatQuotePrice } from "@/lib/quote-money";
 import { SymbolData } from "@/types";
 import { marketChangeTextClass } from "@/lib/market-semantics";
 import {
@@ -24,6 +25,8 @@ export interface SymbolHeaderProps {
 export function SymbolHeader({ symbolData }: SymbolHeaderProps) {
   const isPositive = symbolData.change >= 0;
   const changeColor = marketChangeTextClass(symbolData.change);
+  const priceLabel = formatQuotePrice(symbolData.price, symbolData.currency);
+  const changeLabel = formatQuoteChange(symbolData.change, symbolData.currency);
 
   return (
     <div
@@ -44,16 +47,15 @@ export function SymbolHeader({ symbolData }: SymbolHeaderProps) {
         >
           <div
             className={DNA_DISPLAY}
-            aria-label={`Current price: $${symbolData.price.toFixed(2)}`}
+            aria-label={`Current price: ${priceLabel}`}
           >
-            ${symbolData.price.toFixed(2)}
+            {priceLabel}
           </div>
           <div
             className={`${SYMBOL_CHANGE_LINE} ${changeColor}`}
-            aria-label={`Change: ${isPositive ? "+" : ""}${symbolData.change.toFixed(2)} (${isPositive ? "+" : ""}${symbolData.changePercent.toFixed(2)}%)`}
+            aria-label={`Change: ${changeLabel} (${isPositive ? "+" : ""}${symbolData.changePercent.toFixed(2)}%)`}
           >
-            {isPositive ? "+" : ""}
-            {symbolData.change.toFixed(2)} ({isPositive ? "+" : ""}
+            {changeLabel} ({isPositive ? "+" : ""}
             {symbolData.changePercent.toFixed(2)}%)
           </div>
           <div className={DNA_CAPTION}>

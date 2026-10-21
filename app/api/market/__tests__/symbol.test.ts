@@ -163,6 +163,22 @@ describe("Successful Data Retrieval", () => {
       expect(data.timestamp).toBeDefined();
     });
 
+    it("restores an exchange suffix before loading the quote", async () => {
+      vi.mocked(marketDataService.getSymbolData).mockResolvedValue({
+        ...mockSymbolData,
+        symbol: "SAP.DE",
+      });
+
+      const { GET } = await import("@/app/api/market/symbol/[symbol]/route");
+      const req = makeRequest(
+        "http://localhost:3000/api/market/symbol/SAP__dot__DE"
+      );
+      const response = await GET(req, makeParams("SAP__dot__DE"));
+
+      expect(response.status).toBe(200);
+      expect(marketDataService.getSymbolData).toHaveBeenCalledWith("SAP.DE");
+    });
+
     it("should call marketDataService.getSymbolData with correct symbol", async () => {
       vi.mocked(marketDataService.getSymbolData).mockResolvedValue(
         mockSymbolData

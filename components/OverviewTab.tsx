@@ -49,6 +49,7 @@ export function OverviewTab({
             data={historicalData}
             symbol={symbolData.symbol}
             symbolName={symbolData.name}
+            currency={symbolData.currency}
             type="area"
             timeRange={timeRange}
             dataTimeRange={dataTimeRange}

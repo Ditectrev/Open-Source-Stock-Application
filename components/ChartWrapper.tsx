@@ -23,6 +23,7 @@ import {
   CrosshairMode,
   LineStyle,
 } from "lightweight-charts";
+import { formatQuotePrice } from "@/lib/quote-money";
 import type { ChartType } from "@/types";
 import { chartAtmosphereEnabled } from "@/lib/chart-effects";
 
@@ -39,6 +40,7 @@ export interface ChartWrapperProps {
   visualStyle?: ChartVisualStyle;
   atmosphereGradient?: string;
   chartType?: ChartType;
+  currency?: string;
   overlay?: ReactNode;
   /** Clips the plot canvas during trail reveal (overlay stays full width for splash). */
   plotClipPath?: string | null;
@@ -53,7 +55,8 @@ export const getDefaultChartOptions = (
   width: number,
   height: number,
   isDark: boolean = false,
-  visualStyle: ChartVisualStyle = "default"
+  visualStyle: ChartVisualStyle = "default",
+  currency?: string
 ) => {
   const atmospheric = visualStyle === "atmospheric";
   const crosshairColor = atmospheric
@@ -127,6 +130,9 @@ export const getDefaultChartOptions = (
       mouse: false,
       touch: false,
     },
+    localization: {
+      priceFormatter: (price: number) => formatQuotePrice(price, currency),
+    },
   };
 };
 
@@ -141,6 +147,7 @@ export function ChartWrapper({
   visualStyle = "atmospheric",
   atmosphereGradient,
   chartType = "area",
+  currency,
   overlay,
   plotClipPath = null,
   plotContainerRef,
@@ -162,7 +169,13 @@ export function ChartWrapper({
     // Create chart with default options
     const chart = createChart(
       chartContainerRef.current,
-      getDefaultChartOptions(containerWidth, height, isDark, visualStyle)
+      getDefaultChartOptions(
+        containerWidth,
+        height,
+        isDark,
+        visualStyle,
+        currency
+      )
     );
 
     chartRef.current = chart;
@@ -176,7 +189,7 @@ export function ChartWrapper({
       chart.remove();
       chartRef.current = null;
     };
-  }, [height, isDark, visualStyle, dataRevision, chartContainerRef]);
+  }, [height, isDark, visualStyle, dataRevision, currency, chartContainerRef]);
 
   // Handle responsive resize
   useEffect(() => {

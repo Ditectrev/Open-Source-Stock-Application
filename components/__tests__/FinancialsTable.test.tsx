@@ -256,7 +256,7 @@ describe("FinancialsTable", () => {
         keyFacts: { ...mockFinancials.keyFacts, netIncome: -5000000000 },
       };
       renderWithTheme(negativeData);
-      const value = screen.getByText("$-5.00B");
+      const value = screen.getByText("-$5.00B");
       expect(value).toHaveClass("text-rose-800");
     });
 

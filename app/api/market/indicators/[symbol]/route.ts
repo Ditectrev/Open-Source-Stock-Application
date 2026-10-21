@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { MARKET_UI_COPY, userFacingApiError } from "@/lib/api-user-error";
+import { readMarketSymbolParam } from "@/lib/market-symbol";
 import { marketDataService } from "@/services/market-data.service";
 import { logger } from "@/lib/logger";
 
@@ -13,7 +14,7 @@ export async function GET(
   { params }: { params: Promise<{ symbol: string }> }
 ) {
   try {
-    const { symbol } = await params;
+    const symbol = await readMarketSymbolParam(params);
 
     if (!symbol) {
       return NextResponse.json(

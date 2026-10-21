@@ -7,6 +7,11 @@
  * Requirements: 6.1, 6.2, 6.3, 6.4, 6.5
  */
 
+import {
+  formatQuoteCompact,
+  formatQuotePrice,
+  quoteMajorCurrency,
+} from "@/lib/quote-money";
 import { ForecastData } from "@/types";
 import { useTheme } from "@/lib/theme-context";
 import { useState } from "react";
@@ -29,6 +34,7 @@ import {
 
 export interface ForecastDisplayProps {
   forecast: ForecastData | null | undefined;
+  currency?: string;
 }
 
 interface TooltipTriggerProps {
@@ -78,6 +84,13 @@ const RATING_BAR_FILL_DARK = [
   "bg-rose-500",
 ] as const;
 
+const MINOR_UNIT_MAJOR: Record<string, string> = {
+  GBp: "GBP",
+  GBX: "GBP",
+  ZAc: "ZAR",
+  ILA: "ILS",
+};
+
 function SectionLabel({ label, tooltip }: TooltipTriggerProps) {
   const [showTooltip, setShowTooltip] = useState(false);
 
@@ -108,14 +121,11 @@ function SectionLabel({ label, tooltip }: TooltipTriggerProps) {
   );
 }
 
-function formatCurrency(value: number): string {
-  if (Math.abs(value) >= 1e9) {
-    return `$${(value / 1e9).toFixed(2)}B`;
-  }
+function formatCurrency(value: number, currency?: string): string {
   if (Math.abs(value) >= 1e6) {
-    return `$${(value / 1e6).toFixed(2)}M`;
+    return formatQuoteCompact(value, currency);
   }
-  return `$${value.toFixed(2)}`;
+  return formatQuotePrice(value, quoteMajorCurrency(currency));
 }
 
 function SurpriseIndicator({
@@ -148,11 +158,13 @@ function PriceTargetRange({
   average,
   high,
   isDark,
+  currency,
 }: {
   low: number;
   average: number;
   high: number;
   isDark: boolean;
+  currency?: string;
 }) {
   const range = high - low;
   const avgPosition = range > 0 ? ((average - low) / range) * 100 : 50;
@@ -160,13 +172,17 @@ function PriceTargetRange({
   return (
     <div className="mt-4">
       <div className="mb-1 flex justify-between text-xs">
-        <span className={SYMBOL_SUBTLE_TEXT}>Low: ${low.toFixed(2)}</span>
+        <span className={SYMBOL_SUBTLE_TEXT}>
+          Low: {formatQuotePrice(low, currency)}
+        </span>
         <span
           className={`font-medium ${isDark ? "text-stone-200" : "text-stone-800"}`}
         >
-          Avg: ${average.toFixed(2)}
+          Avg: {formatQuotePrice(average, currency)}
         </span>
-        <span className={SYMBOL_SUBTLE_TEXT}>High: ${high.toFixed(2)}</span>
+        <span className={SYMBOL_SUBTLE_TEXT}>
+          High: {formatQuotePrice(high, currency)}
+        </span>
       </div>
       <div
         data-testid="price-target-range"
@@ -192,7 +208,7 @@ function PriceTargetRange({
   );
 }
 
-export function ForecastDisplay({ forecast }: ForecastDisplayProps) {
+export function ForecastDisplay({ forecast, currency }: ForecastDisplayProps) {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
@@ -231,19 +247,19 @@ export function ForecastDisplay({ forecast }: ForecastDisplayProps) {
           <div>
             <p className={`text-xs ${SYMBOL_SUBTLE_TEXT}`}>Low</p>
             <p className={`mt-1 ${SYMBOL_METRIC}`}>
-              ${forecast.priceTargets.low.toFixed(2)}
+              {formatQuotePrice(forecast.priceTargets.low, currency)}
             </p>
           </div>
           <div>
             <p className={`text-xs ${SYMBOL_SUBTLE_TEXT}`}>Average</p>
             <p className={`mt-1 ${SYMBOL_METRIC_EMPHASIS}`}>
-              ${forecast.priceTargets.average.toFixed(2)}
+              {formatQuotePrice(forecast.priceTargets.average, currency)}
             </p>
           </div>
           <div>
             <p className={`text-xs ${SYMBOL_SUBTLE_TEXT}`}>High</p>
             <p className={`mt-1 ${SYMBOL_METRIC}`}>
-              ${forecast.priceTargets.high.toFixed(2)}
+              {formatQuotePrice(forecast.priceTargets.high, currency)}
             </p>
           </div>
         </div>
@@ -252,6 +268,7 @@ export function ForecastDisplay({ forecast }: ForecastDisplayProps) {
           average={forecast.priceTargets.average}
           high={forecast.priceTargets.high}
           isDark={isDark}
+          currency={currency}
         />
       </section>
 
@@ -319,7 +336,7 @@ export function ForecastDisplay({ forecast }: ForecastDisplayProps) {
                 <div className="flex items-center gap-3">
                   <div className="text-right text-xs">
                     <div className={SYMBOL_SUBTLE_TEXT}>
-                      Est: ${eps.estimate.toFixed(2)}
+                      Est: {formatQuotePrice(eps.estimate, currency)}
                     </div>
                     {eps.actual !== undefined && (
                       <div
@@ -327,7 +344,7 @@ export function ForecastDisplay({ forecast }: ForecastDisplayProps) {
                           isDark ? "text-stone-100" : "text-stone-900"
                         }`}
                       >
-                        Act: ${eps.actual.toFixed(2)}
+                        Act: {formatQuotePrice(eps.actual, currency)}
                       </div>
                     )}
                   </div>
@@ -367,7 +384,7 @@ export function ForecastDisplay({ forecast }: ForecastDisplayProps) {
                 <div className="flex items-center gap-3">
                   <div className="text-right text-xs">
                     <div className={SYMBOL_SUBTLE_TEXT}>
-                      Est: {formatCurrency(rev.estimate)}
+                      Est: {formatCurrency(rev.estimate, currency)}
                     </div>
                     {hasActual && (
                       <div
@@ -375,7 +392,7 @@ export function ForecastDisplay({ forecast }: ForecastDisplayProps) {
                           isDark ? "text-stone-100" : "text-stone-900"
                         }`}
                       >
-                        Act: {formatCurrency(rev.actual!)}
+                        Act: {formatCurrency(rev.actual!, currency)}
                       </div>
                     )}
                   </div>

@@ -39,10 +39,29 @@ describe("SymbolHeader", () => {
     expect(screen.getByText("$150.25")).toBeInTheDocument();
   });
 
+  it("should display a foreign listing in its own currency", () => {
+    render(
+      <SymbolHeader
+        symbolData={{
+          ...mockSymbolData,
+          symbol: "SAP.DE",
+          name: "SAP SE",
+          price: 199.22,
+          change: -2.03,
+          changePercent: -1.01,
+          currency: "EUR",
+        }}
+      />
+    );
+
+    expect(screen.getByText("€199.22")).toBeInTheDocument();
+    expect(screen.getByText(/-€2\.03/)).toBeInTheDocument();
+  });
+
   it("should display positive change with green color", () => {
     render(<SymbolHeader symbolData={mockSymbolData} />);
 
-    const changeElement = screen.getByText(/\+2\.50/);
+    const changeElement = screen.getByText(/\+\$2\.50/);
     expect(changeElement).toBeInTheDocument();
     expect(changeElement).toHaveClass("text-emerald-800");
   });
@@ -56,7 +75,7 @@ describe("SymbolHeader", () => {
 
     render(<SymbolHeader symbolData={negativeData} />);
 
-    const changeElement = screen.getByText(/-2\.50/);
+    const changeElement = screen.getByText(/-\$2\.50/);
     expect(changeElement).toBeInTheDocument();
     expect(changeElement).toHaveClass("text-rose-800");
   });

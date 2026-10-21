@@ -395,8 +395,16 @@ export function HomePageClient() {
             <div className="py-12">
               <ProductGate
                 eyebrow="Symbol"
-                title="Couldn't load symbol"
-                message={error}
+                title={
+                  /symbol not found/i.test(error)
+                    ? "Symbol not found"
+                    : "Couldn't load symbol"
+                }
+                message={
+                  /symbol not found/i.test(error)
+                    ? "The symbol you searched for could not be found. Check the ticker and try again."
+                    : error
+                }
                 onRetry={clearSymbol}
                 retryLabel="Clear selection"
                 align="center"
@@ -424,7 +432,10 @@ export function HomePageClient() {
                   />
                 )}
                 {activeTab === "financials" && (
-                  <FinancialsTable financials={financialData} />
+                  <FinancialsTable
+                    financials={financialData}
+                    currency={symbolData.currency}
+                  />
                 )}
                 {activeTab === "technicals" && (
                   <TechnicalIndicatorsDisplay
@@ -432,7 +443,10 @@ export function HomePageClient() {
                   />
                 )}
                 {activeTab === "forecasts" && (
-                  <ForecastDisplay forecast={forecastData} />
+                  <ForecastDisplay
+                    forecast={forecastData}
+                    currency={symbolData.currency}
+                  />
                 )}
                 {activeTab === "seasonals" && (
                   <SeasonalHeatmap data={seasonalData} />

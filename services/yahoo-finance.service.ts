@@ -5,6 +5,7 @@
 
 import { logger } from "@/lib/logger";
 import { env } from "@/lib/env";
+import { yahooSymbolCandidates } from "@/lib/yahoo-symbol";
 import {
   buildNewsArticle,
   toIsoFromUnixSeconds,
@@ -112,11 +113,31 @@ export class YahooFinanceService {
     symbol: string,
     modules: string
   ): Promise<any> {
+    let lastError: Error | undefined;
+    for (const candidate of yahooSymbolCandidates(symbol)) {
+      try {
+        return await this.fetchQuoteSummaryOnce(candidate, modules);
+      } catch (error) {
+        lastError = error as Error;
+        const missing =
+          /no data found/i.test(lastError.message) ||
+          /API error: 404\b/.test(lastError.message);
+        if (!missing) throw lastError;
+      }
+    }
+    throw lastError ?? new Error(`No data found for symbol: ${symbol}`);
+  }
+
+  private async fetchQuoteSummaryOnce(
+    symbol: string,
+    modules: string
+  ): Promise<any> {
     const { crumb, cookie } = await this.getCrumb();
+    const encoded = encodeURIComponent(symbol);
 
     const url = crumb
-      ? `${this.baseUrl}/v10/finance/quoteSummary/${symbol}?modules=${modules}&crumb=${encodeURIComponent(crumb)}`
-      : `${this.baseUrl}/v10/finance/quoteSummary/${symbol}?modules=${modules}`;
+      ? `${this.baseUrl}/v10/finance/quoteSummary/${encoded}?modules=${modules}&crumb=${encodeURIComponent(crumb)}`
+      : `${this.baseUrl}/v10/finance/quoteSummary/${encoded}?modules=${modules}`;
 
     const headers: Record<string, string> = {
       Accept: "application/json",
@@ -144,50 +165,16 @@ export class YahooFinanceService {
   }
 
   /**
-   * Fetch symbol quote data
+   * Fetch symbol quote data.
+   * `/v8/finance/quote` 404s, so a missing quote falls back to chart meta,
+   * which still returns a price for exchange-suffixed symbols such as SAP.DE.
    */
   async getSymbolQuote(symbol: string): Promise<SymbolData> {
     return retryWithBackoff(async () => {
       try {
-        const ua = "Mozilla/5.0 (compatible; TheOpenStock/1.0)";
-        let response: Response | undefined;
-        for (const base of this.yahooChartBases()) {
-          response = await fetch(
-            `${base}/v8/finance/quote?symbols=${encodeURIComponent(symbol)}`,
-            {
-              headers: {
-                Accept: "application/json",
-                "User-Agent": ua,
-              },
-            }
-          );
-          if (response.ok) break;
-          const retryable = [429, 500, 502, 503, 504].includes(response.status);
-          if (!retryable) break;
-          logger.warn("Yahoo quote: transient error, trying alternate host", {
-            symbol,
-            status: response.status,
-            base,
-          });
-        }
-
-        if (!response) {
-          throw new Error("Yahoo Finance quote: empty response");
-        }
-
-        if (!response.ok) {
-          throw new Error(
-            `Yahoo Finance API error: ${response.status} ${response.statusText}`
-          );
-        }
-
-        const data = await response.json();
-
-        if (!data.quoteResponse?.result?.[0]) {
-          throw new Error(`Symbol not found: ${symbol}`);
-        }
-
-        return this.parseQuoteResponse(data.quoteResponse.result[0]);
+        const listed = await this.fetchListedQuote(symbol);
+        if (listed) return await this.fillMarketCap(listed);
+        return await this.fillMarketCap(await this.fetchChartQuote(symbol));
       } catch (error) {
         logger.error("Failed to fetch symbol quote", error as Error, {
           symbol,
@@ -196,6 +183,120 @@ export class YahooFinanceService {
         throw error;
       }
     }, `YahooFinance:Quote:${symbol}`);
+  }
+
+  private async fetchListedQuote(symbol: string): Promise<SymbolData | null> {
+    const ua = "Mozilla/5.0 (compatible; TheOpenStock/1.0)";
+    for (const base of this.yahooChartBases()) {
+      const response = await fetch(
+        `${base}/v8/finance/quote?symbols=${encodeURIComponent(symbol)}`,
+        {
+          headers: {
+            Accept: "application/json",
+            "User-Agent": ua,
+          },
+        }
+      );
+      if (!response.ok) continue;
+      const data = await response.json();
+      const quote = data.quoteResponse?.result?.[0];
+      if (quote && Number(quote.regularMarketPrice) > 0) {
+        return this.parseQuoteResponse(quote);
+      }
+    }
+    return null;
+  }
+
+  private async fetchChartQuote(symbol: string): Promise<SymbolData> {
+    for (const candidate of yahooSymbolCandidates(symbol)) {
+      const chart = await this.fetchChartResult(
+        candidate,
+        "interval=1d&range=5d"
+      );
+      const price = Number(chart?.meta?.regularMarketPrice);
+      if (chart?.meta?.symbol && Number.isFinite(price) && price > 0) {
+        return { ...this.parseChartMetaQuote(chart.meta), symbol };
+      }
+    }
+    const missing = new Error("Symbol not found") as Error & {
+      status?: number;
+    };
+    missing.status = 404;
+    throw missing;
+  }
+
+  /** Chart meta has no market cap. Quote summary still does, when Yahoo allows it. */
+  private async fillMarketCap(data: SymbolData): Promise<SymbolData> {
+    if (data.marketCap > 0) return data;
+    for (const candidate of yahooSymbolCandidates(data.symbol)) {
+      try {
+        const summary = await this.fetchQuoteSummaryOnce(candidate, "price");
+        const marketCap = Number(summary?.price?.marketCap?.raw);
+        if (Number.isFinite(marketCap) && marketCap > 0) {
+          return { ...data, marketCap };
+        }
+      } catch (error) {
+        logger.warn("Yahoo market cap lookup failed", {
+          symbol: candidate,
+          error: (error as Error).message,
+        });
+      }
+    }
+    return data;
+  }
+
+  /**
+   * Returns the chart result, or null when Yahoo has no listing for the symbol.
+   * Server errors are thrown so the caller can retry.
+   */
+  private async fetchChartResult(
+    symbol: string,
+    query: string
+  ): Promise<any | null> {
+    const ua = "Mozilla/5.0 (compatible; TheOpenStock/1.0)";
+    let lastStatus = 0;
+    for (const base of this.yahooChartBases()) {
+      const response = await fetch(
+        `${base}/v8/finance/chart/${encodeURIComponent(symbol)}?${query}`,
+        {
+          headers: {
+            Accept: "application/json",
+            "User-Agent": ua,
+          },
+        }
+      );
+      if (response.status === 404) return null;
+      if (!response.ok) {
+        lastStatus = response.status;
+        const retryable = [429, 500, 502, 503, 504].includes(response.status);
+        if (!retryable) {
+          throw new Error(
+            `Yahoo Finance API error: ${response.status} ${response.statusText}`
+          );
+        }
+        logger.warn("Yahoo chart: transient error, trying alternate host", {
+          symbol,
+          status: response.status,
+          base,
+        });
+        continue;
+      }
+
+      const data = await response.json();
+      if (data.chart?.result?.[0]) return data.chart.result[0];
+      const description = String(data.chart?.error?.description ?? "");
+      if (
+        data.chart?.error?.code === "Not Found" ||
+        /no data found/i.test(description)
+      ) {
+        return null;
+      }
+    }
+
+    if (lastStatus >= 400) {
+      throw new Error(`Yahoo Finance API error: ${lastStatus}`);
+    }
+    return null;
   }
 
   /**
@@ -208,47 +309,14 @@ export class YahooFinanceService {
     return retryWithBackoff(async () => {
       try {
         const { interval, period } = this.getTimeRangeParams(range);
-
-        const ua = "Mozilla/5.0 (compatible; TheOpenStock/1.0)";
-        let response: Response | undefined;
-        for (const base of this.yahooChartBases()) {
-          response = await fetch(
-            `${base}/v8/finance/chart/${encodeURIComponent(symbol)}?interval=${interval}&range=${period}`,
-            {
-              headers: {
-                Accept: "application/json",
-                "User-Agent": ua,
-              },
-            }
+        for (const candidate of yahooSymbolCandidates(symbol)) {
+          const chart = await this.fetchChartResult(
+            candidate,
+            `interval=${interval}&range=${period}`
           );
-          if (response.ok) break;
-          const retryable = [429, 500, 502, 503, 504].includes(response.status);
-          if (!retryable) break;
-          logger.warn("Yahoo chart: transient error, trying alternate host", {
-            symbol,
-            range,
-            status: response.status,
-            base,
-          });
+          if (chart) return this.parseHistoricalResponse(chart);
         }
-
-        if (!response) {
-          throw new Error("Yahoo Finance chart: empty response");
-        }
-
-        if (!response.ok) {
-          throw new Error(
-            `Yahoo Finance API error: ${response.status} ${response.statusText}`
-          );
-        }
-
-        const data = await response.json();
-
-        if (!data.chart?.result?.[0]) {
-          throw new Error(`No historical data found for symbol: ${symbol}`);
-        }
-
-        return this.parseHistoricalResponse(data.chart.result[0]);
+        throw new Error(`No historical data found for symbol: ${symbol}`);
       } catch (error) {
         logger.error("Failed to fetch historical data", error as Error, {
           symbol,
@@ -1429,6 +1497,42 @@ export class YahooFinanceService {
   }
 
   /**
+   * Chart meta has the live price after `/v8/finance/quote` stopped responding.
+   * `chartPreviousClose` is the start of the requested range, so day change
+   * is calculated from `regularMarketPrice` and `previousClose`.
+   */
+  private parseChartMetaQuote(meta: any): SymbolData {
+    const price = Number(meta.regularMarketPrice) || 0;
+    const previousClose = Number(meta.previousClose);
+    const change =
+      Number.isFinite(previousClose) && previousClose > 0
+        ? price - previousClose
+        : 0;
+    const changePercent =
+      Number.isFinite(previousClose) && previousClose > 0
+        ? (change / previousClose) * 100
+        : 0;
+    const marketTime = Number(meta.regularMarketTime);
+    return {
+      symbol: meta.symbol,
+      name: meta.longName || meta.shortName || meta.symbol,
+      price,
+      change,
+      changePercent,
+      marketCap: 0,
+      volume: Number(meta.regularMarketVolume) || 0,
+      fiftyTwoWeekHigh: Number(meta.fiftyTwoWeekHigh) || 0,
+      fiftyTwoWeekLow: Number(meta.fiftyTwoWeekLow) || 0,
+      currency: typeof meta.currency === "string" ? meta.currency : "USD",
+      lastUpdated: new Date(
+        (Number.isFinite(marketTime) && marketTime > 0
+          ? marketTime
+          : Date.now() / 1000) * 1000
+      ),
+    };
+  }
+
+  /**
    * Parse quote response
    */
   private parseQuoteResponse(quote: any): SymbolData {
@@ -1446,6 +1550,7 @@ export class YahooFinanceService {
         0,
       fiftyTwoWeekHigh: quote.fiftyTwoWeekHigh || 0,
       fiftyTwoWeekLow: quote.fiftyTwoWeekLow || 0,
+      currency: typeof quote.currency === "string" ? quote.currency : "USD",
       lastUpdated: new Date(quote.regularMarketTime * 1000 || Date.now()),
     };
   }

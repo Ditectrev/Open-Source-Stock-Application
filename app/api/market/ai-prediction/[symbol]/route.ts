@@ -4,6 +4,7 @@ import { aiMarketInsightsService } from "@/services/ai-market-insights.service";
 import { logger } from "@/lib/logger";
 import { getAuthenticatedUser } from "@/lib/server-auth";
 import { subscriptionService } from "@/services/subscription.service";
+import { readMarketSymbolParam } from "@/lib/market-symbol";
 import { resolveMarketRouteLLMConfig } from "@/lib/resolve-market-ai-llm-config";
 
 export async function GET(
@@ -27,7 +28,7 @@ export async function GET(
       );
     }
 
-    const { symbol } = await params;
+    const symbol = await readMarketSymbolParam(params);
 
     if (!symbol) {
       return NextResponse.json(
@@ -113,7 +114,7 @@ export async function POST(
       );
     }
 
-    const { symbol } = await params;
+    const symbol = await readMarketSymbolParam(params);
     if (!symbol) {
       return NextResponse.json(
         { success: false, error: "Symbol parameter is required" },

@@ -66,6 +66,8 @@ export interface SymbolData {
   fiftyTwoWeekHigh: number;
   fiftyTwoWeekLow: number;
   lastUpdated: Date;
+  /** Listing currency (ISO 4217, or a minor-unit code such as GBp). */
+  currency?: string;
 }
 
 export interface PriceData {
