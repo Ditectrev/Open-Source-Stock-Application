@@ -263,7 +263,7 @@ describe("TrialBanner", () => {
 
   // --- onAuthenticated callback ---
 
-  it("should show disabled Apple sign-in with availability note", async () => {
+  it("should show Apple sign-in button", async () => {
     mockGetTrialStatus.mockReturnValue({
       isActive: true,
       remainingSeconds: 600,
@@ -272,8 +272,8 @@ describe("TrialBanner", () => {
 
     await renderBanner();
     fireEvent.click(screen.getByTestId("trial-sign-in-btn"));
-    expect(screen.getByTestId("auth-apple-disabled")).toBeDefined();
-    expect(screen.queryByTestId("auth-apple")).toBeNull();
+    expect(screen.getByTestId("auth-apple")).toBeDefined();
+    expect(screen.queryByTestId("auth-apple-disabled")).toBeNull();
   });
 
   it("should show Google sign-in button", async () => {

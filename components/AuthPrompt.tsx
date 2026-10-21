@@ -4,6 +4,7 @@
  * AuthPrompt Component
  * Modal dialog for user authentication with Apple SSO, Google SSO, and Email OTP.
  * Google OAuth starts at /api/auth/oauth/google; Appwrite returns to /auth/callback/google.
+ * Apple OAuth starts at /api/auth/oauth/apple; Appwrite returns to /auth/callback/apple.
  * Rendered via portal to document.body with high z-index so nothing covers the modal.
  * Requirements: 1.6, 21.13
  */
@@ -64,6 +65,7 @@ export function AuthPrompt({
   open,
   onClose,
   dismissible = true,
+  onAppleSignIn,
   onGoogleSignIn,
   onEmailSubmit,
   onEmailVerify,
@@ -282,25 +284,24 @@ export function AuthPrompt({
               Continue with Google
             </a>
 
-            <div className="space-y-1">
-              <button
-                type="button"
-                disabled
-                className={`${oauthLinkClass} cursor-not-allowed bg-stone-200 text-stone-500 opacity-60 dark:bg-stone-800 dark:text-stone-400`}
-                data-testid="auth-apple-disabled"
-                aria-describedby="auth-apple-unavailable-note"
-              >
-                <AppleIcon />
-                Continue with Apple
-              </button>
-              <p
-                id="auth-apple-unavailable-note"
-                className={`text-xs ${HOME_SUBTLE_TEXT}`}
-                data-testid="auth-apple-unavailable-note"
-              >
-                Apple Sign-In is not available yet. Use Google or email below.
-              </p>
-            </div>
+            <a
+              href="/api/auth/oauth/apple"
+              className={`${oauthLinkClass} ${
+                loading ? "pointer-events-none opacity-50" : ""
+              }`}
+              data-testid="auth-apple"
+              aria-disabled={loading}
+              onClick={(e) => {
+                if (loading) {
+                  e.preventDefault();
+                  return;
+                }
+                onAppleSignIn?.();
+              }}
+            >
+              <AppleIcon />
+              Continue with Apple
+            </a>
 
             {/* Divider */}
             <div className="flex items-center gap-3">

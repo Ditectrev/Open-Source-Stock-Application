@@ -176,6 +176,23 @@ Required on Vercel when subscribers use the **Hosted AI** plan. Synced from GitH
 
 See `.env.example` for the full list.
 
+### Appwrite OAuth (Google and Apple)
+
+Sign-in uses Appwrite OAuth2. Google and Apple both start at `/api/auth/oauth/{provider}` and return to `/auth/callback/{provider}` on this app. Apple credentials live in the Appwrite console (not in this repo's env files).
+
+1. In **Appwrite Console → Auth → Settings → OAuth2 Providers**, enable **Apple**.
+2. In [Apple Developer](https://developer.apple.com/account):
+   - Register an **App ID** with **Sign in with Apple** enabled.
+   - Register a **Services ID** for the web app. Enable Sign in with Apple, select that App ID, and add the production domain (`theopenstock.com`) plus the Return URL Appwrite shows in the Apple provider modal.
+   - Create a **Key** with Sign in with Apple, download the `.p8` file (once), and note the **Key ID** and **Team ID**.
+3. Paste **Services ID**, **Key ID**, **Team ID**, and the `.p8` file contents into Appwrite's Apple provider. Save and copy Appwrite's redirect URI back into the Services ID Return URLs if you used a placeholder.
+4. Under **Auth → Platforms**, add Web platforms for `theopenstock.com` and `www.theopenstock.com` (wildcard `*.theopenstock.com` does not cover the apex).
+5. Success/failure URL used by this app: `https://theopenstock.com/auth/callback/apple`.
+
+Apple Sign-In does not work on `localhost` or HTTP. Use Google or email locally; test Apple on the deployed HTTPS domain.
+
+See [Appwrite's Apple OAuth guide](https://appwrite.io/docs/products/auth/oauth2).
+
 ### Appwrite AI keys database setup
 
 ```bash
