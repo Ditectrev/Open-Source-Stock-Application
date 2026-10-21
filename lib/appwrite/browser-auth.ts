@@ -5,8 +5,10 @@
 
 import { ID, OAuthProvider } from "appwrite";
 import {
+  getAppleOAuthCallbackUrl,
   getBrowserOAuthRedirectOrigin,
   getGoogleOAuthCallbackUrl,
+  isAppleOAuthHostAllowed,
 } from "@/lib/auth/oauth-redirect-origin";
 import { AUTH_UI_COPY } from "@/lib/auth-ui-copy";
 import { getBrowserAccount } from "./browser-config";
@@ -50,26 +52,9 @@ export function startGoogleOAuth():
 
 /**
  * Redirects the browser to Apple OAuth. Apple does not support localhost redirects.
- * Callback: /api/auth/callback/apple
+ * Callback: /auth/callback/apple
  */
 export function startAppleOAuth(): { ok: true } | { ok: false; error: string } {
-  if (typeof window !== "undefined") {
-    const { hostname, protocol } = window.location;
-    const isLocalDev =
-      hostname === "localhost" ||
-      hostname === "127.0.0.1" ||
-      hostname.startsWith("192.168.") ||
-      hostname.startsWith("10.") ||
-      protocol === "http:";
-    if (isLocalDev) {
-      return {
-        ok: false,
-        error:
-          "Apple Sign-In needs HTTPS and a registered domain. Use Google or email on localhost, or test Apple after deployment.",
-      };
-    }
-  }
-
   const account = getBrowserAccount();
   if (!account) {
     return missingConfigError();
@@ -77,12 +62,27 @@ export function startAppleOAuth(): { ok: true } | { ok: false; error: string } {
   if (typeof window === "undefined") {
     return { ok: false, error: "OAuth must run in the browser." };
   }
-  const origin = window.location.origin;
-  account.createOAuth2Session({
-    provider: OAuthProvider.Apple,
-    success: `${origin}/api/auth/callback/apple`,
-    failure: `${origin}/?auth_error=apple_oauth_failed`,
-  });
+  if (
+    !isAppleOAuthHostAllowed(window.location.hostname, window.location.protocol)
+  ) {
+    return {
+      ok: false,
+      error:
+        "Apple Sign-In needs HTTPS and a registered domain. Use Google or email on localhost, or test Apple after deployment.",
+    };
+  }
+  const origin = getBrowserOAuthRedirectOrigin();
+  if (!origin) {
+    return { ok: false, error: "OAuth must run in the browser." };
+  }
+  const callback = getAppleOAuthCallbackUrl(origin);
+  try {
+    account.createOAuth2Session(OAuthProvider.Apple, callback, callback);
+  } catch (err: unknown) {
+    const message =
+      err instanceof Error ? err.message : AUTH_UI_COPY.appleSignInFailed;
+    return { ok: false, error: message };
+  }
   return { ok: true };
 }
 

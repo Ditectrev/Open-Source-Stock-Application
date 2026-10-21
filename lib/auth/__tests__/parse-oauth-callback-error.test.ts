@@ -19,4 +19,18 @@ describe("appwriteOAuthErrorToAuthCode", () => {
       "google_oauth_failed"
     );
   });
+
+  it("maps Apple provider errors without Google-specific codes", () => {
+    expect(appwriteOAuthErrorToAuthCode("cancelled", "apple")).toBe(
+      "apple_oauth_failed"
+    );
+    const raw = JSON.stringify({
+      message: "invalid_client",
+      type: "user_oauth2_bad_request",
+      code: 400,
+    });
+    expect(appwriteOAuthErrorToAuthCode(raw, "apple")).toBe(
+      "apple_oauth_bad_request"
+    );
+  });
 });

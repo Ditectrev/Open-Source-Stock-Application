@@ -41,14 +41,17 @@ describe("AuthPrompt", () => {
 
   // --- Provider rendering ---
 
-  it("should show Google sign-in and note that Apple is unavailable", () => {
+  it("should show Google and Apple sign-in links", () => {
     renderAuthPrompt();
 
     expect(screen.getByTestId("auth-google").getAttribute("href")).toBe(
       "/api/auth/oauth/google"
     );
-    expect(screen.getByTestId("auth-apple-disabled")).toBeDefined();
-    expect(screen.getByTestId("auth-apple-unavailable-note")).toBeDefined();
+    expect(screen.getByTestId("auth-apple").getAttribute("href")).toBe(
+      "/api/auth/oauth/apple"
+    );
+    expect(screen.queryByTestId("auth-apple-disabled")).toBeNull();
+    expect(screen.queryByTestId("auth-apple-unavailable-note")).toBeNull();
     expect(screen.queryByTestId("auth-sso-disabled-note")).toBeNull();
   });
 

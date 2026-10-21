@@ -1,5 +1,5 @@
 /**
- * Completes Google OAuth after the browser callback page receives userId + secret.
+ * Completes Google/Apple OAuth after the browser callback page receives userId + secret.
  */
 
 import { NextRequest, NextResponse } from "next/server";

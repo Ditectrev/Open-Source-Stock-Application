@@ -3,7 +3,13 @@ import { getConfiguredSiteOrigin } from "@/lib/auth/oauth-redirect-origin";
 
 const AUTH_ERROR_MESSAGES: Record<string, string> = {
   apple_sign_in_unavailable:
-    "Apple Sign-In is not available yet. Use Google or email sign-in.",
+    "Apple Sign-In needs HTTPS and a registered domain. Use Google or email on localhost, or try Apple on the deployed site.",
+  apple_https_required:
+    "Apple Sign-In needs HTTPS and a registered domain. Use Google or email on localhost, or test Apple after deployment.",
+  apple_oauth_failed:
+    "Apple sign-in was cancelled or didn't complete. Try again.",
+  apple_oauth_bad_request:
+    "Apple sign-in failed in Appwrite. Check Auth → Settings → Apple (Services ID, Key ID, Team ID, and .p8 key) and try again.",
   google_oauth_failed:
     "Google sign-in was cancelled or didn't complete. Try again.",
   google_client_secret_missing:
@@ -13,16 +19,16 @@ const AUTH_ERROR_MESSAGES: Record<string, string> = {
   google_oauth_bad_request:
     "Google sign-in failed in Appwrite. Check Auth → Google provider settings and try again.",
   oauth_redirect_not_whitelisted:
-    "Sign-in failed: this site hostname is not registered in Appwrite. In Appwrite Console → your project → Auth → Platforms, add a Web platform whose hostname matches this site exactly (e.g. theopenstock.com, not localhost). Also add www.theopenstock.com if you use www. Then try Google sign-in again.",
+    "Sign-in failed: this site hostname is not registered in Appwrite. In Appwrite Console → your project → Auth → Platforms, add a Web platform whose hostname matches this site exactly (e.g. theopenstock.com, not localhost). Also add www.theopenstock.com if you use www. Then try sign-in again.",
   appwrite_not_configured:
     "Sign-in is not configured on this server. Try email sign-in or contact support.",
-  oauth_start_failed: "We couldn't start Google sign-in. Try again.",
+  oauth_start_failed: "We couldn't start sign-in. Try again.",
   sso_temporarily_disabled:
     "Social sign-in is temporarily unavailable. Use email sign-in.",
   missing_credentials:
-    "Sign-in did not complete (no session from Google). Try again or use email sign-in.",
+    "Sign-in did not complete (no session from the provider). Try again or use email sign-in.",
   oauth_session_failed:
-    "Could not create your session after Google sign-in. Try again.",
+    "Could not create your session after sign-in. Try again.",
   server_error: "Sign-in failed due to a server error. Try again.",
 };
 
@@ -59,7 +65,8 @@ export function describeAuthQueryError(
       return (
         `Sign-in failed: add a Web platform in Appwrite with hostname "localhost" ` +
         `(Auth → Platforms → Add platform).${projectNote} ` +
-        `OAuth callback: http://localhost:3000/auth/callback/google (use your dev port if different). ` +
+        `OAuth callbacks: http://localhost:3000/auth/callback/google (use your dev port if different). ` +
+        `Apple Sign-In cannot use localhost — test it on the deployed HTTPS site. ` +
         `Do not rely on *.theopenstock.com for local dev.`
       );
     }
@@ -67,7 +74,7 @@ export function describeAuthQueryError(
       `Sign-in failed: Appwrite must allow hostname "${hostname}". ` +
       `Wildcard platforms like *.${hostname} do not include the apex domain—add a separate Web platform with hostname "${hostname}" ` +
       `(not only *.${hostname}).${projectNote} ` +
-      `OAuth callback: https://${hostname}/auth/callback/google.`
+      `OAuth callbacks: https://${hostname}/auth/callback/google and https://${hostname}/auth/callback/apple.`
     );
   }
   const known = AUTH_ERROR_MESSAGES[code];

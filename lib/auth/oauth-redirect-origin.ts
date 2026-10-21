@@ -1,5 +1,7 @@
 import type { NextRequest } from "next/server";
 
+export type BrowserOAuthProvider = "google" | "apple";
+
 /** True for local dev hosts — OAuth must use the live origin, not NEXT_PUBLIC_SITE_URL. */
 export function isLocalDevHostname(hostname: string): boolean {
   return (
@@ -8,6 +10,22 @@ export function isLocalDevHostname(hostname: string): boolean {
     hostname === "[::1]" ||
     hostname.endsWith(".localhost")
   );
+}
+
+/**
+ * Apple Sign-In requires HTTPS on a public hostname (no localhost / private LAN / HTTP).
+ * Same constraint as Practice-Tests-Exams-Platform lib/appwrite/auth.ts.
+ */
+export function isAppleOAuthHostAllowed(
+  hostname: string,
+  protocol: string
+): boolean {
+  const host = hostname.toLowerCase().replace(/^\[|\]$/g, "");
+  if (isLocalDevHostname(host)) return false;
+  if (host.startsWith("192.168.") || host.startsWith("10.")) return false;
+  if (/^172\.(1[6-9]|2\d|3[0-1])\./.test(host)) return false;
+  const scheme = protocol.endsWith(":") ? protocol : `${protocol}:`;
+  return scheme === "https:";
 }
 
 /** Canonical site origin from NEXT_PUBLIC_SITE_URL, if set at build time. */
@@ -40,22 +58,44 @@ export function getOAuthRedirectOrigin(request: NextRequest): string {
 }
 
 /** OAuth return URL — client page reads query/hash and completes session on the server. */
-export function getGoogleOAuthCallbackUrl(origin: string): string {
-  return `${origin}/auth/callback/google`;
+export function getOAuthCallbackUrl(
+  origin: string,
+  provider: BrowserOAuthProvider
+): string {
+  return `${origin}/auth/callback/${provider}`;
 }
 
-export function getGoogleOAuthRedirectUrls(request: NextRequest): {
+export function getOAuthRedirectUrls(
+  request: NextRequest,
+  provider: BrowserOAuthProvider
+): {
   origin: string;
   success: string;
   failure: string;
 } {
   const origin = getOAuthRedirectOrigin(request);
-  const callback = getGoogleOAuthCallbackUrl(origin);
+  const callback = getOAuthCallbackUrl(origin, provider);
   return {
     origin,
     success: callback,
     failure: callback,
   };
+}
+
+export function getGoogleOAuthCallbackUrl(origin: string): string {
+  return getOAuthCallbackUrl(origin, "google");
+}
+
+export function getGoogleOAuthRedirectUrls(request: NextRequest) {
+  return getOAuthRedirectUrls(request, "google");
+}
+
+export function getAppleOAuthCallbackUrl(origin: string): string {
+  return getOAuthCallbackUrl(origin, "apple");
+}
+
+export function getAppleOAuthRedirectUrls(request: NextRequest) {
+  return getOAuthRedirectUrls(request, "apple");
 }
 
 /** Browser OAuth: on localhost use the page origin; in prod prefer NEXT_PUBLIC_SITE_URL. */
